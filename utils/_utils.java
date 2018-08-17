@@ -1,0 +1,230 @@
+package utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.util.NDArrayUtil;
+import weka.classifiers.trees.ht.HNode;
+import weka.classifiers.trees.ht.SplitNode;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.WekaException;
+import weka.filters.unsupervised.attribute.NumericToNominal;
+
+public class _utils {
+
+
+	public static int[] getLabels(Instances data) {
+		int[] list = new int[data.size()];
+		data.setClassIndex(data.numAttributes() - 1);
+		for (int i = 0; i < data.size(); i++) {
+			list[i] = (int) data.get(i).classValue();
+		}
+		return list;
+	}
+	
+	public static INDArray convertActivtionOutput(INDArray arg0 , double [][] prediction) throws Exception {
+		INDArray arr = Nd4j.zeros(prediction.length, prediction[0].length);
+		arr   = Nd4j.create(prediction);
+		//		arr = arr.transpose();
+		INDArray dataset = Nd4j.concat(1, arg0, arr );
+		Instances instances = weka.classifiers.functions.dl4j.Utils.ndArrayToInstances(dataset);
+		instances.setClassIndex( instances.numAttributes() - 1);
+
+
+		NumericToNominal convert= new NumericToNominal();
+		String [] options= new String[2];
+		options[0]="-R";
+		options[1]="" + (instances.classIndex() + 1);  //range of variables to make numeric
+		convert.setOptions(options);
+		convert.setInputFormat(instances);
+		instances = weka.filters.Filter.useFilter(instances, convert);
+
+		DataSet lables = weka.classifiers.functions.dl4j.Utils.instancesToDataSet(instances);
+		return lables.getLabels();
+	}
+
+
+
+	public static int getSplittingFeature(HNode node) throws Exception {
+
+		int attribute = -1;
+		//			 so the node is SpliteNode
+		String att = ((SplitNode) node).getSplitAtt();
+		int attNumeric = Integer.parseInt("" + att.charAt(att.length() - 1));
+		attribute = attNumeric;
+
+		if (attribute ==  -1) {
+			throw new Exception(" cannot get split attribute of leaf node");
+		}
+		
+		return attribute;
+
+	}
+
+	public static Set<ArrayList<String>> XOR ( Set<ArrayList<String>> S , HashMap<Integer, ArrayList<Integer>> sigma_xk  ){
+		HashSet <ArrayList<String>> result = new HashSet<>(); 
+		for (ArrayList<String> partition : S) {
+			for (Integer key  : sigma_xk.keySet()) {
+
+				for( int i =0 ; i < sigma_xk.get(key).size() ; i++    ) {
+					
+					ArrayList<String> temp = crossUnion( (ArrayList<String>) partition.clone(), key, sigma_xk.get(key).get(i));
+					result.add(temp);
+				}
+
+			}
+		}
+		return result;
+	}
+
+	public static 	HashMap<Integer, ArrayList<Integer>>   delta(int xk) {
+
+		HashMap<Integer,  ArrayList<Integer>> result = new HashMap<>();
+
+		for (int i = 1; i < Constants.attCardinality.get(xk); i++) {
+			if ( !result.containsKey(xk)) {
+				ArrayList<Integer>t = new ArrayList<>();
+				t.add(i);
+				result.put(xk, t);
+			} else {
+				ArrayList<Integer>t = result.get(xk);
+				t.add(i);
+				result.put(xk, t);
+			}
+
+		}
+
+		return result;
+
+	}
+
+	public static ArrayList<String> crossUnion(ArrayList<String> h, int attribute , int value ){
+		h.set(attribute, value + "");
+
+		return h;
+
+	}
+
+	public static int getNodeSize(HNode node) {
+		return -1;
+	}
+
+	public static int getSpace(ArrayList<String> nodeSchema) {
+		int size = 1;
+		for (int i = 0; i < nodeSchema.size(); i++) {
+			if (nodeSchema.get(i).compareTo("*") == 0 ) {
+				size *= Constants.attCardinality.get(i);
+			}				
+		}
+		return size;
+	}
+
+	public static double getCompleteInstanceSpace() {
+		if ( Constants.completeInstanceSpace == 0) {
+			Constants.completeInstanceSpace = 1;
+			for (int i = 0; i < Constants.attCardinality.size(); i++) {
+				if ( Constants.attCardinality.get(i) != 0)
+					Constants.completeInstanceSpace *= Constants.attCardinality.get(i);
+			}
+		}
+
+		return Constants.completeInstanceSpace;
+
+	}
+	public static void setAttCardinality(ArrayList<Double>[] cutpoints) {
+		for( int i = 0 ; i < cutpoints.length ; i++) {
+			if ( cutpoints[i] != null   ) {
+				if ( i >= Constants.attCardinality.size() )
+					Constants.attCardinality.add(0);
+				Constants.attCardinality.set(i, cutpoints[i].size() + 1);
+			}
+			else 
+				if (i >= Constants.attCardinality.size())
+					Constants.attCardinality.add(0);
+			//			else
+			//				Constants.attCardinality.add(0);
+			//				
+
+		}
+
+
+	}
+	
+	  public static DataSet instancesToDataSet(Instances insts) {
+		    INDArray data = Nd4j.zeros(insts.numInstances(), insts.numAttributes() - 1);
+		    INDArray outcomes = Nd4j.zeros(insts.numInstances(), insts.numClasses());
+
+		    for (int i = 0; i < insts.numInstances(); i++) {
+		      double[] independent = new double[insts.numAttributes() - 1];
+		      double[] dependent = new double[insts.numClasses()];
+		      Instance current = insts.instance(i);
+		      for (int j = 0; j < current.numValues(); j++) {
+		        int index = current.index(j);
+		        double value = current.valueSparse(j);
+
+		        if (index < insts.classIndex()) {
+		          independent[index] = value;
+		        } else if (index > insts.classIndex()) {
+		          // Shift by -1, since the class is left out from the feature matrix and put into a separate
+		          // outcomes matrix
+		          independent[index - 1] = value;
+		        }
+		      }
+
+		      // Set class values
+		      if (insts.numClasses() > 1) { // Classification
+		        final int oneHotIdx = (int) current.classValue();
+		        dependent[oneHotIdx] = 1.0;
+		      } else { // Regression (currently only single class)
+		        dependent[0] = current.classValue();
+		      }
+
+		      INDArray row = Nd4j.create(independent);
+		      data.putRow(i, row);
+		      outcomes.putRow(i, Nd4j.create(dependent));
+		    }
+		    return new DataSet(data, outcomes);
+		  }
+	  
+	  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
+		    long batchsize = (int) ndArray.size(0);
+		    long[] shape = ndArray.shape();
+		    int dims = shape.length;
+		    if (dims < 2){
+		      throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
+		          + "but was " + Arrays.toString(shape));
+		    }
+
+		    long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
+		    prod = prod/ batchsize;
+
+		    ArrayList<Attribute> atts = new ArrayList<>();
+		    for (int i = 0; i < prod; i++) {
+		      atts.add(new Attribute("transformedAttribute" + i));
+		    }
+		    Instances instances = new Instances("Transformed", atts, (int) batchsize);
+		    for (int i = 0; i < batchsize; i++) {
+		      INDArray row = ndArray.getRow(i);
+		      INDArray flattenedRow = Nd4j.toFlattened(row);
+		      Instance inst = new DenseInstance(atts.size());
+		      for (int j = 0; j < flattenedRow.size(1); j++) {
+		        inst.setValue(j, flattenedRow.getDouble(j));
+		      }
+		      inst.setDataset(instances);
+		      instances.add(inst);
+		    }
+
+		    return instances;
+		  }
+}
