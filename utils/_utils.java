@@ -12,6 +12,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.util.NDArrayUtil;
+
+import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
 import weka.classifiers.trees.ht.SplitNode;
 import weka.core.Attribute;
@@ -88,11 +90,11 @@ public class _utils {
 		return result;
 	}
 
-	public static 	HashMap<Integer, ArrayList<Integer>>   delta(int xk) {
+	public static 	HashMap<Integer, ArrayList<Integer>>   delta(int xk,ActivationFunction activation ) {
 
 		HashMap<Integer,  ArrayList<Integer>> result = new HashMap<>();
 
-		for (int i = 1; i < Constants.attCardinality.get(xk); i++) {
+		for (int i = 1; i < activation.attCardinality.get(xk); i++) {
 			if ( !result.containsKey(xk)) {
 				ArrayList<Integer>t = new ArrayList<>();
 				t.add(i);
@@ -120,38 +122,38 @@ public class _utils {
 		return -1;
 	}
 
-	public static int getSpace(ArrayList<String> nodeSchema) {
+	public static int getSpace(ArrayList<String> nodeSchema, ActivationFunction activation) {
 		int size = 1;
 		for (int i = 0; i < nodeSchema.size(); i++) {
 			if (nodeSchema.get(i).compareTo("*") == 0 ) {
-				size *= Constants.attCardinality.get(i);
+				size *= activation.attCardinality.get(i);
 			}				
 		}
 		return size;
 	}
 
-	public static double getCompleteInstanceSpace() {
-		if ( Constants.completeInstanceSpace == 0) {
-			Constants.completeInstanceSpace = 1;
-			for (int i = 0; i < Constants.attCardinality.size(); i++) {
-				if ( Constants.attCardinality.get(i) != 0)
-					Constants.completeInstanceSpace *= Constants.attCardinality.get(i);
+	public static double getCompleteInstanceSpace(ActivationFunction activation) {
+		if ( activation.completeInstanceSpace == 0) {
+			activation.completeInstanceSpace = 1;
+			for (int i = 0; i < activation.attCardinality.size(); i++) {
+				if ( activation.attCardinality.get(i) != 0)
+					activation.completeInstanceSpace *= activation.attCardinality.get(i);
 			}
 		}
 
-		return Constants.completeInstanceSpace;
+		return activation.completeInstanceSpace;
 
 	}
-	public static void setAttCardinality(ArrayList<Double>[] cutpoints) {
+	public static void setAttCardinality(ArrayList<Double>[] cutpoints, ActivationFunction activation) {
 		for( int i = 0 ; i < cutpoints.length ; i++) {
 			if ( cutpoints[i] != null   ) {
-				if ( i >= Constants.attCardinality.size() )
-					Constants.attCardinality.add(0);
-				Constants.attCardinality.set(i, cutpoints[i].size() + 1);
+				if ( i >= activation.attCardinality.size() )
+					activation.attCardinality.add(0);
+				activation.attCardinality.set(i, cutpoints[i].size() + 1);
 			}
 			else 
-				if (i >= Constants.attCardinality.size())
-					Constants.attCardinality.add(0);
+				if (i >= activation.attCardinality.size())
+					activation.attCardinality.add(0);
 			//			else
 			//				Constants.attCardinality.add(0);
 			//				

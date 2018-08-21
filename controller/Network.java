@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import neuralnetwork.ActivationFunction;
 import neuralnetwork.CustomLayer;
 import tree.DecisionTree;
+import utils.Constants;
 import utils._utils;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
@@ -140,7 +141,7 @@ public class Network {
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(3).nOut(outputNum).build())
-				.backprop(false).pretrain(false).build();
+				.backprop(true).pretrain(false).build();
 
 		// run the model
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -149,8 +150,10 @@ public class Network {
 		model.setListeners(new ScoreIterationListener(100));
 		DecisionTree tree = new DecisionTree(0, test);
 	
+		Constants.test = test;
+		Constants.train = training;
 	
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 10000; i++) {
 			model.fit(trainingData);
 		}
 		

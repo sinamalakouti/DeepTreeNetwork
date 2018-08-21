@@ -13,6 +13,9 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import utils.Constants;
+import weka.core.Instances;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,7 +26,7 @@ import java.util.Map;
 public class CustomLayer extends FeedForwardLayer {
     private boolean hasBias = true;
 
-    private CustomLayer(Builder builder) {
+    private CustomLayer(Builder builder ) {
         super(builder);
         this.hasBias = builder.hasBias;
 
@@ -35,7 +38,7 @@ public class CustomLayer extends FeedForwardLayer {
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
 
-        TreeLayer ret = new TreeLayer(conf);
+        TreeLayer ret = new TreeLayer(conf, Constants.train, Constants.test);
                       
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);
@@ -91,6 +94,7 @@ public class CustomLayer extends FeedForwardLayer {
 
         private boolean hasBias = true;
 
+        
         /**
          * If true (default): include bias parameters in the model. False: no bias.
          *

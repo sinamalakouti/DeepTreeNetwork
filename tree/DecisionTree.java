@@ -2,6 +2,7 @@ package tree;
 
 import java.awt.BorderLayout;
 
+import neuralnetwork.ActivationFunction;
 import utils.Constants;
 import utils.FourierUtils;
 import utils._utils;
@@ -57,11 +58,13 @@ public class DecisionTree extends HoeffdingTree {
 	}
 
 	
-	public void updateClassifier(Instances arg0) throws Exception {
-		if (m_root.isLeaf() == false) {
+	public void updateClassifier(Instances arg0 , ActivationFunction activation) throws Exception {
+//		if (m_root.isLeaf() == false) {
 			
-			_utils.setAttCardinality(cutpoints);
-			if ( Constants.attCardinality.size() == 3 &&! Constants.attCardinality.contains(0) ) {
+			_utils.setAttCardinality(cutpoints, activation);
+//			if ( activation.attCardinality.size() == 2 &&! activation.attCardinality.contains(0) ) {
+				FourierUtils.setFourierSeriesWeights(m_root, activation);
+
 //				final javax.swing.JFrame jf = 
 //					       new javax.swing.JFrame("Weka Classifier Tree Visualizer: J48");
 //					     jf.setSize(500,400);
@@ -78,11 +81,10 @@ public class DecisionTree extends HoeffdingTree {
 //
 //					     jf.setVisible(true);
 //					     tv.fitToScreen();
-			FourierUtils.setFourierSeriesWeights(m_root);
 			
-			}
+//			}
 
-		}
+//		}
 		if( this.depth < 2)
 		{
 			for ( int i =0 ; i < arg0.size() ;  i ++) {

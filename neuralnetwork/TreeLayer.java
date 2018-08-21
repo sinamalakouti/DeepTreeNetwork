@@ -36,6 +36,9 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 
+import utils.Constants;
+import weka.core.Instances;
+
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -53,15 +56,19 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
     protected ConvexOptimizer optimizer;
     protected Gradient gradient;
     protected Solver solver;
+    
+   
+    protected HashMap<Integer, ActivationFunction> activationModels = new HashMap<>();
 
     protected Map<String,INDArray> weightNoiseParams = new HashMap<>();
 
-    public TreeLayer(NeuralNetConfiguration conf) {
+    public TreeLayer(NeuralNetConfiguration conf, Instances train, Instances test) {
         super(conf);
+      
     }
 
-    public TreeLayer(NeuralNetConfiguration conf, INDArray input) {
-        this(conf);
+    public TreeLayer(NeuralNetConfiguration conf, INDArray input, Instances train, Instances test) {
+        this(conf, train, test);
         this.input = input;
     }
 
@@ -77,8 +84,50 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         //INDArray activationDerivative = Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(), z).derivative());
         //        INDArray activationDerivative = conf().getLayer().getActivationFn().getGradient(z);
         //        INDArray delta = epsilon.muli(activationDerivative);
-        INDArray delta = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
+        
+//    original is 
+//        INDArray delta = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
+        
+// TODO : config the backpropagation please :)) 
+        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
+        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, true, workspaceMgr);
+        z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+        
+        b = Nd4j.zeros(W.size(0));
 
+        INDArray delta = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+
+        for( int neuron = 0 ; neuron < activationModels.size() ; neuron ++  ) {
+        	
+        	INDArray weight = W.getColumn(neuron);
+            
+        	INDArray tmp = input.mulRowVector(weight.transpose());
+             z.assign(input.mulRowVector(weight.transpose()));
+    
+    		z.assign(input.mulRowVector(weight.transpose())); 
+    	
+    	 if(hasBias()){
+             z.addiRowVector(b);
+         }
+
+         if (maskArray != null) {
+             applyMask(z);
+         }
+         
+         if( neuron == 0) {
+         	 delta = activationModels.get(neuron).getActivation(z, true);
+          }else {
+         	 
+         	 delta = activationModels.get(neuron).getActivation(z, true).add(delta);
+         	 
+          }
+        	
+         
+         
+        }
+        
+        
+        
         if (maskArray != null) {
             applyMask(delta);
         }
@@ -96,7 +145,7 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
             ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
         }
 
-        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
+         W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
 
         INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD, new long[]{W.size(0), delta.size(0)}, 'f');
         epsilonNext = W.mmuli(delta.transpose(),epsilonNext).transpose();   //W.mmul(delta.transpose()).transpose();
@@ -287,6 +336,8 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         applyDropOutIfNecessary(training, workspaceMgr);
         INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
         INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
+        System.out.println(b);
+
         b = Nd4j.zeros(W.size(0));
         //Input validation:
         if (input.rank() != 2 || input.columns() != W.rows()) {
@@ -308,6 +359,9 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
         for(int neuron  = 0 ; neuron < W.columns() ; neuron ++ ) {
         	
+        	if ( ! activationModels.containsKey(neuron))
+        		activationModels.put(neuron, new ActivationFunction(Constants.train, Constants.test , false));
+        	
         	INDArray weight = W.getColumn(neuron);
         
                 z.assign(input.mulRowVector(weight.transpose()));
@@ -323,11 +377,13 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
                  applyMask(z);
              }
              if( neuron == 0) {
-              ret = layerConf().getActivationFn().getActivation(z, training);
+//              ret = layerConf().getActivationFn().getActivation(z, training);
+            	 ret = activationModels.get(neuron).getActivation(z, training);
              }else {
             	 
+            	 ret = activationModels.get(neuron).getActivation(z, training).add(ret);
             	 
-            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
+//            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
              }
 
 
@@ -447,7 +503,9 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
      */
     public boolean hasBias(){
         //Overridden by layers supporting no bias mode: dense, output, convolutional, embedding
-        return true;
+//        return true;
+//        todo : check that it should be true or false
+        return false;
     }
     
     @Override
