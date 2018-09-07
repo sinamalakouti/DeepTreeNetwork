@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import neuralnetwork.ActivationFunction;
+import neuralnetwork.BayesTreeActivationFunction;
 import neuralnetwork.CustomLayer;
 import tree.DecisionTree;
 import utils.Constants;
@@ -125,16 +126,17 @@ public class Network {
 //						new DenseLayer.Builder().nIn(4).nOut(3)
 //						.activation(new ActivationFunction(training, test, false))
 				.layer(0,
-						new DenseLayer.Builder().nIn(4).nOut(2)
-						.activation(Activation.SIGMOID)
-//						.activation(new ActivationFunction(training, test, false))
+						new CustomLayer.Builder().nIn(4).nOut(3)
+//						.activation(Activation.SIGMOID)
+						.activation(new BayesTreeActivationFunction(training, test, false))
 //				.layer(0,
 //						new ElementWiseMultiplicationLayer.Builder().nIn(4).nOut(4)
 //						.activation(new ActivationFunction(training, test, false))
 
 						.build())
-				.layer(1, new CustomLayer.Builder().nIn(2).nOut(3)
-						.activation(new ActivationFunction(training, test, false))
+				.layer(1, 	
+						new CustomLayer.Builder().nIn(3).nOut(3)
+						.activation(new BayesTreeActivationFunction(training, test, false))
 						.build())
 				//         todo : we should obviously change this one
 
@@ -153,7 +155,7 @@ public class Network {
 		Constants.test = test;
 		Constants.train = training;
 	
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 300; i++) {
 			model.fit(trainingData);
 		}
 		

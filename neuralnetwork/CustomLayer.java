@@ -38,7 +38,7 @@ public class CustomLayer extends FeedForwardLayer {
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
 
-        TreeLayer ret = new TreeLayer(conf, Constants.train, Constants.test);
+        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test);
                       
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);

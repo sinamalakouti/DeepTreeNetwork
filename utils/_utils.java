@@ -2,17 +2,20 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.math3.util.MathArrays;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.util.NDArrayUtil;
 
+import akka.util.Collections;
+import javafx.scene.control.TreeTableRow;
 import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
 import weka.classifiers.trees.ht.SplitNode;
@@ -81,6 +84,7 @@ public class _utils {
 
 				for( int i =0 ; i < sigma_xk.get(key).size() ; i++    ) {
 					
+					@SuppressWarnings("unchecked")
 					ArrayList<String> temp = crossUnion( (ArrayList<String>) partition.clone(), key, sigma_xk.get(key).get(i));
 					result.add(temp);
 				}
@@ -200,6 +204,9 @@ public class _utils {
 		  }
 	  
 	  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
+		  
+//		   	NDArray nd = new  NDArray();
+//		   	nd.std(1,2);
 		    long batchsize = (int) ndArray.size(0);
 		    long[] shape = ndArray.shape();
 		    int dims = shape.length;
@@ -221,6 +228,7 @@ public class _utils {
 		      INDArray flattenedRow = Nd4j.toFlattened(row);
 		      Instance inst = new DenseInstance(atts.size());
 		      for (int j = 0; j < flattenedRow.size(1); j++) {
+		    	  
 		        inst.setValue(j, flattenedRow.getDouble(j));
 		      }
 		      inst.setDataset(instances);
@@ -229,4 +237,10 @@ public class _utils {
 
 		    return instances;
 		  }
+	  
+
+	  
+	  
+	  
+	  
 }

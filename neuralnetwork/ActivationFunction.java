@@ -190,7 +190,6 @@ public class ActivationFunction extends BaseActivationFunction  {
 				e.printStackTrace();
 			}
 			double[] percentage = null;
-			double [] answer = null;
 
 			try {
 				percentage = activationModel.distributionForInstance(instances.get(i));
