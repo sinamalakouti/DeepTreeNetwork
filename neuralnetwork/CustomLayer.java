@@ -13,6 +13,8 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import com.sun.org.apache.bcel.internal.generic.LLOAD;
+
 import utils.Constants;
 import weka.core.Instances;
 
@@ -25,20 +27,19 @@ import java.util.Map;
 
 public class CustomLayer extends FeedForwardLayer {
     private boolean hasBias = true;
-
     private CustomLayer(Builder builder ) {
         super(builder);
         this.hasBias = builder.hasBias;
 
         initializeConstraints(builder);
-    }
+    } 
 
     @Override
     public Layer instantiate(NeuralNetConfiguration conf, Collection<TrainingListener> trainingListeners,
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
-
-        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test);
+        
+        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
                       
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);

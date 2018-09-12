@@ -51,11 +51,11 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
     protected INDArray paramsFlattened;
     protected INDArray gradientsFlattened;
     protected Map<String, INDArray> params;
-    protected transient Map<String, INDArray> gradientViews;
+    protected transient Map<String, INDArray> gradientViews; 
     protected double score = 0.0;
     protected ConvexOptimizer optimizer;
     protected Gradient gradient;
-    protected Solver solver;
+    protected Solver solver; 
     
    
     protected HashMap<Integer, ActivationFunction> activationModels = new HashMap<>();
@@ -81,14 +81,7 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         assertInputSet(true);
         //If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or equivalent)
         INDArray z = preOutput(true, workspaceMgr); //Note: using preOutput(INDArray) can't be used as this does a setInput(input) and resets the 'appliedDropout' flag
-        //INDArray activationDerivative = Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(), z).derivative());
-        //        INDArray activationDerivative = conf().getLayer().getActivationFn().getGradient(z);
-        //        INDArray delta = epsilon.muli(activationDerivative);
-        
-//    original is 
-//        INDArray delta = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
-        
-// TODO : config the backpropagation please :)) 
+
         INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
         INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, true, workspaceMgr);
         z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
@@ -104,7 +97,6 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         	INDArray tmp = input.mulRowVector(weight.transpose());
              z.assign(input.mulRowVector(weight.transpose()));
     
-    		z.assign(input.mulRowVector(weight.transpose())); 
     	
     	 if(hasBias()){
              z.addiRowVector(b);

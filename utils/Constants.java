@@ -1,5 +1,9 @@
 package utils;
 
+import java.util.HashMap;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
+
 import weka.core.Instances;
 
 public class Constants {
@@ -13,4 +17,13 @@ public class Constants {
 	
 	public static Instances train;
 	public static Instances test;
+	public static INDArray trainInstancesLabel;
+	public static INDArray testInstancesLabel;
+	
+	
+	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
+	
+	
+	
+	
 }
