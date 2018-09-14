@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import org.nd4j.linalg.activations.BaseActivationFunction;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.Sigmoid;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.Pair;
 import org.nd4j.linalg.util.NDArrayUtil;
@@ -21,36 +23,59 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
 public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 	private J48 activationModel;
-
+	int layernumber = 0;
+	Boolean isOutputLayerActivation = false;
 //	public BayesTreeActivationFunction(Instances trainInstances, Instances testInstances, boolean isFirstLayer) {
 ////		testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(testInstances)).transpose();
 ////		trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(trainInstances)).transpose();
 //	}
 
+	public BayesTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation) {
+		this.layernumber = layerNUmber;
+		this.isOutputLayerActivation = isOutpuLayerActivation;
+
+	}
+
 	@Override
 	public Pair<INDArray, INDArray> backprop(INDArray in, INDArray epsilon) {
 //		TODO : check the correction of reuslt.muli(epsilon)
+		
+//		if ( isOutputLayerActivation == true)
+//        assertShape(in, epsilon);
+
 		Instances trainInstaces = createProperDataset(in, true);
 		double[] result = new double[trainInstaces.size()];
 
 		Enumeration<Instance> it = trainInstaces.enumerateInstances();
- 
-		int i = 0; 
-		while (it.hasMoreElements()) {
-			try {
-				double[] prediciton = activationModel.predicateDerivative(it.nextElement());
-				double interval = 1d / trainInstaces.numClasses();
-				double res = prediciton[0] / 1d * interval + prediciton[1];
-				if (res > 2) {
-//					System.out.println("okh okh");
-				
-//					prediciton = activationModel.predicateDerivative(is);
 
-				}
-				result[i] = res;
-				if (res > 1) {
+		int i = 0;
+		double[] labelIndexes = new double[trainInstaces.size()];
+		double maxDerivative = Double.NEGATIVE_INFINITY;
+		double minDerivative = Double.POSITIVE_INFINITY;
+		double interval = 1d / trainInstaces.numClasses();
+		double[][] outputLayerResult = null;
+		if (isOutputLayerActivation == true)
+			outputLayerResult = new double[trainInstaces.size()][trainInstaces.numClasses()];
+
+		while (it.hasMoreElements()) {
+
+			try {
+				double[] prediciton = activationModel.predicateDerivative(it.nextElement() , isOutputLayerActivation);
+				if (isOutputLayerActivation == false) {
+					labelIndexes[i] = prediciton[1];
+					double res = prediciton[0];
+					if (res > maxDerivative)
+						maxDerivative = res;
+					else if (res < minDerivative)
+						minDerivative = res;
+					result[i] = res;
+					if (res > 1) {
 //					System.out.println("probability greater than 1 ahha");
 //					System.exit(0);
+					}
+				}else {
+					
+					outputLayerResult[i] = prediciton;
 				}
 
 			} catch (Exception e) {
@@ -60,15 +85,45 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 			i++;
 		}
+		if ( isOutputLayerActivation == false ) {
+		INDArray output;
+		if (layernumber == -1) {
 
+			output = Nd4j.create(result);
+			output = output.add((-1 * minDerivative));
+			output = output.mul((1 / (maxDerivative - minDerivative)));
+			INDArray coeff = Nd4j.create(labelIndexes);
+			output = output.mul(interval).add(coeff.mul(interval));
+		} else {
+			output = Nd4j.create(result);
+			INDArray coeff = Nd4j.create(labelIndexes);
+
+			output = output.mul(interval);
+
+		}
 //		result = result.muli(epsilon);
 
-		return new Pair<>(Nd4j.create(result), null);
+		return new Pair<>(output, null);
+		}else 
+			return  new Pair<>(Nd4j.create(outputLayerResult), null) ;
+		
 	}
 
-	@Override
+	@Override 
 	public INDArray getActivation(INDArray in, boolean training) {
+
 		// in = inputData .* weights
+		double [][] temp = in.toDoubleMatrix();
+		for (int i =0 ; i< temp.length; i ++) {
+			
+			for ( int j = 0 ; j < temp[0].length ; j++)
+			{
+				if ( Double.isNaN(temp[i][j])) {
+					System.out.println("komaaaak");
+					System.exit(0);
+				}
+			}
+		}
 		Instances trainInstaces = createProperDataset(in, training);
 		activationModel = new J48();
 		double[] result = new double[trainInstaces.size()];
@@ -82,18 +137,34 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 		Iterator<Instance> it = trainInstaces.iterator();
 		int i = 0;
+		double correct = 0d;
+		double[][] outputLayerOutput = null;
+		if (this.isOutputLayerActivation == true)
+			outputLayerOutput = new double[trainInstaces.size()][trainInstaces.numClasses()];
 		while (it.hasNext()) {
 
 			double[] prediciton;
 			try {
-				prediciton = activationModel.predicate(it.next());
+				prediciton = activationModel.predicate(it.next(), isOutputLayerActivation);
+
 				double interval = 1d / trainInstaces.numClasses();
-				double res = prediciton[0] / 1d * interval + prediciton[1] * interval;
-				result[i] = res;
-				if (res > 1) {
-					System.out.println("probability greater than 1 ahha");
-					System.exit(0);
+				double res;
+
+				if (isOutputLayerActivation == false) {
+					res = prediciton[0] / 1d * interval + prediciton[1] * interval;
+					if ( res ==0)
+						res += 0.001;
+					result[i] = res;
+					if (res > 1) {
+						System.out.println("probability greater than 1 ahha");
+						System.exit(0);
+					}
+				} else {
+
+					outputLayerOutput[i] = prediciton;
 				}
+				if (prediciton[1] == trainInstaces.get(i).classValue())
+					correct++;
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -103,7 +174,15 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 		}
 
+//		System.out.println("layer number is:\t" +);
 
+		if (layernumber == 2) {
+			System.out.println(correct);
+			System.out.println(correct / trainInstaces.size());
+		}
+
+		if (isOutputLayerActivation == true)
+			return Nd4j.create(outputLayerOutput);
 		return Nd4j.create(result);
 	}
 

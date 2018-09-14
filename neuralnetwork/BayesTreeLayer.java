@@ -97,16 +97,15 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 //    original is 
 //        INDArray delta1 = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
 
-// TODO : config the backpropagation please :)) 
 		z = z.muli(epsilon);
 
 		Pair<INDArray, INDArray> result = new Pair<>(z, null);
 
 		INDArray delta = result.getFirst();
 
-		if (maskArray != null) {
+		if (maskArray != null) { 
 			applyMask(delta);
-		}
+		} 
 
 		Gradient ret = new DefaultGradient();
 
@@ -115,11 +114,11 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 
 		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
 
-		if (hasBias()) {
-			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
-			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
-			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
-		}
+//		if (hasBias()) {
+//			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
+//			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
+//			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
+//		}
 
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
 
@@ -344,7 +343,7 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 
 			if (!activationModels.containsKey(neuron))
-				activationModels.put(neuron, new BayesTreeActivationFunction());
+				activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false));
 
 //				activationModels.put(neuron, new BayesTreeActivationFunction(Constants.train, Constants.test, false));
 
@@ -361,44 +360,30 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 			if (maskArray != null) {
 				applyMask(z);
 			}
-			
-			if ( z.length() == 0)
-			{
+
+			if (z.length() == 0) {
 				System.out.println("zero data set");
-				
+
 			}
 			if (neuron == 0) {
 //              ret = layerConf().getActivationFn().getActivation(z, training);
 
-				
-				
-				if (LayerNumber == 0) {
-					INDArray ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-					if ( ztemp.size(0) != z.size(0)  ) {
-						System.out.println("shisdfdsfsdafsdaffuckdddd");
-						
-					}
-					ret = activationModels.get(neuron)
-							.getActivation(ztemp, training);
-				}
+				INDArray ztemp;
+				if (LayerNumber == 0)
+					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
 				else
-					ret = activationModels.get(neuron).getActivation(z, training);
+					ztemp = z;
 
-				result = ret.dup().transpose();
+				ret = activationModels.get(neuron).getActivation(ztemp, training);
+				result = ret.transpose();
 			} else {
-				
-				if (LayerNumber == 0) {
-					INDArray ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-
-					if ( ztemp.size(0) != z.size(0)  ) {
-						System.out.println("shisdfdsfsdafsdaffuckdddd");
-						
-					}
-					ret = activationModels.get(neuron)
-							.getActivation(z.getColumns(Constants.attributesIndexes.get(neuron)), training);
-				}
+				INDArray ztemp;
+				if (LayerNumber == 0)
+					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
 				else
-					ret = activationModels.get(neuron).getActivation(z, training);
+					ztemp = z;
+
+				ret = activationModels.get(neuron).getActivation(ztemp, training);
 				result = Nd4j.concat(1, result, ret.transpose());
 //            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
 			}
@@ -436,17 +421,10 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 		INDArray result = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 
-			if (!activationModels.containsKey(neuron)) {
-				System.out.println("No neuron found");
-				System.exit(0);
-				activationModels.put(neuron, new BayesTreeActivationFunction());
-			}
 
 			INDArray weight = W.getColumn(neuron);
 
 			z.assign(input.mulRowVector(weight.transpose()));
-
-//        		z.assign(input.mulRowVector(weight.transpose())); 
 
 			if (hasBias()) {
 				z.addiRowVector(b);
@@ -456,16 +434,15 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 				applyMask(z);
 			}
 			if (neuron == 0) {
-//              ret = layerConf().getActivationFn().getActivation(z, training); 
 				INDArray ztemp;
 				if (LayerNumber == 0)
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
 				else
 					ztemp = z;
-				
-				if ( ztemp.size(0) != z.size(0)  ) {
+
+				if (ztemp.size(0) != z.size(0)) {
 					System.out.println("shisdfdsfsdafsdaffuckdddd");
-					
+
 				}
 				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
 				result = ret.transpose();
@@ -473,13 +450,11 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 				INDArray ztemp;
 				if (LayerNumber == 0)
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-				else 
+				else
 					ztemp = z;
 				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
-//				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
 
 				result = Nd4j.concat(1, result, ret.transpose());
-//            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
 			}
 
 		}
@@ -490,7 +465,6 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 	@Override
 	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
 		INDArray ret = preOutput(training, workspaceMgr);
-//        INDArray ret = layerConf().getActivationFn().getActivation(z, training);
 
 		if (maskArray != null) {
 			applyMask(ret);
