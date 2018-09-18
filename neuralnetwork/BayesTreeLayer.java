@@ -21,6 +21,7 @@ import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.gradient.DefaultGradient;
 import org.deeplearning4j.nn.gradient.Gradient;
+import org.deeplearning4j.nn.layers.AbstractLayer;
 import org.deeplearning4j.nn.layers.BaseLayer;
 import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.nn.params.PretrainParamInitializer;
@@ -46,7 +47,7 @@ import java.util.*;
  * 
  * @author Adam Gibson
  */
-public class BayesTreeLayer extends BaseLayer<CustomLayer> {
+public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer> extends AbstractLayer<CustomLayer> {
 
 	protected INDArray paramsFlattened;
 	protected INDArray gradientsFlattened;
@@ -78,59 +79,108 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 		return (CustomLayer) this.conf.getLayer();
 	}
 
+	
+	
+	
+	
+	@Override
+    public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
+        assertInputSet(true);
+        //If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or equivalent)
+        INDArray z = bacpropOutput(true, workspaceMgr); //Note: using preOutput(INDArray) can't be used as this does a setInput(input) and resets the 'appliedDropout' flag
+        //INDArray activationDerivative = Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(), z).derivative());
+        //        INDArray activationDerivative = conf().getLayer().getActivationFn().getGradient(z);
+        //        INDArray delta = epsilon.muli(activationDerivative);
+        
+        INDArray delta =  z.muli(epsilon).dup();
+
+        
+//        INDArray delta = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function paramsZ
+        
+
+        if (maskArray != null) {
+            applyMask(delta);
+        }
+
+        Gradient ret = new DefaultGradient();
+
+        INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); //f order
+        Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
+
+        ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
+
+//        if(hasBias()){
+//            INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
+//            delta.sum(biasGrad, 0); //biasGrad is initialized/zeroed first
+//            ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
+//        }
+
+        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
+
+        INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD, new long[]{W.size(0), delta.size(0)}, 'f');
+        epsilonNext = W.mmuli(delta.transpose(),epsilonNext).transpose();   //W.mmul(delta.transpose()).transpose();
+
+        weightNoiseParams.clear();
+
+        epsilonNext = backpropDropOutIfPresent(epsilonNext);
+        return new Pair<>(ret, epsilonNext);
+    }
+	
+	
+	
 //    TODO check and implement this function properly
 	@Override
-	public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
-		assertInputSet(true);
-		// If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or
-		// equivalent)
-		INDArray z = backpropOutput(epsilon, workspaceMgr); // Note: using preOutput(INDArray) can't be used as this
-															// does a setInput(input) and resets the 'appliedDropout'
-															// flag
-		// INDArray activationDerivative =
-		// Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(),
-		// z).derivative());
-		// INDArray activationDerivative =
-		// conf().getLayer().getActivationFn().getGradient(z);
-		// INDArray delta = epsilon.muli(activationDerivative);
-
-//    original is 
-//        INDArray delta1 = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
-
-		z = z.muli(epsilon);
-
-		Pair<INDArray, INDArray> result = new Pair<>(z, null);
-
-		INDArray delta = result.getFirst();
-
-		if (maskArray != null) { 
-			applyMask(delta);
-		} 
-
-		Gradient ret = new DefaultGradient();
-
-		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f order
-		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
-
-		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
-
-//		if (hasBias()) {
-//			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
-//			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
-//			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
-//		}
-
-		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
-
-		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
-				new long[] { W.size(0), delta.size(0) }, 'f');
-		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose(); // W.mmul(delta.transpose()).transpose();
-
-		weightNoiseParams.clear();
-
-		epsilonNext = backpropDropOutIfPresent(epsilonNext);
-		return new Pair<>(ret, epsilonNext);
-	}
+//	public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
+//		assertInputSet(true);
+//		// If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or
+//		// equivalent)
+//		INDArray z = backpropOutput(epsilon, workspaceMgr); // Note: using preOutput(INDArray) can't be used as this
+//															// does a setInput(input) and resets the 'appliedDropout'
+//															// flag
+//		// INDArray activationDerivative =
+//		// Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(),
+//		// z).derivative());
+//		// INDArray activationDerivative =
+//		// conf().getLayer().getActivationFn().getGradient(z);
+//		// INDArray delta = epsilon.muli(activationDerivative);
+//
+////    original is 
+////        INDArray delta1 = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
+//
+//		z = z.muli(epsilon);
+//
+//		Pair<INDArray, INDArray> result = new Pair<>(z, null);
+//
+//		INDArray delta = result.getFirst();
+//
+//		if (maskArray != null) { 
+//			applyMask(delta);
+//		} 
+//
+//		Gradient ret = new DefaultGradient();
+//
+//		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f order
+//		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
+//
+//		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
+//
+////		if (hasBias()) {
+////			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
+////			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
+////			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
+////		}
+//
+//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
+//
+//		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
+//				new long[] { W.size(0), delta.size(0) }, 'f');
+//		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose(); // W.mmul(delta.transpose()).transpose();
+//
+//		weightNoiseParams.clear();
+//
+//		epsilonNext = backpropDropOutIfPresent(epsilonNext);
+//		return new Pair<>(ret, epsilonNext);
+//	}
 
 	public void fit() {
 		throw new UnsupportedOperationException("Not supported");
@@ -189,7 +239,7 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 	 * Returns the parameters of the neural network as a flattened row vector
 	 * 
 	 * @return the parameters of the neural network
-	 */
+	 */ 
 	@Override
 	public INDArray params() {
 		return paramsFlattened;
@@ -314,57 +364,52 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 	}
 
 //    TODO : check and implement this function properly ( BIAS TERM VERY VERY VERY VERY VERY VERY VERY IMPORTANT)
-	protected INDArray preOutput(boolean training, LayerWorkspaceMgr workspaceMgr) {
-		assertInputSet(false);
-		applyDropOutIfNecessary(training, workspaceMgr);
-		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-		INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-//        System.out.println(b);
 
-		b = Nd4j.zeros(W.size(0));
-		// Input validation:
-		if (input.rank() != 2 || input.columns() != W.rows()) {
-			if (input.rank() != 2) {
-				throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
-						+ input.rank() + " array with shape " + Arrays.toString(input.shape())
-						+ ". Missing preprocessor or wrong input type? " + layerId());
-			}
-			throw new DL4JInvalidInputException(
-					"Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
-							+ ") is invalid: does not match layer input size (layer # inputs = " + W.size(0) + ") "
-							+ layerId());
-		}
+    protected INDArray preOutput(boolean training, LayerWorkspaceMgr workspaceMgr) {
+    	 assertInputSet(false);
+        applyDropOutIfNecessary(training, workspaceMgr);
+        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
+
+        
+        if ( LayerNumber == 1) {
+//        	System.out.println("here123");
+        }
+        //Input validation:
+        if (input.rank() != 2 || input.columns() != W.rows()) {
+            if (input.rank() != 2) {
+                throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
+                        + input.rank() + " array with shape " + Arrays.toString(input.shape())
+                        + ". Missing preprocessor or wrong input type? " + layerId());
+            }
+            throw new DL4JInvalidInputException(
+                    "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
+                            + ") is invalid: does not match layer input size (layer # inputs = "
+                            + W.size(0) + ") " + layerId());
+        }
+
+
+//        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+        
+        
+//        code khodeman :)) 
+        
+         
+//        input.mmuli(W, ret);
 
 		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
-
-//        TODO : is the weighted input
-		INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-		INDArray result = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+		INDArray result = null;
+	
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
-
-			if (!activationModels.containsKey(neuron))
-				activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false));
-
-//				activationModels.put(neuron, new BayesTreeActivationFunction(Constants.train, Constants.test, false));
-
-			INDArray weight = W.getColumn(neuron);
-
+			
+			
+			if (! activationModels.containsKey(neuron))
+			activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false));
+			
+			
+			INDArray weight = W.getColumn(neuron); 
 			z.assign(input.mulRowVector(weight.transpose()));
 
-//        		z.assign(input.mulRowVector(weight.transpose())); 
-
-			if (hasBias()) {
-				z.addiRowVector(b);
-			}
-
-			if (maskArray != null) {
-				applyMask(z);
-			}
-
-			if (z.length() == 0) {
-				System.out.println("zero data set");
-
-			}
 			if (neuron == 0) {
 //              ret = layerConf().getActivationFn().getActivation(z, training);
 
@@ -374,8 +419,8 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 				else
 					ztemp = z;
 
-				ret = activationModels.get(neuron).getActivation(ztemp, training);
-				result = ret.transpose();
+				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
+				 result = ret.transpose().dup();
 			} else {
 				INDArray ztemp;
 				if (LayerNumber == 0)
@@ -383,95 +428,239 @@ public class BayesTreeLayer extends BaseLayer<CustomLayer> {
 				else
 					ztemp = z;
 
-				ret = activationModels.get(neuron).getActivation(ztemp, training);
+				INDArray	ret = activationModels.get(neuron).getActivation(ztemp, training);
 				result = Nd4j.concat(1, result, ret.transpose());
 //            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
 			}
-
-		}
-		return result;
-	}
-
-	protected INDArray backpropOutput(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
-		assertInputSet(false);
-		boolean training = true;
-		applyDropOutIfNecessary(training, workspaceMgr);
-		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-		INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-//        System.out.println(b);
-
-		b = Nd4j.zeros(W.size(0));
-		// Input validation:
-		if (input.rank() != 2 || input.columns() != W.rows()) {
-			if (input.rank() != 2) {
-				throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
-						+ input.rank() + " array with shape " + Arrays.toString(input.shape())
-						+ ". Missing preprocessor or wrong input type? " + layerId());
-			}
-			throw new DL4JInvalidInputException(
-					"Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
-							+ ") is invalid: does not match layer input size (layer # inputs = " + W.size(0) + ") "
-							+ layerId());
+			
 		}
 
-		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+		
+		
+//        if(hasBias()){
+//            ret.addiRowVector(b);
+//        }
 
-//        TODO : is the weighted input
-		INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-		INDArray result = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-		for (int neuron = 0; neuron < W.columns(); neuron++) {
+        if (maskArray != null) {
+            applyMask(z);
+        }
+
+        return result;
+    }
+    
+    
+
+    
+    @Override
+    public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
+          INDArray z = preOutput(training, workspaceMgr);
+        
+        if (LayerNumber == 1)
+        {
+//        	System.out.println(z);
+        }
+//        INDArray ret = layerConf().getActivationFn().getActivation(z, training);
+
+        INDArray ret = z.dup();
+//        if (maskArray != null) {
+//            applyMask(ret);
+//        }
+
+        return ret;
+    }
+    
+    
+    
+    protected INDArray bacpropOutput ( boolean training , LayerWorkspaceMgr workspaceMgr) {
+    	 assertInputSet(false);
+         applyDropOutIfNecessary(true, workspaceMgr);
+         INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+         INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
+
+         
+         if ( LayerNumber == 1) {
+//         	System.out.println("here123");
+         }
+         //Input validation:
+         if (input.rank() != 2 || input.columns() != W.rows()) {
+             if (input.rank() != 2) {
+                 throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
+                         + input.rank() + " array with shape " + Arrays.toString(input.shape())
+                         + ". Missing preprocessor or wrong input type? " + layerId());
+             }
+             throw new DL4JInvalidInputException(
+                     "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
+                             + ") is invalid: does not match layer input size (layer # inputs = "
+                             + W.size(0) + ") " + layerId());
+         }
 
 
-			INDArray weight = W.getColumn(neuron);
+//         INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+         
+         
+//         code khodeman :)) 
+         
+          
+//         input.mmuli(W, ret);
 
-			z.assign(input.mulRowVector(weight.transpose()));
+ 		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+ 		INDArray result = null;
+ 		for (int neuron = 0; neuron < W.columns(); neuron++) {
+ 			
+ 			activationModels.get(neuron);
+ 			INDArray weight = W.getColumn(neuron);
+ 			z.assign(input.mulRowVector(weight.transpose()));
 
-			if (hasBias()) {
-				z.addiRowVector(b);
-			}
+ 			if (neuron == 0) {
+//               ret = layerConf().getActivationFn().getActivation(z, training);
 
-			if (maskArray != null) {
-				applyMask(z);
-			}
-			if (neuron == 0) {
-				INDArray ztemp;
-				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-				else
-					ztemp = z;
+ 				INDArray ztemp;
+ 				if (LayerNumber == 0)
+ 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
+ 				else
+ 					ztemp = z;
 
-				if (ztemp.size(0) != z.size(0)) {
-					System.out.println("shisdfdsfsdafsdaffuckdddd");
+ 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
+ 				 result = ret.transpose().dup();
+ 			} else {
+ 				INDArray ztemp;
+ 				if (LayerNumber == 0)
+ 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
+ 				else
+ 					ztemp = z.dup();
 
-				}
-				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
-				result = ret.transpose();
-			} else {
-				INDArray ztemp;
-				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-				else
-					ztemp = z;
-				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
+ 				Pair<INDArray, INDArray>	ret = activationModels.get(neuron).backprop(ztemp, null);
+ 				INDArray tmp = ret.getFirst().dup().transpose();
+ 				result = Nd4j.concat(1, result, tmp);
+//             	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
+ 			}
+ 			
+ 		}
 
-				result = Nd4j.concat(1, result, ret.transpose());
-			}
+ 		
+ 		
+//         if(hasBias()){
+//             ret.addiRowVector(b);
+//         }
 
-		}
+         if (maskArray != null) {
+             applyMask(z);
+         }
 
-		return result;
-	}
+         return result;
+    }
 
-	@Override
-	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
-		INDArray ret = preOutput(training, workspaceMgr);
+    protected INDArray preOutput1 (boolean training, LayerWorkspaceMgr workspaceMgr) {
+        assertInputSet(false);
+        applyDropOutIfNecessary(training, workspaceMgr);
+        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
 
-		if (maskArray != null) {
-			applyMask(ret);
-		}
+        //Input validation:
+        if (input.rank() != 2 || input.columns() != W.rows()) {
+            if (input.rank() != 2) {
+                throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
+                        + input.rank() + " array with shape " + Arrays.toString(input.shape())
+                        + ". Missing preprocessor or wrong input type? " + layerId());
+            }
+            throw new DL4JInvalidInputException(
+                    "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
+                            + ") is invalid: does not match layer input size (layer # inputs = "
+                            + W.size(0) + ") " + layerId());
+        }
 
-		return ret;
-	}
+
+        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+        input.mmuli(W, ret);
+        if(hasBias()){
+            ret.addiRowVector(b);
+        }
+
+        if (maskArray != null) {
+            applyMask(ret);
+        }
+
+        return ret;
+    }
+
+//	protected INDArray backpropOutput(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
+//		assertInputSet(false);
+//		boolean training = true;
+//		applyDropOutIfNecessary(training, workspaceMgr);
+//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+//		INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
+////        System.out.println(b);
+//
+//		b = Nd4j.zeros(W.size(0));
+//		// Input validation:
+//		if (input.rank() != 2 || input.columns() != W.rows()) {
+//			if (input.rank() != 2) {
+//				throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
+//						+ input.rank() + " array with shape " + Arrays.toString(input.shape())
+//						+ ". Missing preprocessor or wrong input type? " + layerId());
+//			}
+//			throw new DL4JInvalidInputException(
+//					"Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
+//							+ ") is invalid: does not match layer input size (layer # inputs = " + W.size(0) + ") "
+//							+ layerId());
+//		}
+//
+//		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+//
+////        TODO : is the weighted input
+//		INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+//		INDArray result = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+//		for (int neuron = 0; neuron < W.columns(); neuron++) {
+//
+//
+//			INDArray weight = W.getColumn(neuron);
+//
+//			z.assign(input.mulRowVector(weight.transpose()));
+//
+//		
+//
+//			if (maskArray != null) {
+//				applyMask(z);
+//			}
+//			if (neuron == 0) {
+//				INDArray ztemp;
+//				if (LayerNumber == 0)
+//					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
+//				else
+//					ztemp = z;
+//
+//				if (ztemp.size(0) != z.size(0)) {
+//					System.out.println("shisdfdsfsdafsdaffuckdddd");
+//
+//				}
+//				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
+//				result = ret.transpose();
+//			} else {
+//				INDArray ztemp;
+//				if (LayerNumber == 0)
+//					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
+//				else
+//					ztemp = z;
+//				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
+//
+//				result = Nd4j.concat(1, result, ret.transpose());
+//			}
+//
+//		}
+//
+//		return result;
+//	}
+
+//	@Override
+//	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
+//		INDArray ret = preOutput(training, workspaceMgr);
+//
+//		if (maskArray != null) {
+//			applyMask(ret);
+//		}
+//
+//		return ret;
+//	}
 
 	@Override
 	public double calcL2(boolean backpropParamsOnly) {

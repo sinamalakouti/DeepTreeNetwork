@@ -47,7 +47,7 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 	@Override
 	public double computeScore(INDArray labels, INDArray preOutput, IActivation activationFn, INDArray mask,
 			boolean average) {
-		System.out.println("compute score");
+//		System.out.println("compute score");
 		INDArray scoreArr = scoreArray(labels, preOutput, activationFn, mask);
 		double score = -scoreArr.sumNumber().doubleValue();
 		double s[][] = scoreArr.toDoubleMatrix();
@@ -80,7 +80,7 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 
 	@Override
 	public INDArray computeGradient(INDArray labels, INDArray preOutput, IActivation activationFn, INDArray mask) {
-		System.out.println("compute gradients");
+//		System.out.println("compute gradients");
 
 		INDArray grad;
 
@@ -105,6 +105,9 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 			grad = output.subi(labels);
 		}
 		
+		
+//        grad = activationFn.backprop(preOutput, dLda).getFirst(); //TODO activation function with weights
+
 		
 		
 		 //Loss function with masking
@@ -159,6 +162,7 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 	@Override
 	public void initFromOnnx(NodeProto node, SameDiff initWith, Map<String, AttributeProto> attributesForNode,
 			GraphProto graph) {
+		
 		// TODO Auto-generated method stub
 
 	}
@@ -188,20 +192,18 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 			System.exit(0);
 		}
 		double s[][] = output.toDoubleMatrix();
-		double sd = 0d;
+		
 		for (int i = 0; i < s.length; i++)
 			for (int j = 0; j < s[0].length; j++) {
 				if (Double.isNaN(s[i][j])) {
 					System.out.println(s[i][j]);
 					System.out.println("ey babaa chi kar konim ");
 				}
-				s[i][j] += 0.001;
 
 				if (s[i][j] == 0) {
-					System.out.println(s[i][j]);
-					System.out.println("shiiiiiit");
+					s[i][j] += 0.001;
+
 				}
-				sd += s[i][j];
 			}
 		output = Nd4j.create(s);
 

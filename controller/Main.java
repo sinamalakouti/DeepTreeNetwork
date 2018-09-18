@@ -17,6 +17,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 
 import play.mvc.WebSocket.In;
 import utils._utils;
@@ -43,6 +44,10 @@ public class Main {
 	
 	
 	public static void main(String[] args) throws Exception {
+		 
+		
+		
+		
 		
 		 RecordReader recordReader = new CSVRecordReader();
 		recordReader.initialize(new FileSplit(new File("iris.txt")));

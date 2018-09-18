@@ -19,7 +19,8 @@ public class Constants {
 	public static Instances test;
 	public static INDArray trainInstancesLabel;
 	public static INDArray testInstancesLabel;
-	
+	public static boolean isEvaluating = false;
+	public static int maximumDepth;
 	
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
 	

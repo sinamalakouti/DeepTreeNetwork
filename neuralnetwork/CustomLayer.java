@@ -1,4 +1,20 @@
 
+/*******************************************************************************
+ * Copyright (c) 2015-2018 Skymind, Inc.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
 package neuralnetwork;
 
 import org.deeplearning4j.nn.api.Layer;
@@ -13,10 +29,7 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-import com.sun.org.apache.bcel.internal.generic.LLOAD;
-
 import utils.Constants;
-import weka.core.Instances;
 
 import java.util.Collection;
 import java.util.Map;
@@ -27,12 +40,13 @@ import java.util.Map;
 
 public class CustomLayer extends FeedForwardLayer {
     private boolean hasBias = true;
-    private CustomLayer(Builder builder ) {
+
+    private CustomLayer(Builder builder) {
         super(builder);
         this.hasBias = builder.hasBias;
 
         initializeConstraints(builder);
-    } 
+    }
 
     @Override
     public Layer instantiate(NeuralNetConfiguration conf, Collection<TrainingListener> trainingListeners,
@@ -40,7 +54,7 @@ public class CustomLayer extends FeedForwardLayer {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
         
         BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
-                      
+ 
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);
         ret.setParamsViewArray(layerParamsView);
@@ -59,8 +73,8 @@ public class CustomLayer extends FeedForwardLayer {
     public LayerMemoryReport getMemoryReport(InputType inputType) {
         InputType outputType = getOutputType(-1, inputType);
 
-        long  numParams = initializer().numParams(this);
-        long updaterStateSize = (int) getIUpdater().stateSize(numParams);
+        long numParams = initializer().numParams(this);
+        int updaterStateSize = (int) getIUpdater().stateSize(numParams);
 
         int trainSizeFixed = 0;
         int trainSizeVariable = 0;
@@ -91,11 +105,11 @@ public class CustomLayer extends FeedForwardLayer {
         return hasBias;
     }
 
+    
     public static class Builder extends FeedForwardLayer.Builder<Builder> {
 
         private boolean hasBias = true;
 
-        
         /**
          * If true (default): include bias parameters in the model. False: no bias.
          *

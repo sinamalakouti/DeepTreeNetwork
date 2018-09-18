@@ -1,10 +1,14 @@
 package controller;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
@@ -18,11 +22,14 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.jfree.data.general.DatasetUtilities;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.util.NDArrayUtil;
@@ -34,9 +41,11 @@ import neuralnetwork.BayesTreeActivationFunction;
 import neuralnetwork.CustomLayer;
 import neuralnetwork.LossBayesTree;
 import neuralnetwork.OutputCustomLayer;
+import scala.collection.immutable.Stream.Cons;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.J48;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.core.converters.ConverterUtils.DataSource;
@@ -53,55 +62,55 @@ public class Network {
 
  
 //  <iris datast>		
-		/*
-		CSVRecordReader recordReader = new CSVRecordReader();
-		recordReader.initialize(new FileSplit(new File("iris.txt")));
-
-		CSVLoader loader = new CSVLoader();
-		loader.setSource(new File("iris.txt"));
-		String[] options = new String[1];
-		options[0] =  "-H";
-		loader.setOptions(options);
-        int labelIndex = 4;     //5 values in each row of the iris.txt CSV: 4 input features followed by an integer label (class) index. Labels are the 5th value (index 4) in each row
-        int numClasses = 3;     //3 classes (types of iris flowers) in the iris data set. Classes have integer values 0, 1 or 2
-        int batchSize = 150;    //Iris data set: 150 examples total. We are loading all of them into one DataSet (not recommended for large data sets)
-
-		Instances dataset = loader.getDataSet();
-		NumericToNominal convert = new NumericToNominal();
-		options = new String[2];
-		options[0] = "-R";
-		options[1] = "" + (dataset.numAttributes()); // range of variables to make numeric 
-		convert.setOptions(options);
-		convert.setInputFormat(dataset);
-		dataset = weka.filters.Filter.useFilter(dataset, convert);
-		dataset.setClassIndex(dataset.numAttributes() - 1);
-	
-		// DataSet (not recommended for large data sets)
-
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, batchSize, labelIndex, numClasses);
-		DataSet allData = iterator.next();
-		allData.shuffle();
-		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.65); // Use 65% of data for training
-
-		DataSet trainingData = testAndTrain.getTrain();
-		DataSet testData = testAndTrain.getTest();
-
-		java.util.Random rand = new java.util.Random(3);
-		Instances randData = new Instances(dataset);
-		randData.setClassIndex(randData.numAttributes() - 1);
-		randData.randomize(rand); 
-		randData.stratify(10);
-
-		Instances training = randData.trainCV(10, 0);
-		training.setClassIndex(training.numAttributes() - 1);
-		Instances test = randData.testCV(10, 0);
-		test.setClassIndex(test.numAttributes() - 1);
-		training.setClassIndex(training.numAttributes() - 1);
-		test.setClassIndex(test.numAttributes() - 1);
-		trainingData = _utils.instancesToDataSet(training);
-		testData = _utils.instancesToDataSet(test);
 		
-	*/
+//		CSVRecordReader recordReader = new CSVRecordReader();
+//		recordReader.initialize(new FileSplit(new File("iris.txt")));
+//
+//		CSVLoader loader = new CSVLoader();
+//		loader.setSource(new File("iris.txt"));
+//		String[] options = new String[1];
+//		options[0] =  "-H";
+//		loader.setOptions(options);
+//        int labelIndex = 4;     //5 values in each row of the iris.txt CSV: 4 input features followed by an integer label (class) index. Labels are the 5th value (index 4) in each row
+//        int numClasses = 3;     //3 classes (types of iris flowers) in the iris data set. Classes have integer values 0, 1 or 2
+//        int batchSize = 150;    //Iris data set: 150 examples total. We are loading all of them into one DataSet (not recommended for large data sets)
+//
+//		Instances dataset = loader.getDataSet();
+//		NumericToNominal convert = new NumericToNominal();
+//		options = new String[2];
+//		options[0] = "-R";
+//		options[1] = "" + (dataset.numAttributes()); // range of variables to make numeric 
+//		convert.setOptions(options);
+//		convert.setInputFormat(dataset);
+//		dataset = weka.filters.Filter.useFilter(dataset, convert);
+//		dataset.setClassIndex(dataset.numAttributes() - 1);
+//	
+//		// DataSet (not recommended for large data sets)
+//
+//		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, batchSize, labelIndex, numClasses);
+//		DataSet allData = iterator.next();
+//		allData.shuffle();
+//		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.65); // Use 65% of data for training
+//
+//		DataSet trainingData = testAndTrain.getTrain();
+//		DataSet testData = testAndTrain.getTest();
+//
+//		java.util.Random rand = new java.util.Random(3);
+//		Instances randData = new Instances(dataset);
+//		randData.setClassIndex(randData.numAttributes() - 1);
+//		randData.randomize(rand); 
+//		randData.stratify(10);
+//
+//		Instances training = randData.trainCV(10, 0);
+//		training.setClassIndex(training.numAttributes() - 1);
+//		Instances test = randData.testCV(10, 0);
+//		test.setClassIndex(test.numAttributes() - 1);
+//		training.setClassIndex(training.numAttributes() - 1);
+//		test.setClassIndex(test.numAttributes() - 1);
+//		trainingData = _utils.instancesToDataSet(training);
+//		testData = _utils.instancesToDataSet(test);
+		
+	
 //		</irisdataset>
 		
 //		<isolet5>
@@ -184,9 +193,7 @@ public class Network {
 //		// objects, ready for use in neural network
 		int labelIndex = 4; // 5 values in each row of the iris.txt CSV: 4 input features followed by an
 		// integer label (class) index. Labels are the 5th value (index 4) in each row
-		int numClasses = 3; // 3 classes (types of iris flowers) in the iris data set. Classes have integer
-		// values 0, 1 or 2
-		int batchSize = 150; // Iris data set: 150 examples total. We are loading all of them into one
+		int batchSize = 250; // Iris data set: 150 examples total. We are loading all of them into one
 		int trainSize = (int) Math.round(dataset.numInstances() * 0.7);
 		int testSize = dataset.numInstances() - trainSize;
 		Instances training = new Instances(dataset, 0, trainSize);
@@ -195,6 +202,8 @@ public class Network {
 //
 		DataSet trainingData = _utils.instancesToDataSet(training);
 		DataSet testData = _utils.instancesToDataSet(test);
+		int  batchNum = trainingData.numExamples() / batchSize;
+		Constants.maximumDepth =3;
 //		</mnistdataset>
 		
 		
@@ -256,9 +265,7 @@ public class Network {
 		int outputNum = 10;
 		long seed = 6;
 		log.info("Build model....");
-
-		J48 tree = new J48();
-		tree.buildClassifier(training);
+//org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed)
 
@@ -267,12 +274,12 @@ public class Network {
 
 
 				.layer(0,
-						new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(new BayesTreeActivationFunction(0,false)).build())
+						new CustomLayer.Builder().nIn(numInputs).nOut(25).activation(new BayesTreeActivationFunction(0, false)).build())
 
 //						.activation(new BayesTreeActivationFunction(training, test, false))
 //							.activation(new BayesTreeActivationFunction(training, test, false))
 
-				.layer(1, new CustomLayer.Builder().nIn(40).nOut(40).activation(new BayesTreeActivationFunction(1,false))
+				.layer(1, new CustomLayer.Builder().nIn(25).nOut(25).activation(new BayesTreeActivationFunction(1, false))
 						.build())
 
 				// todo : we should obviously change this one
@@ -280,8 +287,8 @@ public class Network {
 //						.build())
  
 				.layer(2,
-						new OutputLayer.Builder(new LossBayesTree(null))
-								.activation(new BayesTreeActivationFunction(1, true)).nIn(40).nOut(outputNum).build())
+						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+								.activation(Activation.SOFTMAX).nIn(25).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
@@ -318,26 +325,41 @@ public class Network {
 
 		if ( attInexes.containsValue(false)) {
 			System.out.println("ajab badbakhti gir kardim");
+			System.exit(0);
 		}
+		
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
-		for (int i = 0; i < 280; i++) {
-			long startTime = System.nanoTime();
-			Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
-			model.fit(trainingData);
-			long endTime = System.nanoTime();
-			long totalTime = endTime - startTime;
-			System.out.println("iteration: " + i);
-			System.out.println(totalTime);
-//			if ( i % 10 ==  0) {
-////				weka.classifiers.Evaluation eval1 = new weka.classifiers.Evaluation(test);
-////				eval1.evaluateModel(tree, test);
-//
-//				// evaluate the model on the test set
-//				Evaluation eval = new Evaluation(outputNum);
-//				INDArray output = model.output(testData.getFeatures());
-//				eval.eval(testData.getLabels(), output);
-//				log.info(eval.stats());
-//			}
+		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
+		
+		for (int i = 0; i < 250; i++) {
+			for ( int b = 0;  b < batchNum ; b ++) {
+				
+				
+				DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
+				
+				
+				model.fit(set);
+				
+				
+
+			}
+			
+			if ( i % 5 == 0) {
+//				Constants.isEvaluating = fala;
+				Evaluation eval = new Evaluation(outputNum);
+				INDArray output = model.output(testData.getFeatures());
+				eval.eval(testData.getLabels(), output);
+				
+				 String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/resultBatch_"+ i;
+				  File file = new File (path);
+				  BufferedWriter out = new BufferedWriter(new FileWriter(file)); 
+				  out.write(eval.stats());
+				  out.close();
+//				  Constants.isEvaluating = false;
+//				out.println(e);
+
+			}
+
 
 		}
 //		long endTime   = System.?nanoTime();
@@ -346,10 +368,33 @@ public class Network {
 //		System.out.println(totalTime);
 
 
-		// evaluate the model on the test set
-		Evaluation eval = new Evaluation(outputNum);
-		INDArray output = model.output(testData.getFeatures());
-		eval.eval(testData.getLabels(), output);
-		log.info(eval.stats());
+		
+	}
+	
+	private static DataSet getBatchTrainSet(int batchNumber , int batchRate,  	DataSet trainSet , Instances training) {
+		
+		INDArray features = trainSet.getFeatures();
+		INDArray labels = trainSet.getLabels();
+		int start =  batchNumber * batchRate;
+		int end =  (batchNumber + 1) * batchRate;
+		
+		INDArray batchTrain_features = features.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
+		INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
+		
+		DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
+		 List<Instance> list = training.subList(start, end);
+		 double [] labels_list = new double[list.size()];
+		 for( int i =0 ; i< list.size() ; i++)
+			 labels_list[i] = list.get(i).classValue(); 
+//		 System.out.println(labels.length());
+//		 System.out.println(batchTrain_labels.shapeInfoToString());
+//		 System.out.println(batchTrain_labels);
+//		 System.out.println(labels_list[labels_list.length - 1]);
+		Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
+//		System.out.println(Constants.trainInstancesLabel.shapeInfoToString());
+//		System.out.println(set.numExamples());
+		
+		return set;
+		
 	}
 }

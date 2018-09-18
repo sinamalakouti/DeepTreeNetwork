@@ -8,6 +8,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.Sigmoid;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 import org.nd4j.linalg.util.NDArrayUtil;
 
@@ -24,6 +25,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 	private J48 activationModel;
 	int layernumber = 0;
+	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 //	public BayesTreeActivationFunction(Instances trainInstances, Instances testInstances, boolean isFirstLayer) {
 ////		testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(testInstances)).transpose();
@@ -37,9 +39,9 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 	}
 
 	@Override
-	public Pair<INDArray, INDArray> backprop(INDArray in, INDArray epsilon) {
+	public Pair<INDArray, INDArray> backprop(INDArray in, INDArray epsilon1) {
 //		TODO : check the correction of reuslt.muli(epsilon)
-		
+
 //		if ( isOutputLayerActivation == true)
 //        assertShape(in, epsilon);
 
@@ -60,7 +62,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 		while (it.hasMoreElements()) {
 
 			try {
-				double[] prediciton = activationModel.predicateDerivative(it.nextElement() , isOutputLayerActivation);
+				double[] prediciton = activationModel.predicateDerivative(it.nextElement(), isOutputLayerActivation);
 				if (isOutputLayerActivation == false) {
 					labelIndexes[i] = prediciton[1];
 					double res = prediciton[0];
@@ -73,8 +75,8 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 //					System.out.println("probability greater than 1 ahha");
 //					System.exit(0);
 					}
-				}else {
-					
+				} else {
+
 					outputLayerResult[i] = prediciton;
 				}
 
@@ -85,56 +87,49 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 			i++;
 		}
-		if ( isOutputLayerActivation == false ) {
-		INDArray output;
-		if (layernumber == -1) {
+		if (isOutputLayerActivation == false) {
+			INDArray output;
+			if (layernumber == -1) {
 
-			output = Nd4j.create(result);
-			output = output.add((-1 * minDerivative));
-			output = output.mul((1 / (maxDerivative - minDerivative)));
-			INDArray coeff = Nd4j.create(labelIndexes);
-			output = output.mul(interval).add(coeff.mul(interval));
-		} else {
-			output = Nd4j.create(result);
-			INDArray coeff = Nd4j.create(labelIndexes);
+				output = Nd4j.create(result);
+				output = output.add((-1 * minDerivative));
+				output = output.mul((1 / (maxDerivative - minDerivative)));
+				INDArray coeff = Nd4j.create(labelIndexes);
+				output = output.mul(interval).add(coeff.mul(interval));
+			} else {
+				output = Nd4j.create(result);
+				INDArray coeff = Nd4j.create(labelIndexes);
 
-			output = output.mul(interval);
+//			output = output.mul(interval);
 
-		}
+			}
 //		result = result.muli(epsilon);
 
-		return new Pair<>(output, null);
-		}else 
-			return  new Pair<>(Nd4j.create(outputLayerResult), null) ;
-		
+			return new Pair<>(output, null);
+		} else
+			return new Pair<>(Nd4j.create(outputLayerResult), null);
+
 	}
 
-	@Override 
+	@Override
 	public INDArray getActivation(INDArray in, boolean training) {
 
-		// in = inputData .* weights
-		double [][] temp = in.toDoubleMatrix();
-		for (int i =0 ; i< temp.length; i ++) {
-			
-			for ( int j = 0 ; j < temp[0].length ; j++)
-			{
-				if ( Double.isNaN(temp[i][j])) {
-					System.out.println("komaaaak");
-					System.exit(0);
-				}
-			}
-		}
-		Instances trainInstaces = createProperDataset(in, training);
-		activationModel = new J48();
+		// in = inputData .* weights 
+		Instances trainInstaces = createProperDataset(in.dup(), training);
 		double[] result = new double[trainInstaces.size()];
 
-		try {
-			activationModel.buildClassifier(trainInstaces);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		if (Constants.isEvaluating == false ) {
+			activationModel = new J48();
 
+			try {
+				activationModel.buildClassifier(trainInstaces);
+				isTraind = true;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+ 
 		Iterator<Instance> it = trainInstaces.iterator();
 		int i = 0;
 		double correct = 0d;
@@ -151,9 +146,13 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				double res;
 
 				if (isOutputLayerActivation == false) {
-					res = prediciton[0] / 1d * interval + prediciton[1] * interval;
-					if ( res ==0)
-						res += 0.001;
+//					res = prediciton[0] / 1d * interval + prediciton[1] * interval;
+					res = prediciton[0] ;
+
+					if (res == 0)
+						res += 0.00001;
+					if (res == 1)
+						res -= 0.00001;
 					result[i] = res;
 					if (res > 1) {
 						System.out.println("probability greater than 1 ahha");
@@ -174,13 +173,6 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 		}
 
-//		System.out.println("layer number is:\t" +);
-
-		if (layernumber == 2) {
-			System.out.println(correct);
-			System.out.println(correct / trainInstaces.size());
-		}
-
 		if (isOutputLayerActivation == true)
 			return Nd4j.create(outputLayerOutput);
 		return Nd4j.create(result);
@@ -196,8 +188,19 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			else
 				label = Constants.trainInstancesLabel;
 
+			System.out.println(Constants.testInstancesLabel.shapeInfoToString());
+			System.out.println(Constants.trainInstancesLabel.shapeInfoToString());
+			System.out.println(label.shapeInfoToString());
+			System.out.println(in.shapeInfoToString());
 			INDArray dataset = Nd4j.concat(1, in, label);
-			instances = _utils.ndArrayToInstances(dataset);
+			
+			INDArray tempArr;
+			Nd4j.shuffle(dataset, 1);
+			tempArr =  dataset.get(NDArrayIndex.interval(0, 20), NDArrayIndex.all());
+//			System.out.println(dataset.shapeInfoToString());
+			instances = _utils.ndArrayToInstances(tempArr);
+			
+			
 			instances.setClassIndex(instances.numAttributes() - 1);
 
 			if (!instances.classAttribute().isNominal()) {
