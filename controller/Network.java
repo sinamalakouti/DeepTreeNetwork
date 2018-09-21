@@ -22,6 +22,7 @@ import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.util.ModelSerializer;
 import org.jfree.data.general.DatasetUtilities;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -42,6 +43,7 @@ import neuralnetwork.CustomLayer;
 import neuralnetwork.LossBayesTree;
 import neuralnetwork.OutputCustomLayer;
 import scala.collection.immutable.Stream.Cons;
+import sigmoid.MySigmoidActivationFunction;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.J48;
@@ -193,7 +195,7 @@ public class Network {
 //		// objects, ready for use in neural network
 		int labelIndex = 4; // 5 values in each row of the iris.txt CSV: 4 input features followed by an
 		// integer label (class) index. Labels are the 5th value (index 4) in each row
-		int batchSize = 250; // Iris data set: 150 examples total. We are loading all of them into one
+		int batchSize = 100; // Iris data set: 150 examples total. We are loading all of them into one
 		int trainSize = (int) Math.round(dataset.numInstances() * 0.7);
 		int testSize = dataset.numInstances() - trainSize;
 		Instances training = new Instances(dataset, 0, trainSize);
@@ -273,29 +275,20 @@ public class Network {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 
 
-				.layer(0,
-						new CustomLayer.Builder().nIn(numInputs).nOut(25).activation(new BayesTreeActivationFunction(0, false)).build())
-
-//						.activation(new BayesTreeActivationFunction(training, test, false))
-//							.activation(new BayesTreeActivationFunction(training, test, false))
-
-				.layer(1, new CustomLayer.Builder().nIn(25).nOut(25).activation(new BayesTreeActivationFunction(1, false))
+				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(new BayesTreeActivationFunction(0, false,-1))
 						.build())
-
-				// todo : we should obviously change this one
-//				.layer(2, new CustomLayer.Builder().nIn(40).nOut(1).activation(new BayesTreeActivationFunction(0, false))
-//						.build())
- 
+				.layer(1,
+						new CustomLayer.Builder().nIn(40).nOut(40).activation(new BayesTreeActivationFunction(0, false,-2)).build())
 				.layer(2,
-						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-								.activation(Activation.SOFTMAX).nIn(25).nOut(outputNum).build())
+						new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
+								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
 
 		model.init();
-		model.setListeners(new ScoreIterationListener(1));
+		model.setListeners(new ScoreIterationListener(5));
 
 		Constants.test = test;
 		Constants.train = training;
@@ -328,46 +321,74 @@ public class Network {
 			System.exit(0);
 		}
 		
+		
+//		class configuration for each neuron
+		ArrayList<Integer> tmp1= new ArrayList<Integer>(40);
+		ArrayList<Integer> tmp2= new ArrayList<Integer>(40);
+
+		for (int i = 0 ; i < 10 ; i++)
+		{
+			tmp1.add(i);
+			tmp1.add(i);
+			tmp1.add(i);
+			tmp1.add(i);
+			
+			tmp2.add(i);
+			tmp2.add(i);
+			tmp2.add(i);
+			tmp2.add(i);
+		}
+		
+		Collections.shuffle(tmp1);
+		Collections.shuffle(tmp2);
+
+		Constants.classChosedArray.put(0, tmp1);
+		Constants.classChosedArray.put(1, tmp2);
+//
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
 		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
 		
-		for (int i = 0; i < 250; i++) {
+		for (int i = 0; i < 200; i++) {
 			for ( int b = 0;  b < batchNum ; b ++) {
 				
 				
 				DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
 				
 				
-				model.fit(set);
+				model.fit(set	);
+//				ModelSerializer.writeModel(model, "laylaylay", true);
 				
 				
 
 			}
 			
+			
+			
 			if ( i % 5 == 0) {
-//				Constants.isEvaluating = fala;
+				Constants.isEvaluating = true;
 				Evaluation eval = new Evaluation(outputNum);
 				INDArray output = model.output(testData.getFeatures());
+				System.out.println("sdaf");
 				eval.eval(testData.getLabels(), output);
 				
-				 String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/resultBatch_"+ i;
+				 String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/second/Incremental_and_classConfiguration/resultIteration_"+ i;
 				  File file = new File (path);
 				  BufferedWriter out = new BufferedWriter(new FileWriter(file)); 
 				  out.write(eval.stats());
 				  out.close();
-//				  Constants.isEvaluating = false;
-//				out.println(e);
+				  Constants.isEvaluating = false;
+
 
 			}
 
 
 		}
-//		long endTime   = System.?nanoTime();
-//		long totalTime = endTim?e - startTime;
-//		System.out.println("iteration: " + i);  
-//		System.out.println(totalTime);
 
 
+		Evaluation eval = new Evaluation(outputNum);
+		INDArray output = model.output(testData.getFeatures());
+		eval.eval(testData.getLabels(), output);
+		log.info(eval.stats());
 		
 	}
 	

@@ -241,6 +241,19 @@ public class _utils {
 
 	  
 	  
+	  public static double calcPooledMean(double mu1, double n1 , double mu2, double n2) {
+		  double temp =  mu1*n1 + mu2*n2;
+		  return temp / (n1 + n2);
+	  }
+	  
+	  public static double calcPooledSTD(double std1 , double n1, double std2, double n2) {
+		  
+		  double temp = (n1-1) * Math.pow(std1, 2) + (n2-1) * Math.pow(std2, 2);
+		  temp /= (n1+n2-1);
+		  
+		  return Math.max(0.00001, temp);
+	  }
+	  
 	  
 	  
 }

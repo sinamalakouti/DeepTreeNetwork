@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package neuralnetwork;
+package sigmoid;
 
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.api.Layer;
@@ -36,24 +36,16 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 
+import neuralnetwork.CustomLayer;
 import utils.Constants;
-import weka.classifiers.trees.J48;
 import weka.core.Instances;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
 
-/**
- * A layer with parameters
- * 
- * @author Adam Gibson
- */
-public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer> extends AbstractLayer<CustomLayer> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public  class SigmoidLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer> extends AbstractLayer<CustomLayer> {
+
 	protected INDArray paramsFlattened;
 	protected INDArray gradientsFlattened;
 	protected Map<String, INDArray> params;
@@ -64,11 +56,10 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
 	protected Solver solver;
 
 	protected int LayerNumber;
-	protected HashMap<Integer, BayesTreeActivationFunction> activationModels = new HashMap<>();
 
 	protected Map<String, INDArray> weightNoiseParams = new HashMap<>();
 
-	public BayesTreeLayer(NeuralNetConfiguration conf, Instances train, Instances test, int layernumber) {
+	public SigmoidLayer(NeuralNetConfiguration conf, Instances train, Instances test, int layernumber) {
 		super(conf);
 		this.LayerNumber = layernumber;
 
@@ -132,60 +123,6 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
     }
 	
 	
-	
-//    TODO check and implement this function properly
-	@Override
-//	public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
-//		assertInputSet(true);
-//		// If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or
-//		// equivalent)
-//		INDArray z = backpropOutput(epsilon, workspaceMgr); // Note: using preOutput(INDArray) can't be used as this
-//															// does a setInput(input) and resets the 'appliedDropout'
-//															// flag
-//		// INDArray activationDerivative =
-//		// Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(),
-//		// z).derivative());
-//		// INDArray activationDerivative =
-//		// conf().getLayer().getActivationFn().getGradient(z);
-//		// INDArray delta = epsilon.muli(activationDerivative);
-//
-////    original is 
-////        INDArray delta1 = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
-//
-//		z = z.muli(epsilon);
-//
-//		Pair<INDArray, INDArray> result = new Pair<>(z, null);
-//
-//		INDArray delta = result.getFirst();
-//
-//		if (maskArray != null) { 
-//			applyMask(delta);
-//		} 
-//
-//		Gradient ret = new DefaultGradient();
-//
-//		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f order
-//		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
-//
-//		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
-//
-////		if (hasBias()) {
-////			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
-////			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
-////			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
-////		}
-//
-//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
-//
-//		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
-//				new long[] { W.size(0), delta.size(0) }, 'f');
-//		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose(); // W.mmul(delta.transpose()).transpose();
-//
-//		weightNoiseParams.clear();
-//
-//		epsilonNext = backpropDropOutIfPresent(epsilonNext);
-//		return new Pair<>(ret, epsilonNext);
-//	}
 
 	public void fit() {
 		throw new UnsupportedOperationException("Not supported");
@@ -408,11 +345,10 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 			
 			
-			if (! activationModels.containsKey(neuron))
-			activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false,neuron));
-			
+		
 			
 			INDArray weight = W.getColumn(neuron); 
+
 			z.assign(input.mulRowVector(weight.transpose()));
 
 			if (neuron == 0) {
@@ -420,22 +356,21 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
 
 				INDArray ztemp;
 				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
 				else
-					ztemp = z.dup();
-								
+					ztemp = z;
 
-				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
-				 result = ret.transpose().dup();
+				INDArray ret1 =  layerConf().getActivationFn().getActivation(ztemp, training);
+				 result = ret1.dup();
 			} else {
 				INDArray ztemp;
 				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
 				else
-					ztemp = z.dup();
+					ztemp = z;
 
-				INDArray	ret = activationModels.get(neuron).getActivation(ztemp, training);
-				result = Nd4j.concat(1, result, ret.transpose());
+				INDArray	ret1 =  layerConf().getActivationFn().getActivation(ztemp, training);
+				result = Nd4j.concat(1, result, ret1);
 //            	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
 			}
 			
@@ -460,18 +395,10 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
     @Override
     public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
           INDArray z = preOutput(training, workspaceMgr);
-        
-        if (LayerNumber == 1)
-        {
-//        	System.out.println("YESS");
-//        	System.out.println(z);
-        }
-//        INDArray ret = layerConf().getActivationFn().getActivation(z, training);
+   
 
         INDArray ret = z.dup();
-//        if (maskArray != null) {
-//            applyMask(ret);
-//        }
+
 
         return ret;
     }
@@ -508,7 +435,7 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
 //         code khodeman :)) 
          
           
-//         input.mmuli(W, ret);
+
 
  		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
  		INDArray result = null;
@@ -522,28 +449,28 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
 
  				INDArray ztemp;
  				if (LayerNumber == 0)
- 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+ 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
  				else
  					ztemp = z;
-
-
- 				Pair<INDArray, INDArray>	ret = activationModels.get(neuron).backprop(ztemp, null);
- 				 result = ret.getFirst().transpose().dup();
+ 				Pair<INDArray, INDArray>	ret1 = layerConf().getActivationFn().backprop(ztemp, null);
+ 				INDArray tmp = ret1.getFirst().dup();
+ 				 result = tmp.dup();
  			} else {
  				INDArray ztemp;
  				if (LayerNumber == 0)
- 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+ 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
  				else
  					ztemp = z.dup();
 
- 				Pair<INDArray, INDArray>	ret = activationModels.get(neuron).backprop(ztemp, null);
- 				INDArray tmp = ret.getFirst().dup().transpose();
+ 				Pair<INDArray, INDArray>	ret1 = layerConf().getActivationFn().backprop(ztemp, null);
+ 				INDArray tmp = ret1.getFirst().dup();
  				result = Nd4j.concat(1, result, tmp);
 //             	 ret = layerConf().getActivationFn().getActivation(z, training).add(ret);
  			}
  			
  		}
 
+ 		
  		
  		
 //         if(hasBias()){
@@ -553,42 +480,45 @@ public  class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layer
          if (maskArray != null) {
              applyMask(z);
          }
+         
+//         input.mmuli(W, ret);
+//         result = 
 
          return result;
     }
 
-//    protected INDArray preOutput1 (boolean training, LayerWorkspaceMgr workspaceMgr) {
-//        assertInputSet(false);
-//        applyDropOutIfNecessary(training, workspaceMgr);
-//        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-//        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-//
-//        //Input validation:
-//        if (input.rank() != 2 || input.columns() != W.rows()) {
-//            if (input.rank() != 2) {
-//                throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
-//                        + input.rank() + " array with shape " + Arrays.toString(input.shape())
-//                        + ". Missing preprocessor or wrong input type? " + layerId());
-//            }
-//            throw new DL4JInvalidInputException(
-//                    "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
-//                            + ") is invalid: does not match layer input size (layer # inputs = "
-//                            + W.size(0) + ") " + layerId());
-//        }
-//
-//
-//        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-//        input.mmuli(W, ret);
-//        if(hasBias()){
-//            ret.addiRowVector(b);
-//        }
-//
-//        if (maskArray != null) {
-//            applyMask(ret);
-//        }
-//
-//        return ret;
-//    }
+    protected INDArray preOutput1 (boolean training, LayerWorkspaceMgr workspaceMgr) {
+        assertInputSet(false);
+        applyDropOutIfNecessary(training, workspaceMgr);
+        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
+
+        //Input validation:
+        if (input.rank() != 2 || input.columns() != W.rows()) {
+            if (input.rank() != 2) {
+                throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
+                        + input.rank() + " array with shape " + Arrays.toString(input.shape())
+                        + ". Missing preprocessor or wrong input type? " + layerId());
+            }
+            throw new DL4JInvalidInputException(
+                    "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
+                            + ") is invalid: does not match layer input size (layer # inputs = "
+                            + W.size(0) + ") " + layerId());
+        }
+
+
+        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+        input.mmuli(W, ret);
+        if(hasBias()){
+            ret.addiRowVector(b);
+        }
+
+        if (maskArray != null) {
+            applyMask(ret);
+        }
+
+        return ret;
+    }
 
 //	protected INDArray backpropOutput(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
 //		assertInputSet(false);

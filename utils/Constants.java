@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -21,7 +22,7 @@ public class Constants {
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
 	public static int maximumDepth;
-	
+	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
 	
 	

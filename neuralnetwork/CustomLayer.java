@@ -29,6 +29,7 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import sigmoid.SigmoidLayer;
 import utils.Constants;
 
 import java.util.Collection;
@@ -47,7 +48,7 @@ public class CustomLayer extends FeedForwardLayer {
 
         initializeConstraints(builder);
     }
-
+ 
     @Override
     public Layer instantiate(NeuralNetConfiguration conf, Collection<TrainingListener> trainingListeners,
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {

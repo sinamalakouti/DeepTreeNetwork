@@ -8,7 +8,6 @@ import org.nd4j.autodiff.functions.DifferentialFunction;
 import org.nd4j.autodiff.samediff.SDVariable;
 import org.nd4j.autodiff.samediff.SameDiff;
 import org.nd4j.linalg.activations.IActivation;
-import org.nd4j.linalg.activations.impl.ActivationSigmoid;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
@@ -65,7 +64,6 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 			score /= scoreArr.size(0);
 		}
 
-		// TODO Auto-generated method stub
 		return score;
 	}
 
@@ -201,15 +199,20 @@ public class LossBayesTree extends DifferentialFunction implements Serializable,
 				}
 
 				if (s[i][j] == 0) {
-					s[i][j] += 0.001;
+					s[i][j] += 0.0001;
 
+				}
+				if ( s[i][j] == 1)
+				{
+					s[i][j] -= 0.0001;
 				}
 			}
 		output = Nd4j.create(s);
-
-		INDArray scoreArr = Transforms.log(output, false).muli(labels);
-
-		s = output.toDoubleMatrix();
+		INDArray scoreArr1= Transforms.log(output, false).mul(labels);
+		INDArray scoreArr2 = Transforms.log((output.sub(1)).mul(-1),false).mul((labels.sub(1)).mul(-1));
+		INDArray scoreArr = (scoreArr1.add(scoreArr2)).mul(-1);	
+		
+		s = scoreArr.toDoubleMatrix();
 		for (int i = 0; i < s.length; i++)
 			for (int j = 0; j < s[0].length; j++) {
 				if (Double.isNaN(s[i][j])) {
