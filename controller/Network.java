@@ -3,32 +3,22 @@ package controller;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
-import org.datavec.api.split.FileSplit;
-import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.util.ModelSerializer;
-import org.jfree.data.general.DatasetUtilities;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.SplitTestAndTrain;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
@@ -37,25 +27,57 @@ import org.nd4j.linalg.util.NDArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import neuralnetwork.BayesTreeActivationFunction;
 import neuralnetwork.CustomLayer;
-import neuralnetwork.LossBayesTree;
-import neuralnetwork.OutputCustomLayer;
-import scala.collection.immutable.Stream.Cons;
-import sigmoid.MySigmoidActivationFunction;
 import utils.Constants;
 import utils._utils;
-import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.CSVLoader;
+import weka.core.WekaException;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 public class Network {
 
 	private static Logger log = LoggerFactory.getLogger(Network.class);
+	
+	
+	
+	@SuppressWarnings("unused")
+	private static Instances createProperDataset(INDArray in, boolean training) {
+		Instances instances = null;
+
+		try {
+			INDArray label = null;
+			
+			if (training == false)
+				label = Constants.testInstancesLabel;		
+			else
+				label = Constants.trainInstancesLabel;
+
+			INDArray dataset = Nd4j.concat(1, in, label);
+
+			instances = _utils.ndArrayToInstances(dataset);	
+			instances.setClassIndex(instances.numAttributes() - 1);
+
+			if (!instances.classAttribute().isNominal()) {
+				NumericToNominal convert = new NumericToNominal();
+				String[] options = new String[2];
+				options[0] = "-R";
+				options[1] = "" + (instances.classIndex() + 1); // range of variables to make numeric
+				convert.setOptions(options);
+				convert.setInputFormat(instances);
+				instances = weka.filters.Filter.useFilter(instances, convert);
+			}
+		} catch (WekaException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return instances;
+
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -191,19 +213,27 @@ public class Network {
 		dataset.setClassIndex(dataset.numAttributes() - 1);
 		
 
-		// Second: the RecordReaderDataSetIterator handles conversion to DataSet
-//		// objects, ready for use in neural network
-		int labelIndex = 4; // 5 values in each row of the iris.txt CSV: 4 input features followed by an
-		// integer label (class) index. Labels are the 5th value (index 4) in each row
 		int batchSize = 100; // Iris data set: 150 examples total. We are loading all of them into one
 		int trainSize = (int) Math.round(dataset.numInstances() * 0.7);
 		int testSize = dataset.numInstances() - trainSize;
+		dataset.randomize(new java.util.Random());	// randomize instance order before splitting dataset
+
+		
+		
+		
 		Instances training = new Instances(dataset, 0, trainSize);
 		Instances test = new Instances(dataset, trainSize, testSize);
-		training.randomize(new java.util.Random(0));
-//
+
+		
+//		
+//        Normalize filterNorm = new Normalize();
+//        filterNorm.setInputFormat(training);
+//		training = Filter.useFilter(training, filterNorm);
+//		test = Filter.useFilter(test, filterNorm);
+		dataset = null;
+
 		DataSet trainingData = _utils.instancesToDataSet(training);
-		DataSet testData = _utils.instancesToDataSet(test);
+		DataSet testData = _utils.instancesToDataSet(test);			
 		int  batchNum = trainingData.numExamples() / batchSize;
 		Constants.maximumDepth =3;
 //		</mnistdataset>
@@ -263,22 +293,25 @@ public class Network {
 //		// from the *training* set
 
 		final int numInputs = 784;
-
 		int outputNum = 10;
-		long seed = 6;
 		log.info("Build model....");
 //org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
-		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed)
+		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+				.seed(6)
 
 				.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 
 
-				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(new BayesTreeActivationFunction(0, false,-1))
+				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(new BayesTreeActivationFunction(0, false, -1198))
 						.build())
 				.layer(1,
-						new CustomLayer.Builder().nIn(40).nOut(40).activation(new BayesTreeActivationFunction(0, false,-2)).build())
+						new CustomLayer.Builder().nIn(40).nOut(40).activation(new BayesTreeActivationFunction(1, false, -100) ).build())
+//				.layer(1,
+//						new DenseLayer.Builder().nIn(40).nOut(40).activation(Activation.SIGMOID).build())
+//						new OutputLayer.Builder(new LossBayesTree(null))
+//								.activation(new BayesTreeActivationFunction(2, true, -3)).nIn(40).nOut(outputNum).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
 								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
@@ -316,10 +349,6 @@ public class Network {
 
 		}
 
-		if ( attInexes.containsValue(false)) {
-			System.out.println("ajab badbakhti gir kardim");
-			System.exit(0);
-		}
 		
 		
 //		class configuration for each neuron
@@ -348,33 +377,71 @@ public class Network {
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
 		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
 		
-		for (int i = 0; i < 200; i++) {
-			for ( int b = 0;  b < batchNum ; b ++) {
+		
+	
+		for ( int i = 0; i < 200; i++) {
+//			for ( int b = 0;  b < batchNum ; b ++) {
+				
+//				DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
+//				INDArray z = set.getFeatures().dup();
+////				System.out.print("at neuron "+b+":    ");
+////				for (int j = 0; j < Constants.attributesIndexes.get(b).length; j++) {
+////					System.out.print(Constants.attributesIndexes.get(b)[j]+"  ");
+////				}
+////				System.out.println();
+//
+//				Instances  incs = createProperDataset(z, true);
+//				J48 btree = new J48();
+//				btree.buildClassifier(incs);
+//				
+//
+//				Iterator<Instance> it = incs.iterator();
+//				int correct = 0;
+//				while (it.hasNext()) {
+//
+//					double[] prediciton;
+//					try {
+//						Instance next = it.next();
+//						prediciton = btree.predicate(next, true);
+//							
+//						INDArray nd = Nd4j.create(prediciton);
+//						System.out.println(nd.maxNumber());
+//						int idx = Nd4j.getExecutioner().execAndReturn(new IAMax(nd)).getFinalResult();	
+//						if ( idx == next.classValue())
+//							correct ++;
+////						else {
+//////							System.out.println(idx);
+////						}
+//
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//
+//				System.out.println(((double)correct) / test.size());
+////				
 				
 				
-				DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
-				
-				
-				model.fit(set	);
-//				ModelSerializer.writeModel(model, "laylaylay", true);
-				
+//				model.fit(set);
 				
 
-			}
+//			}
+		model.fit(trainingData);
+
 			
 			
-			
-			if ( i % 5 == 0) {
+			if ( i % 2 == 0) {
 				Constants.isEvaluating = true;
 				Evaluation eval = new Evaluation(outputNum);
+				System.out.println(testData.numExamples());
 				INDArray output = model.output(testData.getFeatures());
 				System.out.println("sdaf");
 				eval.eval(testData.getLabels(), output);
 				
-				 String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/second/Incremental_and_classConfiguration/resultIteration_"+ i;
+				 String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/Not Incremental/Epoch Iteration/resultIteration_"+ i;
 				  File file = new File (path);
 				  BufferedWriter out = new BufferedWriter(new FileWriter(file)); 
-				  out.write(eval.stats());
+				  out.write(eval.stats()+"\n" + model.score());
 				  out.close();
 				  Constants.isEvaluating = false;
 
