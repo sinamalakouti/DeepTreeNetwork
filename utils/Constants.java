@@ -3,6 +3,7 @@ package utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import weka.core.Instances;
@@ -24,7 +25,9 @@ public class Constants {
 	public static int maximumDepth;
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
-	
+	public static	MultiLayerNetwork model;
+	public static double [] weightLayerMin;
+	public static double [] weightLayerMax;
 	
 	
 	

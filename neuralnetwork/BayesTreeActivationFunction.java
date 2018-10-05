@@ -1,11 +1,15 @@
 package neuralnetwork;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.jfree.data.general.Dataset;
 import org.nd4j.linalg.activations.BaseActivationFunction;
+import org.nd4j.linalg.api.buffer.DataBuffer.Type;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
@@ -14,6 +18,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.StandardizeStrategy;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.Pair;
 import org.nd4j.linalg.util.FeatureUtil;
+import org.nd4j.linalg.util.ND4JTestUtils;
 
 import utils.Constants;
 import utils._utils;
@@ -21,6 +26,7 @@ import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
+import weka.core.matrix.Matrix;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.NumericToNominal;
@@ -75,8 +81,10 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				
 //			for mapping : 	result [i] = predictionDerivative[0]; should changed true -> false in the line above
 				
-				
+			
 			result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+			
+			
 
 //				if (isOutputLayerActivation == false) {
 //					labelIndexes[i] = prediciton[1];
@@ -121,8 +129,8 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			}
 //		result = result.muli(epsilon);
 			
-			output = Nd4j.create(result).transpose();
 			
+			output = Nd4j.create(result).transpose();
 //			normalizer.transform(output);
 //			double mu = output.meanNumber().doubleValue();
 //			double std = Math.sqrt(output.varNumber().doubleValue());
@@ -133,13 +141,8 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			double max = output.maxNumber().doubleValue();
 			
 
-//		output =  output.sub(min);
-//		output =  output.div(max - min);
-			
-			
-//			System.out.println(output.maxNumber());
-//			System.out.println(output.minNumber());
-//			
+			output =  output.sub(min);
+			output =  output.div(max - min);
 
 			return new Pair<>(output, null);
 		} else {
@@ -267,10 +270,13 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			
 			if (training == false)
 				label = Constants.testInstancesLabel;		
-			else
+			else{
+				_utils.setLabels(Constants.model.getLabels(), false,training);
 				label = Constants.trainInstancesLabel;
 
+			}
 			INDArray dataset = Nd4j.concat(1, in, label);
+			
 
 			instances = _utils.ndArrayToInstances(dataset);	
 			instances.setClassIndex(instances.numAttributes() - 1);

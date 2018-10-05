@@ -41,6 +41,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 
+import scala.collection.immutable.Stream.Cons;
 import utils.Constants;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -103,7 +104,17 @@ extends AbstractLayer<CustomLayer> {
 		// INDArray delta = epsilon.muli(activationDerivative);
 
 		
-		double [][] zprim = z.toDoubleMatrix();
+		double [][] zprim = W.toDoubleMatrix();
+		for  ( int i =0 ; i  < zprim.length ; i++)
+			for (int j =0 ; j < zprim[i].length; j ++)
+			{
+				if ( Double.isNaN(zprim[i][j]) ||Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number zero");
+					System.out.println(zprim[i][j]);
+					System.exit(0);
+				}
+			}
+		zprim = z.toDoubleMatrix();
 		for  ( int i =0 ; i  < zprim.length ; i++)
 			for (int j =0 ; j < zprim[i].length; j ++)
 			{
@@ -430,13 +441,17 @@ extends AbstractLayer<CustomLayer> {
 		return p;
 	}
 
-	//    TODO : check and implement this function properly ( BIAS TERM VERY VERY VERY VERY VERY VERY VERY IMPORTANT)
 
 	protected INDArray preOutput(boolean training, LayerWorkspaceMgr workspaceMgr) {
 		assertInputSet(false);
 		applyDropOutIfNecessary(training, workspaceMgr);
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-		
+//		normalization: 
+		double mu = W.meanNumber().doubleValue();
+		double std = Math.sqrt(W.varNumber().doubleValue());
+		W = W.subi(mu);
+		W = W.divi(std);
+
 		
 		double [][] zprim = W.toDoubleMatrix();
 		for  ( int i =0 ; i  < zprim.length ; i++)
@@ -448,7 +463,6 @@ extends AbstractLayer<CustomLayer> {
 					System.exit(0);
 				}
 			}
-		//INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
 
 		
 		// Input validation:
@@ -466,7 +480,6 @@ extends AbstractLayer<CustomLayer> {
 
 		
 
-//		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
 		INDArray z = null;
 		INDArray result = null;
 
@@ -476,15 +489,7 @@ extends AbstractLayer<CustomLayer> {
 				activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false, neuron));
 
 			INDArray weight = W.getColumn(neuron);
-//			double sum = 0d;
-//			for (int i = 0; i < weight.length(); i++) {
-//				
-//				sum += Math.abs(weight.getDouble(i));
-//			}
-//			double mu = weight.meanNumber().doubleValue();
-//			double std = Math.sqrt(weight.varNumber().doubleValue());
-//			weight = weight.subi(mu);
-//			weight = weight.divi(std);
+
 			
 
 			 z = input.mulRowVector(weight.transpose());
@@ -571,11 +576,7 @@ extends AbstractLayer<CustomLayer> {
 					+ layerId());
 		}
 
-		//         INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
 
-		//         code khodeman :)) 
-
-		//         input.mmuli(W, ret);
 
 		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
 		INDArray result = null;
@@ -608,9 +609,6 @@ extends AbstractLayer<CustomLayer> {
 
 		}
 
-		//         if(hasBias()){
-		//             ret.addiRowVector(b);
-		//         }
 
 		if (maskArray != null) {
 			applyMask(z);
@@ -619,116 +617,7 @@ extends AbstractLayer<CustomLayer> {
 		return result;
 	}
 
-	//    protected INDArray preOutput1 (boolean training, LayerWorkspaceMgr workspaceMgr) {
-	//        assertInputSet(false);
-	//        applyDropOutIfNecessary(training, workspaceMgr);
-	//        INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-	//        INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-	//
-	//        //Input validation:
-	//        if (input.rank() != 2 || input.columns() != W.rows()) {
-	//            if (input.rank() != 2) {
-	//                throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
-	//                        + input.rank() + " array with shape " + Arrays.toString(input.shape())
-	//                        + ". Missing preprocessor or wrong input type? " + layerId());
-	//            }
-	//            throw new DL4JInvalidInputException(
-	//                    "Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
-	//                            + ") is invalid: does not match layer input size (layer # inputs = "
-	//                            + W.size(0) + ") " + layerId());
-	//        }
-	//
-	//
-	//        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-	//        input.mmuli(W, ret);
-	//        if(hasBias()){
-	//            ret.addiRowVector(b);
-	//        }
-	//
-	//        if (maskArray != null) {
-	//            applyMask(ret);
-	//        }
-	//
-	//        return ret;
-	//    }
 
-	//	protected INDArray backpropOutput(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
-	//		assertInputSet(false);
-	//		boolean training = true;
-	//		applyDropOutIfNecessary(training, workspaceMgr);
-	//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-	//		INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-	////        System.out.println(b);
-	//
-	//		b = Nd4j.zeros(W.size(0));
-	//		// Input validation:
-	//		if (input.rank() != 2 || input.columns() != W.rows()) {
-	//			if (input.rank() != 2) {
-	//				throw new DL4JInvalidInputException("Input that is not a matrix; expected matrix (rank 2), got rank "
-	//						+ input.rank() + " array with shape " + Arrays.toString(input.shape())
-	//						+ ". Missing preprocessor or wrong input type? " + layerId());
-	//			}
-	//			throw new DL4JInvalidInputException(
-	//					"Input size (" + input.columns() + " columns; shape = " + Arrays.toString(input.shape())
-	//							+ ") is invalid: does not match layer input size (layer # inputs = " + W.size(0) + ") "
-	//							+ layerId());
-	//		}
-	//
-	//		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
-	//
-	////        TODO : is the weighted input
-	//		INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-	//		INDArray result = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
-	//		for (int neuron = 0; neuron < W.columns(); neuron++) {
-	//
-	//
-	//			INDArray weight = W.getColumn(neuron);
-	//
-	//			z.assign(input.mulRowVector(weight.transpose()));
-	//
-	//		
-	//
-	//			if (maskArray != null) {
-	//				applyMask(z);
-	//			}
-	//			if (neuron == 0) {
-	//				INDArray ztemp;
-	//				if (LayerNumber == 0)
-	//					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-	//				else
-	//					ztemp = z;
-	//
-	//				if (ztemp.size(0) != z.size(0)) {
-	//
-	//				}
-	//				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
-	//				result = ret.transpose();
-	//			} else {
-	//				INDArray ztemp;
-	//				if (LayerNumber == 0)
-	//					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron));
-	//				else
-	//					ztemp = z;
-	//				ret = activationModels.get(neuron).backprop(ztemp, epsilon).getFirst();
-	//
-	//				result = Nd4j.concat(1, result, ret.transpose());
-	//			}
-	//
-	//		}
-	//
-	//		return result;
-	//	}
-
-	//	@Override
-	//	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
-	//		INDArray ret = preOutput(training, workspaceMgr);
-	//
-	//		if (maskArray != null) {
-	//			applyMask(ret);
-	//		}
-	//
-	//		return ret;
-	//	}
 
 	@Override
 	public double calcL2(boolean backpropParamsOnly) {

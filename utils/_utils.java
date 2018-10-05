@@ -10,13 +10,13 @@ import java.util.Set;
 
 import org.apache.commons.math3.util.MathArrays;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
 import akka.util.Collections;
-import javafx.scene.control.TreeTableRow;
-import neuralnetwork.ActivationFunction;
+ import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
 import weka.classifiers.trees.ht.SplitNode;
 import weka.core.Attribute;
@@ -36,6 +36,19 @@ public class _utils {
 			list[i] = (int) data.get(i).classValue();
 		}
 		return list;
+	}
+	
+	public static void setLabels( INDArray labels , boolean evaluating, boolean training ) {
+		
+		INDArray idxOfMaxInEachColumn = Nd4j.getExecutioner().exec(new IAMax(labels),1);
+
+		if ( training )
+			Constants.trainInstancesLabel = idxOfMaxInEachColumn;
+		else if ( evaluating )
+			Constants.testInstancesLabel = idxOfMaxInEachColumn;
+		
+		
+		
 	}
 	
 	public static INDArray convertActivtionOutput(INDArray arg0 , double [][] prediction) throws Exception {
