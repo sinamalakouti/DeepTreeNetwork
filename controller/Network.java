@@ -88,7 +88,7 @@ public class Network {
 
 	public static void main(String[] args) throws Exception {
 
-		Nd4j.setDataType(Type.DOUBLE);
+//	TODO	Nd4j.setDataType(Type.DOUBLE);
 
 
 		// <mnistdataset>
@@ -262,7 +262,7 @@ public class Network {
 //		Constants.testInstancesLabel = ar.getColumns(784);
 		
 		
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 150; i++) {
 //			 for ( int b = 0; b < batchNum ; b ++) {
 
 //			 DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
@@ -273,6 +273,7 @@ public class Network {
 				Constants.model.fit(set);
 //				counter ++;
 			}
+			mnistTrain.reset();
 
 			// }
 			// model.fit(trainingData);

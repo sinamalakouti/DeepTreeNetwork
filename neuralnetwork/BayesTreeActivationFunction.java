@@ -275,6 +275,10 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				label = Constants.trainInstancesLabel;
 
 			}
+			if ( in.rows() != label.rows()){
+				System.out.println(in.shapeInfoToString());
+				System.out.println(label.shapeInfoToString());
+			}
 			INDArray dataset = Nd4j.concat(1, in, label);
 			
 
