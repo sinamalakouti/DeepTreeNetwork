@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import utils.Constants;
 import weka.classifiers.trees.ht.LeafNode;
 import weka.core.Attribute;
 import weka.core.Capabilities;
@@ -84,6 +85,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 //  Add by Sina
 
 	protected double[][] mu;
+	
 	protected double[][] sd;
 	protected double[] classProb;
 	public int depth = 0;
@@ -109,10 +111,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 //	public double getSu(Instance instance, boolean isOutputLayerActivation) throws Exception {
 //	}
 	public double[] predicateDerviativ(Instance instance, boolean isOutputLayerActivation) throws Exception {
-//
-//		return pdfDerivative(instance, node.classProb, node.mu, node.sd);
-
-//		return predicateDerivative(instance);
 
 		return predicateDerivative_log(instance, isOutputLayerActivation);
 	}
@@ -216,8 +214,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 		if (node.isLeaf() == false) {
 			System.out.println("not a leaf");
-//			 node = getBayesParameters(instance);
-
 			System.exit(0);
 			
 		}
@@ -338,61 +334,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		}
 	}
 
-	public double[] getGaussianPDF(Instance data, double[] classProb, double[][] sampleMeans, double[][] sampleStDevs,
-			Instances dataset) {
-		double[] pdf = new double[data.numClasses()];
-		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
-			System.out.println("ERRRROOOOORRRR !!");
-			System.exit(0);
-		}
-
-		int n_attributes = sampleMeans.length;
-		int n_classes = sampleMeans[0].length;
-
-		for (int index = 0; index < 1; index++) {
-
-			Instance x = data;
-			for (int c = 0; c < n_classes; c++) {
-				double res = 1d;
-
-				if (classProb[c] == 0) {
-					pdf[c] = 0;
-					continue;
-				} else {
-					boolean check = false;
-					for (int i = 0; i < n_attributes; i++) {
-
-						Attribute attribute = data.attribute(i);
-						double power = Math.pow((x.value(attribute) - sampleMeans[i][c]), 2)
-								/ (2 * Math.pow(sampleStDevs[i][c], 2));
-						if (sampleStDevs[i][c] == 0) {
-//							System.out.println(sampleStDevs[i][c] + "");
-							pdf[c] = 0;
-							check = true;
-						}
-
-						double temp = (1 / (Math.sqrt(2 * Math.PI) * sampleStDevs[i][c])) * Math.exp(-1 * power);
-						res = res * temp;
-
-					}
-
-					res = res * classProb[c];
-					if (Double.isNaN(res)) {
-						System.out.println("oh my god1233321321");
-						System.exit(0);
-					}
-					if (check == true)
-						pdf[c] = Double.MAX_VALUE;
-					else
-						pdf[c] = res;
-				}
-
-			}
-		}
-
-		return pdf;
-
-	}
 
 	public double[] getGaussianPDF_log(Instance data, double[] classProb, double[][] sampleMeans,
 			double[][] sampleStDevs, Instances dataset) {
@@ -404,7 +345,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		}
 
 		int n_attributes = sampleMeans.length;
-		int n_classes = sampleMeans[0].length;
+		int n_classes = Constants.numClasses;
 
 		Instance x = data;
 		for (int c = 0; c < n_classes; c++) {
@@ -413,6 +354,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			for (int i = 0; i < n_attributes; i++) {
 
 				Attribute attribute = data.attribute(i);
+				
 
 				double tempLog1 = Math.log(1 / (Math.sqrt(2 * Math.PI) * sampleStDevs[i][c]))
 						- (Math.pow((x.value(attribute) - sampleMeans[i][c]), 2)
@@ -480,30 +422,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		}
 
 		return grediant;
-	}
-
-	public double[] pdfDerivative(Instance x, double[] classProb, double[][] sampleMeans, double[][] sampleStDevs,
-			Instances dataset) throws Exception {
-
-		double[] pdf = getGaussianPDF(x, classProb, sampleMeans, sampleStDevs, dataset);
-		double[] devPdf = getGaussianPDF_derivation(x, classProb, sampleMeans, sampleStDevs);
-		int n_classes = sampleMeans[0].length;
-		double[] gredients = new double[n_classes];
-		double pdfDenominator = 0d;
-		double devPdfDenominator = 0d;
-
-		for (int c = 0; c < n_classes; c++) {
-			pdfDenominator += pdf[c];
-			devPdfDenominator += devPdf[c];
-		}
-		for (int c = 0; c < n_classes; c++) {
-			double numerator = devPdf[c] * pdfDenominator - (devPdfDenominator * pdf[c]);
-			gredients[c] = numerator / (Math.pow(pdfDenominator, 2));
-
-		}
-
-		return gredients;
-
 	}
 
 	public static double[] getGaussianPDF_derivation(Instance data, double[] classProb, double[][] sampleMeans,
@@ -584,18 +502,20 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 	  
 	  public void update ( Instances data) throws Exception {
 		
-		  this.setParameters1(data);
+		  this.setParameters(data);
 	  }
-	protected void setParameters1(Instances data) throws Exception {
-		double[][] mu2 = new double[data.numAttributes() - 1][data.numClasses()];
-		double[][] sd2 = new double[data.numAttributes() - 1][data.numClasses()];
+	protected void setParameters(Instances data) throws Exception {
+		double[][] mu2 = new double[data.numAttributes() - 1][Constants.numClasses];
+		double[][] sd2 = new double[data.numAttributes() - 1][Constants.numClasses];
 		int numInstances2 = data.size();
-		double[] classProb2 = new double[data.numClasses()];
+		double[] classProb2 = new double[Constants.numClasses];
 
 		Instances[] tempInstances = new Instances[data.numClasses()];
 		double s = 0d;
-
-		for (int c = 0; c < data.numClasses(); c++) {
+		for (int j = 0; j < data.classAttribute().numValues(); j++) {
+			
+			int c = Integer.parseInt(data.classAttribute().value(j));
+			
 			RemoveWithValues rwv = new RemoveWithValues();
 
 			String[] options = new String[5];
@@ -625,11 +545,13 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 			if (!data.attribute(i).equals(data.classAttribute())) {
 
-				for (int c = 0; c < data.numClasses(); c++) {
+				for (int j = 0; j < data.classAttribute().numValues(); j++) {
+
+					int c = Integer.parseInt(data.classAttribute().value(j));
 
 					if (tempInstances[c].size() < 2) {
 						mu2[i][c] = 0;
-						sd2[i][c] = 0.1;
+						sd2[i][c] = 0.01;
 					} else {
 						try {
 							mu2[i][c] = tempInstances[c].meanOrMode(i);
@@ -660,8 +582,10 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			this.sd = sd2;
 		} else {
 
-			for (int c = 0; c < data.numClasses(); c++) {
+			for (int j = 0; j < data.classAttribute().numValues(); j++) {
 				
+				int c = Integer.parseInt(data.classAttribute().value(j));
+
 				classProb[c] = calcPooledMean(classProb[c], numInstances, classProb2[c], numInstances2);
 				
 				for (int i = 0; i < data.numAttributes(); i++) {
@@ -682,7 +606,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		}
 	}
 
-//	ta inja
 	public ClassifierSplitModel getLocalModel() {
 		return m_localModel;
 	}
@@ -773,7 +696,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 		Instances[] localInstances;
 
-		this.setParameters1(data);
+		this.setParameters(data);
 
 		if (m_localModel.numSubsets() > 1 && this.depth < 0) {
 			localInstances = m_localModel.split(data);

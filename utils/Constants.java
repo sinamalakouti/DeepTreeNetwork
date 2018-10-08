@@ -28,6 +28,7 @@ public class Constants {
 	public static	MultiLayerNetwork model;
 	public static double [] weightLayerMin;
 	public static double [] weightLayerMax;
+	public static int numClasses = 10;
 	
 	
 	
