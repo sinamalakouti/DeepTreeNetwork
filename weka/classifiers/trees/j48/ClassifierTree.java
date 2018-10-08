@@ -338,7 +338,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 	public double[] getGaussianPDF_log(Instance data, double[] classProb, double[][] sampleMeans,
 			double[][] sampleStDevs, Instances dataset) {
 
-		double[] pdf = new double[data.numClasses()];
+		double[] pdf = new double[Constants.numClasses];
 		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
 			System.out.println("ERRRROOOOORRRR !!");
 			System.exit(0);
@@ -510,7 +510,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		int numInstances2 = data.size();
 		double[] classProb2 = new double[Constants.numClasses];
 
-		Instances[] tempInstances = new Instances[data.numClasses()];
+		Instances[] tempInstances = new Instances[Constants.numClasses];
 		double s = 0d;
 		for (int j = 0; j < data.classAttribute().numValues(); j++) {
 			
