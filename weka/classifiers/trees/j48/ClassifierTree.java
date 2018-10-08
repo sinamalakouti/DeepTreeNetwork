@@ -522,7 +522,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			options[0] = "-C";
 			options[1] = "" + (data.numAttributes());
 			options[2] = "-L";
-			options[3] = "" + (c + 1);
+			options[3] = "" + (j + 1);
 			options[4] = "-V";
 			rwv.setOptions(options);
 			rwv.setInputFormat(data);
