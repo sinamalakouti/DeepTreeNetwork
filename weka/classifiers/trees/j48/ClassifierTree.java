@@ -307,7 +307,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			if (mu == null) {
 				System.out.println(m_train.size());
 				System.out.println(m_train.numAttributes());
-//				this.setParameters(m_train);
 				System.out.println("khaaak");
 				System.exit(0);
 			}
@@ -342,7 +341,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
 			System.out.println("ERRRROOOOORRRR !!");
 			System.exit(0);
-		}
+		}				
 
 		int n_attributes = sampleMeans.length;
 		int n_classes = Constants.numClasses;
@@ -356,6 +355,9 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 				Attribute attribute = data.attribute(i);
 				
 
+				if ( sampleStDevs[i][c] == 0)
+					sampleStDevs[i][c] = 0.1;
+				
 				double tempLog1 = Math.log(1 / (Math.sqrt(2 * Math.PI) * sampleStDevs[i][c]))
 						- (Math.pow((x.value(attribute) - sampleMeans[i][c]), 2)
 								/ (2 * Math.pow(sampleStDevs[i][c], 2)));
@@ -400,20 +402,16 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 		int n_attributes = sampleMeans.length;
 		int n_classes = sampleMeans[0].length;
+		
 		double[] grediant = new double[n_classes];
-
 		for (int c = 0; c < n_classes; c++) {
 
 			double derivativePart = 0d;
+			
 			for (int i = 0; i < n_attributes; i++) {
-
 				Attribute attribute = data.attribute(i);
-//				System.out.println(data.value(attribute));
-//				System.out.println(sampleMeans[i][c]);
-//				System.out.println(sampleSTDs[i][c]);
-//				System.out.println(n.attributeStats(i).numericStats.mean);
-//				System.out.println(n.meanOrMode(attribute));
-//				System.out.println(n);
+				if ( sampleSTDs[i][c] == 0)
+					sampleSTDs[i][c] = 0.1;
 				derivativePart += (data.value(attribute) - sampleMeans[i][c]) / (Math.pow(sampleSTDs[i][c], 2));
 
 			}
@@ -424,60 +422,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		return grediant;
 	}
 
-	public static double[] getGaussianPDF_derivation(Instance data, double[] classProb, double[][] sampleMeans,
-			double[][] sampleStDevs) {
-		double[] devpdf = new double[data.numClasses()];
-		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
-			System.out.println("ERRRROOOOORRRR !!");
-			System.exit(0);
-		}
-
-		int n_attributes = sampleMeans.length;
-		int n_classes = sampleMeans[0].length;
-
-		for (int index = 0; index < 1; index++) {
-
-			Instance x = data;
-			double max = Double.MIN_VALUE;
-			double maxIndex = -1;
-			for (int c = 0; c < n_classes; c++) {
-				double res = 1d;
-				if (classProb[c] == 0) {
-					devpdf[c] = 0;
-					continue;
-				}
-
-				boolean check = false;
-
-				for (int i = 0; i < n_attributes; i++) {
-
-					Attribute attribute = data.attribute(i);
-					double power = Math.pow((x.value(attribute) - sampleMeans[i][c]), 2)
-							/ (2 * Math.pow(sampleStDevs[i][c], 2));
-					if (sampleStDevs[i][c] == 0) {
-//						System.out.println(sampleStDevs[i][c] + "");
-
-						devpdf[c] = 0;
-						check = true;
-					}
-
-					double temp = (1 / (Math.sqrt(1 * Math.PI) * sampleStDevs[i][c])) * Math.exp(-1 * power);
-					res = res * temp;
-//					  adding derivation part : 
-					res = res * (-1 / Math.pow(sampleStDevs[i][c], 2)) * (x.value(attribute) - sampleMeans[i][c]);
-				}
-				res = res * classProb[c];
-				if (check == true)
-					devpdf[c] = Double.MAX_VALUE;
-				else
-					devpdf[c] = res;
-
-			}
-
-		}
-
-		return devpdf;
-	}
+	
 //	
 	  public  double calcPooledMean(double mu1, double n1 , double mu2, double n2) {
 		  double temp =  mu1*n1 + mu2*n2;

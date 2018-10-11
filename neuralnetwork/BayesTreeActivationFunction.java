@@ -43,10 +43,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 	int neuronNumber = 0;
-//	public BayesTreeActivationFunction(Instances trainInstances, Instances testInstances, boolean isFirstLayer) {
-////		testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(testInstances)).transpose();
-////		trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(trainInstances)).transpose();
-//	}
+
 
 	public BayesTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
@@ -131,19 +128,14 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			
 			
 			output = Nd4j.create(result).transpose();
-//			normalizer.transform(output);
-//			double mu = output.meanNumber().doubleValue();
-//			double std = Math.sqrt(output.varNumber().doubleValue());
-//			output = output.sub(mu);
-//			output = output.div(std);
-//			
+// normalization : ( 0, 1 )
+			/*
 			double min = output.minNumber().doubleValue();
 			double max = output.maxNumber().doubleValue();
-			
-
+		
 			output =  output.sub(min);
 			output =  output.div(max - min);
-
+*/
 			return new Pair<>(output, null);
 		} else {
 //			System.out.println("mage darim ");

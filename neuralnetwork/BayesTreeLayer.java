@@ -91,18 +91,9 @@ extends AbstractLayer<CustomLayer> {
 	@Override
 	public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
 		assertInputSet(true);
-		// If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or
-		// equivalent)
+		
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
 		INDArray z = bacpropOutput(true, workspaceMgr, W); // Note: using preOutput(INDArray) can't be used as this does a
-		// setInput(input) and resets the 'appliedDropout' flag
-		// INDArray activationDerivative =
-		// Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(),
-		// z).derivative());
-		// INDArray activationDerivative =
-		// conf().getLayer().getActivationFn().getGradient(z);
-		// INDArray delta = epsilon.muli(activationDerivative);
-
 		
 		double [][] zprim = W.toDoubleMatrix();
 		for  ( int i =0 ; i  < zprim.length ; i++)
@@ -149,7 +140,6 @@ extends AbstractLayer<CustomLayer> {
 			}
 		
 
-		//        INDArray delta = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function paramsZ
 
 		if (maskArray != null) {
 			applyMask(delta);
@@ -161,14 +151,6 @@ extends AbstractLayer<CustomLayer> {
 		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
 
 		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
-
-		//        if(hasBias()){
-		//            INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
-		//            delta.sum(biasGrad, 0); //biasGrad is initialized/zeroed first
-		//            ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
-		//        }
-
-
 		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
 				new long[] { W.size(0), delta.size(0) }, 'f');
 		
@@ -185,7 +167,6 @@ extends AbstractLayer<CustomLayer> {
 					System.exit(0);
 				}
 			}
-//		W.mmul(delta.transpose()).transpose();
 		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose();
 		
 		zprim = W.toDoubleMatrix();
@@ -205,60 +186,6 @@ extends AbstractLayer<CustomLayer> {
 		epsilonNext = backpropDropOutIfPresent(epsilonNext);
 		return new Pair<>(ret, epsilonNext);
 	}
-
-	//    TODO check and implement this function properly
-	@Override
-	//	public Pair<Gradient, INDArray> backpropGradient(INDArray epsilon, LayerWorkspaceMgr workspaceMgr) {
-	//		assertInputSet(true);
-	//		// If this layer is layer L, then epsilon is (w^(L+1)*(d^(L+1))^T) (or
-	//		// equivalent)
-	//		INDArray z = backpropOutput(epsilon, workspaceMgr); // Note: using preOutput(INDArray) can't be used as this
-	//															// does a setInput(input) and resets the 'appliedDropout'
-	//															// flag
-	//		// INDArray activationDerivative =
-	//		// Nd4j.getExecutioner().execAndReturn(Nd4j.getOpFactory().createTransform(conf().getLayer().getActivationFunction(),
-	//		// z).derivative());
-	//		// INDArray activationDerivative =
-	//		// conf().getLayer().getActivationFn().getGradient(z);
-	//		// INDArray delta = epsilon.muli(activationDerivative);
-	//
-	////    original is 
-	////        INDArray delta1 = layerConf().getActivationFn().backprop(z, epsilon).getFirst(); //TODO handle activation function params
-	//
-	//		z = z.muli(epsilon);
-	//
-	//		Pair<INDArray, INDArray> result = new Pair<>(z, null);
-	//
-	//		INDArray delta = result.getFirst();
-	//
-	//		if (maskArray != null) { 
-	//			applyMask(delta);
-	//		} 
-	//
-	//		Gradient ret = new DefaultGradient();
-	//
-	//		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f order
-	//		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
-	//
-	//		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
-	//
-	////		if (hasBias()) {
-	////			INDArray biasGrad = gradientViews.get(DefaultParamInitializer.BIAS_KEY);
-	////			delta.sum(biasGrad, 0); // biasGrad is initialized/zeroed first
-	////			ret.gradientForVariable().put(DefaultParamInitializer.BIAS_KEY, biasGrad);
-	////		}
-	//
-	//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
-	//
-	//		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
-	//				new long[] { W.size(0), delta.size(0) }, 'f');
-	//		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose(); // W.mmul(delta.transpose()).transpose();
-	//
-	//		weightNoiseParams.clear();
-	//
-	//		epsilonNext = backpropDropOutIfPresent(epsilonNext);
-	//		return new Pair<>(ret, epsilonNext);
-	//	}
 
 	public void fit() {
 		throw new UnsupportedOperationException("Not supported");
@@ -446,12 +373,18 @@ extends AbstractLayer<CustomLayer> {
 		assertInputSet(false);
 		applyDropOutIfNecessary(training, workspaceMgr);
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
+		
+		
+		
+		
 //		normalization: 
+	
+/*
 		double mu = W.meanNumber().doubleValue();
 		double std = Math.sqrt(W.varNumber().doubleValue());
 		W = W.subi(mu);
 		W = W.divi(std);
-
+*/
 		
 		double [][] zprim = W.toDoubleMatrix();
 		for  ( int i =0 ; i  < zprim.length ; i++)
@@ -536,10 +469,6 @@ extends AbstractLayer<CustomLayer> {
 
 		}
 
-		//        if(hasBias()){
-		//            ret.addiRowVector(b);
-		//        }
-
 		if (maskArray != null) {
 			applyMask(z);
 		}
@@ -549,7 +478,6 @@ extends AbstractLayer<CustomLayer> {
 
 	@Override
 	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
-//		System.out.println(LayerNumber);
 		INDArray z = preOutput(training, workspaceMgr);
 		INDArray ret = z.dup();
 
@@ -559,10 +487,6 @@ extends AbstractLayer<CustomLayer> {
 	protected INDArray bacpropOutput(boolean training, LayerWorkspaceMgr workspaceMgr, INDArray W) {
 		assertInputSet(false);
 		applyDropOutIfNecessary(true, workspaceMgr);
-//		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
-//		INDArray b = getParamWithNoise(DefaultParamInitializer.BIAS_KEY, training, workspaceMgr);
-
-		
 		// Input validation:
 		if (input.rank() != 2 || input.columns() != W.rows()) {
 			if (input.rank() != 2) {
@@ -627,12 +551,6 @@ extends AbstractLayer<CustomLayer> {
 			if (l2 > 0) {
 
 				double norm2 = getParam(entry.getKey()).norm2Number().doubleValue();
-
-//				if (Double.isInfinite(norm2)) {
-//					System.out.println("ah aha h");
-//					System.out.println(getParam(entry.getKey()));
-//
-//				}
 				l2Sum += 0.5 * l2 * norm2 * norm2;
 			}
 		}

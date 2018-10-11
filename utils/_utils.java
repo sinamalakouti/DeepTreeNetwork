@@ -54,7 +54,6 @@ public class _utils {
 	public static INDArray convertActivtionOutput(INDArray arg0 , double [][] prediction) throws Exception {
 		INDArray arr = Nd4j.zeros(prediction.length, prediction[0].length);
 		arr   = Nd4j.create(prediction);
-		//		arr = arr.transpose();
 		INDArray dataset = Nd4j.concat(1, arg0, arr );
 		Instances instances = weka.classifiers.functions.dl4j.Utils.ndArrayToInstances(dataset);
 		instances.setClassIndex( instances.numAttributes() - 1);
@@ -77,11 +76,11 @@ public class _utils {
 	public static int getSplittingFeature(HNode node) throws Exception {
 
 		int attribute = -1;
-		//			 so the node is SpliteNode
 		String att = ((SplitNode) node).getSplitAtt();
 		int attNumeric = Integer.parseInt("" + att.charAt(att.length() - 1));
 		attribute = attNumeric;
 
+		
 		if (attribute ==  -1) {
 			throw new Exception(" cannot get split attribute of leaf node");
 		}

@@ -48,31 +48,31 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
 public class Network {
 
 	private static Logger log = LoggerFactory.getLogger(Network.class);
-	
-	
-	
+
 	@SuppressWarnings("unused")
 	private static Instances createProperDataset(INDArray in, boolean training) {
 		Instances instances = null;
 
 		try {
 			INDArray label = null;
-			
+
 			if (training == false)
-				label = Constants.testInstancesLabel;		
+				label = Constants.testInstancesLabel;
 			else
 				label = Constants.trainInstancesLabel;
 
 			INDArray dataset = Nd4j.concat(1, in, label);
 
-			instances = _utils.ndArrayToInstances(dataset);	
+			instances = _utils.ndArrayToInstances(dataset);
 			instances.setClassIndex(instances.numAttributes() - 1);
 
 			if (!instances.classAttribute().isNominal()) {
 				NumericToNominal convert = new NumericToNominal();
 				String[] options = new String[2];
 				options[0] = "-R";
-				options[1] = "" + (instances.classIndex() + 1); // range of variables to make numeric
+				options[1] = "" + (instances.classIndex() + 1); // range of
+																// variables to
+																// make numeric
 				convert.setOptions(options);
 				convert.setInputFormat(instances);
 				instances = weka.filters.Filter.useFilter(instances, convert);
@@ -88,8 +88,7 @@ public class Network {
 
 	public static void main(String[] args) throws Exception {
 
-//	TODO	Nd4j.setDataType(Type.DOUBLE);
-
+		// TODO Nd4j.setDataType(Type.DOUBLE);
 
 		// <mnistdataset>
 
@@ -126,13 +125,13 @@ public class Network {
 		DataSet testData = _utils.instancesToDataSet(test);
 		int batchNum = trainingData.numExamples() / batchSize;
 		Constants.maximumDepth = 3;
-//		for weights  normalization
+		// for weights normalization
 		Constants.weightLayerMin = new double[2];
-		Constants.weightLayerMin[0]= Double.POSITIVE_INFINITY;
-		Constants.weightLayerMin[1]= Double.POSITIVE_INFINITY;
+		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
+		Constants.weightLayerMin[1] = Double.POSITIVE_INFINITY;
 		Constants.weightLayerMax = new double[2];
-		Constants.weightLayerMax[0]= Double.NEGATIVE_INFINITY;
-		Constants.weightLayerMax[1]= Double.NEGATIVE_INFINITY;
+		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
+		Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
 		// </mnistdataset>
 
 		final int numInputs = 784;
@@ -211,67 +210,68 @@ public class Network {
 		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
 
 		// setupe the project :
-		
+
 		DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 6);
 		DataSetIterator mnistTest = new MnistDataSetIterator(batchSize, false, 6);
-		
-		
-		 int counter = 0 ;
-		 INDArray ar = null;
-//		while ( mnistTrain.hasNext()){
-//			
-//			DataSet set = mnistTrain.next();
-//			_utils.setLabels(set.getLabels(), false, true);
-//			if ( counter == 0)
-//				ar = 	Nd4j.concat(1, set.getFeatures(),Constants.trainInstancesLabel);
-//			else
-//			{
-//				INDArray tm = Nd4j.concat(1, set.getFeatures(),Constants.trainInstancesLabel.dup());
-//				ar =Nd4j.concat(0, ar,tm).dup();
-//			}
-//			
-//			counter++;
-//		}
-		
-//		training = _utils.ndArrayToInstances(ar);
-//		System.out.println(ar.getColumn(784));
-//		training.setClassIndex(training.numAttributes()-1);
-//		training.randomize(new java.util.Random()); // randomize instance order
-//		System.out.println(training.numClasses());
-//		trainingData = _utils.instancesToDataSet(training);
-//		
-		
-		
-//		  counter = 0 ;
-//		  ar = null;
-//		while ( mnistTest.hasNext()){
-//			
-//			DataSet set = mnistTest.next();
-//			_utils.setLabels(set.getLabels(), true, false);
-//			if ( counter == 0)
-//				ar = 	Nd4j.concat(1, set.getFeatures(),Constants.testInstancesLabel);
-//			else
-//			{
-//				INDArray tm = Nd4j.concat(1, set.getFeatures(),Constants.testInstancesLabel);
-//				ar =Nd4j.concat(0, ar,tm);
-//			}
-//			
-//		}
-//		
-//		training = _utils.ndArrayToInstances(ar);
-//		Constants.testInstancesLabel = ar.getColumns(784);
-		
-		
-		for (int i = 0; i < 150; i++) {
-//			 for ( int b = 0; b < batchNum ; b ++) {
 
-//			 DataSet set = getBatchTrainSet(b, batchSize, trainingData, training);
-						//
-//			int counter = 0 ;
-			while ( mnistTrain.hasNext()){
+		int counter = 0;
+		INDArray ar = null;
+		// while ( mnistTrain.hasNext()){
+		//
+		// DataSet set = mnistTrain.next();
+		// _utils.setLabels(set.getLabels(), false, true);
+		// if ( counter == 0)
+		// ar = Nd4j.concat(1, set.getFeatures(),Constants.trainInstancesLabel);
+		// else
+		// {
+		// INDArray tm = Nd4j.concat(1,
+		// set.getFeatures(),Constants.trainInstancesLabel.dup());
+		// ar =Nd4j.concat(0, ar,tm).dup();
+		// }
+		//
+		// counter++;
+		// }
+
+		// training = _utils.ndArrayToInstances(ar);
+		// System.out.println(ar.getColumn(784));
+		// training.setClassIndex(training.numAttributes()-1);
+		// training.randomize(new java.util.Random()); // randomize instance
+		// order
+		// System.out.println(training.numClasses());
+		// trainingData = _utils.instancesToDataSet(training);
+		//
+
+		// counter = 0 ;
+		// ar = null;
+		// while ( mnistTest.hasNext()){
+		//
+		// DataSet set = mnistTest.next();
+		// _utils.setLabels(set.getLabels(), true, false);
+		// if ( counter == 0)
+		// ar = Nd4j.concat(1, set.getFeatures(),Constants.testInstancesLabel);
+		// else
+		// {
+		// INDArray tm = Nd4j.concat(1,
+		// set.getFeatures(),Constants.testInstancesLabel);
+		// ar =Nd4j.concat(0, ar,tm);
+		// }
+		//
+		// }
+		//
+		// training = _utils.ndArrayToInstances(ar);
+		// Constants.testInstancesLabel = ar.getColumns(784);
+
+		for (int i = 0; i < 150; i++) {
+			// for ( int b = 0; b < batchNum ; b ++) {
+
+			// DataSet set = getBatchTrainSet(b, batchSize, trainingData,
+			// training);
+			//
+			// int counter = 0 ;
+			while (mnistTrain.hasNext()) {
 				DataSet set = mnistTrain.next();
 				Constants.model.fit(set);
-//				counter ++;
+				// counter ++;
 			}
 			mnistTrain.reset();
 
@@ -284,49 +284,41 @@ public class Network {
 				// System.out.println(mnistTest.());
 				// INDArray output =
 				// Constants.model.output(testData.getFeatures());
-				 System.out.println("sdaf");
+				System.out.println("sdaf");
 				// eval.eval(testData.getLabels(), output);
 
 				log.info("Evaluate model....");
-//				 counter = 0;
+				// counter = 0;
 				Evaluation eval = new Evaluation(outputNum); // create an
 																// evaluation
 																// object with
 																// 10 possible
 																// classes
-				
-
 				while (mnistTest.hasNext()) {
 
 					DataSet next = mnistTest.next();
 					System.out.println(Constants.isEvaluating);
 					_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
-					INDArray output = Constants.model.output(next.getFeatures()); // get
-																					// the
-																					// networks
-																					// prediction
-					eval.eval(next.getLabels(), output); // check the
-																// prediction
-																// against the
-																// true class
-//					counter++;
+					INDArray output = Constants.model.output(next.getFeatures());
+
+					eval.eval(next.getLabels(), output);
 				}
 				mnistTest.reset();
 
-//				System.out.println(counter);
+				// System.out.println(counter);
 
-				
-				
-//				_utils.setLabels(testData.getLabels(), Constants.isEvaluating, false);
-//				INDArray output = Constants.model.output(testData.getFeatures()); // get
-//																				// the
-//																// networks
-//																				// prediction
-//				eval.eval(testData.getLabels(), output); // check the
-//				
-				
-				
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/both_layerwise/resultIteration_"+ i;
+				// _utils.setLabels(testData.getLabels(),
+				// Constants.isEvaluating, false);
+				// INDArray output =
+				// Constants.model.output(testData.getFeatures()); // get
+				// // the
+				// // networks
+				// // prediction
+				// eval.eval(testData.getLabels(), output); // check the
+				//
+
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
+						+ i;
 				File file = new File(path);
 				BufferedWriter out = new BufferedWriter(new FileWriter(file));
 				out.write(eval.stats() + "\n" + Constants.model.score());
@@ -340,7 +332,7 @@ public class Network {
 		Evaluation eval = new Evaluation(outputNum); // create an evaluation
 														// object with 10
 														// possible classes
-		 counter = 0;
+		counter = 0;
 		while (mnistTest.hasNext()) {
 
 			DataSet next = mnistTest.next();
@@ -350,40 +342,39 @@ public class Network {
 																			// networks
 																			// prediction
 			eval.eval(next.getLabels(), output); // check the prediction
-														// against the true
-														// class
+													// against the true
+													// class
 			counter++;
 		}
 		System.out.println(counter);
 		log.info(eval.stats());
 
 	}
-	
 
-	private static DataSet getBatchTrainSet(int batchNumber , int batchRate,  	DataSet trainSet , Instances training) {
-		
+	private static DataSet getBatchTrainSet(int batchNumber, int batchRate, DataSet trainSet, Instances training) {
+
 		INDArray features = trainSet.getFeatures();
 		INDArray labels = trainSet.getLabels();
-		int start =  batchNumber * batchRate;
-		int end =  (batchNumber + 1) * batchRate;
-		
+		int start = batchNumber * batchRate;
+		int end = (batchNumber + 1) * batchRate;
+
 		INDArray batchTrain_features = features.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
 		INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
-		
+
 		DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
-		 List<Instance> list = training.subList(start, end);
-		 double [] labels_list = new double[list.size()];
-		 for( int i =0 ; i< list.size() ; i++)
-			 labels_list[i] = list.get(i).classValue(); 
-//		 System.out.println(labels.length());
-//		 System.out.println(batchTrain_labels.shapeInfoToString());
-//		 System.out.println(batchTrain_labels);
-//		 System.out.println(labels_list[labels_list.length - 1]);
+		List<Instance> list = training.subList(start, end);
+		double[] labels_list = new double[list.size()];
+		for (int i = 0; i < list.size(); i++)
+			labels_list[i] = list.get(i).classValue();
+		// System.out.println(labels.length());
+		// System.out.println(batchTrain_labels.shapeInfoToString());
+		// System.out.println(batchTrain_labels);
+		// System.out.println(labels_list[labels_list.length - 1]);
 		Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
-//		System.out.println(Constants.trainInstancesLabel.shapeInfoToString());
-//		System.out.println(set.numExamples());
-		
+		// System.out.println(Constants.trainInstancesLabel.shapeInfoToString());
+		// System.out.println(set.numExamples());
+
 		return set;
-		
+
 	}
 }
