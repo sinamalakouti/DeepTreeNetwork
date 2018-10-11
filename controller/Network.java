@@ -305,17 +305,7 @@ public class Network {
 				}
 				mnistTest.reset();
 
-				// System.out.println(counter);
 
-				// _utils.setLabels(testData.getLabels(),
-				// Constants.isEvaluating, false);
-				// INDArray output =
-				// Constants.model.output(testData.getFeatures()); // get
-				// // the
-				// // networks
-				// // prediction
-				// eval.eval(testData.getLabels(), output); // check the
-				//
 
 				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
 						+ i;
@@ -329,6 +319,8 @@ public class Network {
 
 		}
 
+		
+		Constants.isEvaluating = true;
 		Evaluation eval = new Evaluation(outputNum); // create an evaluation
 														// object with 10
 														// possible classes
@@ -337,10 +329,7 @@ public class Network {
 
 			DataSet next = mnistTest.next();
 			_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
-			INDArray output = Constants.model.output(next.getFeatures()); // get
-																			// the
-																			// networks
-																			// prediction
+			INDArray output = Constants.model.output(next.getFeatures()); 
 			eval.eval(next.getLabels(), output); // check the prediction
 													// against the true
 													// class
