@@ -97,6 +97,107 @@ import weka.estimators.NormalEstimator;
 public class NaiveBayes extends AbstractClassifier implements OptionHandler,
   WeightedInstancesHandler, WeightedAttributesHandler, TechnicalInformationHandler,
   Aggregateable<NaiveBayes> {
+	
+	
+	
+	/*********************
+	 * Implemented By Sina
+	 *********************/
+	  public double[] distributionForInstance_derivative(Instance instance) throws Exception {
+
+	    if (m_UseDiscretization) { 
+	      m_Disc.input(instance);
+	      instance = m_Disc.output();
+	    }
+	    double[] probs = new double[m_NumClasses];
+	    for (int j = 0; j < m_NumClasses; j++) {
+	      probs[j] = m_ClassDistribution.getProbability(j);
+	    }
+	    
+	    double sum =0d;
+	    for ( int i =0 ; i < probs.length ; i++)
+	    	sum += probs[i];
+	    
+	    if ( sum == 0)
+	    {
+	    	System.out.println("dsfsf");
+	    }
+	    Enumeration<Attribute> enumAtts = instance.enumerateAttributes();
+	    int attIndex = 0;
+	    while (enumAtts.hasMoreElements()) {
+	      Attribute attribute = enumAtts.nextElement();
+	      if (!instance.isMissing(attribute)) {
+	        double temp, max = 0;
+	        for (int j = 0; j < m_NumClasses; j++) {
+//	          temp = Math.max(1e-75, Math.pow(m_Distributions[attIndex][j]
+//	            .getProbability(instance.value(attribute)),
+//	            m_Instances.attribute(attIndex).weight())
+	        	
+	        	double weight =  m_Instances.attribute(attIndex).weight();
+	        	
+	        	double prob = m_Distributions[attIndex][j].getProbability(instance.value(attribute));
+	        	
+	        	double deriv = m_Distributions[attIndex][j].getProbability_derivative(instance.value(attribute));
+	        	
+	        	if ( prob == 0 && deriv == 0)
+	        	{
+	        		System.out.println("safaddfdfsafdas");
+	        	}
+	        	temp = weight * (Math.pow(m_Distributions[attIndex][j].getProbability(instance.value(attribute)), weight -1));
+	        	temp *= temp * m_Distributions[attIndex][j].getProbability_derivative(instance.value(attribute));
+	        	
+	        	if ( temp == 0d || probs[j] == 0d )
+	        	{
+	        		System.out.println("adsfadsfdsfsaf");
+		        deriv = m_Distributions[attIndex][j].getProbability_derivative(instance.value(attribute));
+
+	        	}
+	        	double tempProbs = probs[j];
+	          probs[j] *= temp;
+	          if ( probs[j] == 0d)
+	          {
+	        	  System.out.println("lafusmale");
+	          }
+	          if (probs[j] > max) {
+	            max = probs[j];
+	          }
+	          if (Double.isNaN(probs[j])) {
+	            throw new Exception("NaN returned from estimator for attribute "
+	              + attribute.name() + ":\n"
+	              + m_Distributions[attIndex][j].toString());
+	          }
+	        }
+	        if ((max > 0) && (max < 1e-75)) { // Danger of probability underflow
+	          for (int j = 0; j < m_NumClasses; j++) {
+	            probs[j] *= 1e75;
+	          }
+	        }
+	      }
+	      attIndex++;
+	      
+
+		    
+		
+	    }
+	   
+	     sum =0d;
+	    for ( int i =0 ; i < probs.length ; i++)
+	    	sum += probs[i];
+	    if ( sum == 0 )
+	    {
+	    	
+	    	System.out.println("Shoot sum ----90");
+	    	System.exit(0);
+//	    	this.distributionForInstance_derivative(instance);
+	    }
+	    // Display probabilities
+	    Utils.normalize(probs);
+	    return probs;
+	  }
+	
+	/********************
+	 * Finished Implemented By Sian
+	 ********************/
 
   /** for serialization */
   static final long serialVersionUID = 5995231201785697655L;
@@ -356,7 +457,9 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler,
         for (int j = 0; j < m_NumClasses; j++) {
           temp = Math.max(1e-75, Math.pow(m_Distributions[attIndex][j]
             .getProbability(instance.value(attribute)),
-            m_Instances.attribute(attIndex).weight()));
+            m_Instances.attribute(attIndex).weight())
+        		  );
+          
           probs[j] *= temp;
           if (probs[j] > max) {
             max = probs[j];
@@ -376,6 +479,16 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler,
       attIndex++;
     }
 
+    double [] probs2 = probs.clone();
+    double sum =0d;
+    for ( int i = 0 ; i < probs.length ;i++)
+    {
+    	sum+= probs2[i];
+    }
+    for ( int i = 0 ; i < probs.length ;i++)
+    {
+    	probs2[i]/= sum;
+    }
     // Display probabilities
     Utils.normalize(probs);
     return probs;

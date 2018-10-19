@@ -33,7 +33,7 @@ import weka.core.Instance;
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
  * @version $Revision: 9705 $
  */
-public class InactiveHNode extends LeafNode implements LearningNode,
+public  class InactiveHNode extends LeafNode implements LearningNode,
     Serializable {
 
   /**

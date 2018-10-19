@@ -36,6 +36,62 @@ public class Statistics implements RevisionHandler {
   /*************************************************
    * COEFFICIENTS FOR METHOD normalInverse() *
    *************************************************/
+  
+  
+/******************************
+ * Implemented By Sina Malakouti : 
+ ******************************/
+  public static double normalProbability_derivative(double a) {
+
+	    double x, y, z;
+
+	    x = a * SQRTH;
+	    z = Math.abs(x);
+
+	    if (z < SQRTH) {
+	      y = 0.5 * errorFunction_derivative(x);
+	    } else {
+	      y = 0.5 * errorFunctionComplemented_derivative(z);
+	      if (x > 0) {
+	        y = - y;
+	      }
+	    }
+	    	return y;
+	  }
+	  
+  
+  public static double errorFunction_derivative(double x) {
+//	  
+	  double coef = 2 / Math.sqrt(Math.PI);
+	  double result = coef * gauss(x);
+	  return result;
+  }
+  
+  public static double errorFunctionComplemented_derivative(double a) {
+	  return -1 * errorFunction_derivative(a);
+  
+  }
+  
+  
+  
+  
+  public static double gauss(double x) 
+  {
+   
+	  
+	  return 1 - Math.pow(x, 2) /1 + Math.pow(x, 4) / 2 - Math.pow(x, 6)/6  + Math.pow(x, 8) / 24 - Math.pow(x, 10)/ 120; 
+  }
+  
+  
+  
+  /***********************
+   * finished Implemented by sina part
+   ***********************/
+  
+  
+  
+  
+  
   /* approximation for 0 <= |y - 0.5| <= 3/8 */
   protected static final double P0[] = { -5.99633501014107895267E1,
     9.80010754185999661536E1, -5.66762857469070293439E1,
@@ -154,7 +210,10 @@ public class Statistics implements RevisionHandler {
 
     x = a * SQRTH;
     z = Math.abs(x);
-
+//    z1 : 0.30304576336566325
+//    z2 0.30304576336566325
+//    y1 0.3341175708976246
+//    y2 0.6658824291023754
     if (z < SQRTH) {
       y = 0.5 + 0.5 * errorFunction(x);
     } else {
@@ -163,8 +222,10 @@ public class Statistics implements RevisionHandler {
         y = 1.0 - y;
       }
     }
-    return y;
+    	return y;
   }
+  
+
 
   /**
    * Returns the value, <tt>x</tt>, for which the area under the Normal

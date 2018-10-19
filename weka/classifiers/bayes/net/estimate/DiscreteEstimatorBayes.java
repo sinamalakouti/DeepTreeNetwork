@@ -259,5 +259,15 @@ public class DiscreteEstimatorBayes extends Estimator
       System.out.println(e.getMessage());
     } 
   }    // main
+
+@Override
+public double getProbability_derivative(double data) {
+	// TODO Auto-generated method stub
+	System.out.println("In DiscreteEstimator");
+	System.exit(0);
+	return 0;
+}
+
+
  
 }      // class DiscreteEstimatorBayes

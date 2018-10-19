@@ -13,7 +13,6 @@ import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -33,7 +32,6 @@ import org.nd4j.linalg.util.NDArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import neuralnetwork.BayesTreeActivationFunction;
 import neuralnetwork.CustomLayer;
 import scala.collection.immutable.Stream.Cons;
 import utils.Constants;
@@ -307,7 +305,7 @@ public class Network {
 
 
 
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/hoeffdingTree/without_weight_normalization/resultIteration_"
 						+ i;
 				File file = new File(path);
 				BufferedWriter out = new BufferedWriter(new FileWriter(file));

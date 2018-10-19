@@ -23,6 +23,7 @@ package weka.classifiers.trees.ht;
 
 import java.io.Serializable;
 
+import weka.core.Attribute;
 import weka.core.Instance;
 
 /**
@@ -75,4 +76,11 @@ public class LeafNode extends HNode implements Serializable {
       super.updateDistribution(inst);
     }
   }
+
+@Override
+public double[] getDistribution_derivative(Instance inst, Attribute classAtt) throws Exception {
+	System.out.println("in LeafNode");
+	System.exit(0);
+	return null;
+}
 }

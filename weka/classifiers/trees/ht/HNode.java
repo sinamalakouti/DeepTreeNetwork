@@ -25,9 +25,14 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import utils.Constants;
+import utils._utils;
 import weka.core.Attribute;
 import weka.core.Instance;
+import weka.core.Instances;
 import weka.core.Utils;
+import weka.filters.Filter;
+import weka.filters.unsupervised.instance.RemoveWithValues;
 
 /**
  * Abstract base class for nodes in a Hoeffding tree
@@ -37,6 +42,141 @@ import weka.core.Utils;
  * @revision $Revision: 9707 $
  */
 public abstract class HNode implements Serializable {
+	
+ /**
+  * 
+  * added by sina :D  
+  * 
+  * 
+  * 
+  */
+	
+	
+	protected double[][] mu;
+	
+	protected double[][] sd;
+	protected double[] classProb;
+	public int depth = 0;
+	public int numInstances;
+
+	public double[][] getMu() {
+		return this.mu;
+	}
+
+	public double[][] getSd() {
+		return this.sd;
+	}
+
+	public double[] getClassProb() {
+		return this.classProb;
+	}
+	
+	
+	 public abstract double[] getDistribution_derivative(Instance inst, Attribute classAtt) throws Exception;
+
+	protected void setParameters(Instances data) throws Exception {
+		double[][] mu2 = new double[data.numAttributes() - 1][Constants.numClasses];
+		double[][] sd2 = new double[data.numAttributes() - 1][Constants.numClasses];
+		int numInstances2 = data.size();
+		double[] classProb2 = new double[Constants.numClasses];
+
+		Instances[] tempInstances = new Instances[Constants.numClasses];
+		double s = 0d;
+		for (int j = 0; j < data.classAttribute().numValues(); j++) {
+			
+			int c = Integer.parseInt(data.classAttribute().value(j));
+			
+			RemoveWithValues rwv = new RemoveWithValues();
+
+			String[] options = new String[5];
+			options[0] = "-C";
+			options[1] = "" + (data.numAttributes());
+			options[2] = "-L";
+			options[3] = "" + (j + 1);
+			options[4] = "-V";
+			rwv.setOptions(options);
+			rwv.setInputFormat(data);
+			Instances xt = Filter.useFilter(data, rwv);
+			tempInstances[c] = xt;
+
+			if (data.size() == 0) {
+				classProb2[c] = 0;
+			} else
+				classProb2[c] = ((double) xt.size()) / ((double) data.size());
+
+			s += classProb2[c];
+		}
+
+		if (s - 1 > 0.001 || 1 - s > 0.001) {
+			System.out.println("class problem!!");
+		}
+
+		for (int i = 0; i < data.numAttributes(); i++) {
+
+			if (!data.attribute(i).equals(data.classAttribute())) {
+
+				for (int j = 0; j < data.classAttribute().numValues(); j++) {
+
+					int c = Integer.parseInt(data.classAttribute().value(j));
+
+					if (tempInstances[c].size() < 2) {
+						mu2[i][c] = 0;
+						sd2[i][c] = 0.01;
+					} else {
+						try {
+							mu2[i][c] = tempInstances[c].meanOrMode(i);
+						} catch (Exception e) {
+							System.out.println(data.classIndex());
+							System.out.println("hereererererererer");
+							System.out.println(tempInstances[c].attribute(i).isNominal());
+							System.out.println(tempInstances[c].attributeStats(i).numericStats);
+							System.exit(0);
+						}
+						sd2[i][c] = tempInstances[c].attributeStats(i).numericStats.stdDev + 0.1;
+						if ( sd2[i][c] > 10) {
+//							System.out.println("hallo");
+						}
+					}
+
+
+				}
+
+			}
+
+		}
+
+		if (mu == null && sd == null) {
+			this.mu = mu2;
+			this.numInstances = numInstances2;
+			this.classProb = classProb2;
+			this.sd = sd2;
+		} else {
+
+			for (int j = 0; j < data.classAttribute().numValues(); j++) {
+				
+				int c = Integer.parseInt(data.classAttribute().value(j));
+
+				classProb[c] = _utils.calcPooledMean(classProb[c], numInstances, classProb2[c], numInstances2);
+				
+				for (int i = 0; i < data.numAttributes(); i++) {
+
+					if (!data.attribute(i).equals(data.classAttribute())) {
+
+						mu[i][c] = _utils.calcPooledMean(mu[i][c], numInstances, mu2[i][c], numInstances2);
+
+						sd[i][c] = _utils.calcPooledSTD(sd[i][c], numInstances, sd2[i][c], numInstances2);
+
+					}
+				}
+
+			}
+			
+			numInstances += numInstances2;
+
+		}
+	}
+	
+	
   /**
    * For serialization
    */
@@ -239,9 +379,9 @@ public abstract class HNode implements Serializable {
    * @return the leaf that the supplied instance ends up at
    */
   public LeafNode leafForInstance(Instance inst, SplitNode parent,
-      String parentBranch) {
-    return new LeafNode(this, parent, parentBranch);
-  }
+	      String parentBranch) {
+		  return new LeafNode(this, parent, parentBranch);
+	  }
 
   /**
    * Update the node with the supplied instance

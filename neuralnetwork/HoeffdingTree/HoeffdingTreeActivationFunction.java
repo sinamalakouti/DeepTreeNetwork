@@ -1,4 +1,4 @@
-package neuralnetwork;
+package neuralnetwork.HoeffdingTree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,22 +32,20 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
-public class BayesTreeActivationFunction extends BaseActivationFunction {
+public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -6622285329198225782L;
-	private J48 activationModel;
-	J48 classifier;
-	HoeffdingTree hf ;
+	private HoeffdingTree activationModel;
 	int layernumber = 0;
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 	int neuronNumber = 0;
 	boolean createdHF = false;
 
-	public BayesTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
+	public HoeffdingTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
 		this.isOutputLayerActivation = isOutpuLayerActivation;
 		this.neuronNumber = neuronNumber;
@@ -56,7 +54,6 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 	@Override
 	public Pair<INDArray, INDArray> backprop(INDArray in, INDArray epsilon1) {
-//		TODO : check the correction of reuslt.muli(epsilon)
 
 //		if ( isOutputLayerActivation == true)
 //        assertShape(in, epsilon);
@@ -76,7 +73,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			try {
 				Instance next = it.nextElement();
 //				TODO : add mapping again [Constants.classChosedArray.get(layernumber).get(neuronNumber)]
-				double[] predictionDerivative = activationModel.predicateDerivative(next, true);
+				double[] predictionDerivative = activationModel.predicate_derivative(next);
 				
 //			for mapping : 	result [i] = predictionDerivative[0]; should changed true -> false in the line above
 				
@@ -132,11 +129,11 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			output = Nd4j.create(result).transpose();
 // normalization : ( 0, 1 )
 			
-			double min = output.minNumber().doubleValue();
-			double max = output.maxNumber().doubleValue();
-		
-			output =  output.sub(min);
-			output =  output.div(max - min);
+//			double min = output.minNumber().doubleValue();
+//			double max = output.maxNumber().doubleValue();
+//		
+//			output =  output.sub(min);
+//			output =  output.div(max - min);
 
 			return new Pair<>(output, null);
 		} else {
@@ -157,40 +154,40 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 		// in = inputData .* weights 
 	
 		Instances trainInstaces = createProperDataset(in.dup(), training);
-		if ( hf == null)
-		{
-			hf = new HoeffdingTree();
-			this.createdHF = true;
-			try {
-				hf.buildClassifier(trainInstaces);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}else{
-			for( int i =0 ; i< trainInstaces.size(); i ++)
-				try {
-					if ( hf == null)
-						System.out.println("shoot");
-					hf.updateClassifier(trainInstaces.get(i));
-					
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-		}
-		
-		if ( hf.m_root.isLeaf() == false){
-			System.out.println("lets do it my frendinto");
-			try {
-				hf.classifyInstance(trainInstaces.get(0));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		if ( hf == null)
+//		{
+//			hf = new HoeffdingTree();
+//			this.createdHF = true;
+//			try {
+//				hf.buildClassifier(trainInstaces);
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		}else{
+//			for( int i =0 ; i< trainInstaces.size(); i ++)
+//				try {
+//					if ( hf == null)
+//						System.out.println("shoot");
+//					hf.updateClassifier(trainInstaces.get(i));
+//					
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			
+//		}
+//		
+//		if ( hf.m_root.isLeaf() == false){
+//			System.out.println("lets do it my frendinto");
+//			try {
+//				hf.classifyInstance(trainInstaces.get(0));
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		double[] result = new double[trainInstaces.size()];
 		
 
@@ -199,7 +196,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 			if (Constants.isEvaluating == false ) {
 				if ( activationModel == null) {
-				activationModel = new J48();
+				activationModel = new HoeffdingTree();
 				try {
 					this.isTraind = true;
 					
@@ -213,9 +210,8 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				}
 				}else {
 					try {
-						activationModel = new J48();
-						activationModel.buildClassifier(trainInstaces);
-//						activationModel.m_root.update(trainInstaces);;
+						for ( int i =0 ; i < trainInstaces.size() ; i++)
+							activationModel.updateClassifier(trainInstaces.get(i));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -240,7 +236,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				Instance next = it.next();
 //				Instance next2 = it2.next();
 
-				prediction = activationModel.predicate(next, true);
+				prediction = activationModel.predicate(next);
 			//	prediciton2 = activationModel.predicate(next , isOutputLayerActivation);
 				
 				double res;

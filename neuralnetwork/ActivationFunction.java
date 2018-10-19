@@ -77,7 +77,7 @@ public class ActivationFunction extends BaseActivationFunction  {
 		
 		if (activationModel.m_root.isLeaf() == false) {
 			
-			_utils.setAttCardinality(activationModel.cutpoints, this);
+//			_utils.setAttCardinality(activationModel.cutpoints, this);
 			if ( attCardinality.size() == 3 &&! this.attCardinality.contains(0) ) {
 				try {
 					FourierUtils.setFourierSeriesWeights(activationModel.m_root,this);

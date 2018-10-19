@@ -53,6 +53,8 @@ public abstract class AbstractClassifier implements Classifier, BatchPredictor,
   Cloneable, Serializable, OptionHandler, CapabilitiesHandler, RevisionHandler,
   CapabilitiesIgnorer, CommandlineRunnable {
 
+	
+		
   /** for serialization */
   private static final long serialVersionUID = 6502780192411755341L;
 
@@ -174,7 +176,10 @@ public abstract class AbstractClassifier implements Classifier, BatchPredictor,
     if (dist == null) {
       throw new Exception("Null distribution predicted");
     }
+    
+    
     switch (instance.classAttribute().type()) {
+    
     case Attribute.NOMINAL:
       double max = 0;
       int maxIndex = 0;
@@ -196,6 +201,8 @@ public abstract class AbstractClassifier implements Classifier, BatchPredictor,
     default:
       return Utils.missingValue();
     }
+    
+    
   }
 
   /**

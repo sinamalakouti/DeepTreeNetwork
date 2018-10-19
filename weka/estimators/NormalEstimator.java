@@ -37,6 +37,58 @@ import weka.core.Utils;
  */
 public class NormalEstimator extends Estimator implements IncrementalEstimator,
     Aggregateable<NormalEstimator> {
+	
+	
+/*******************
+ * Implemented By Sina
+ *******************/
+	 public double getProbability_derivative(double data) {
+
+		    data = round(data);
+//		    double zLower = (data - m_Mean - (m_Precision / 2)) / ( m_StandardDev + 0.01);
+//		    double zUpper = (data - m_Mean + (m_Precision / 2)) / ( m_StandardDev + 0.01);
+
+		    double z = ( data - m_Mean ) / (m_StandardDev + 0.01);
+		    double p_derivative = Statistics.normalProbability_derivative(z);
+//		    double pLower_derivative = Statistics.normalProbability_derivative(zLower);
+//		    double pUpper_derivative = Statistics.normalProbability_derivative(zUpper);
+//		    
+//		    double der  = 1 / ( Math.sqrt(2 * Math.PI));
+//		    double der1 = der * Math.exp(-1 * zLower * zLower / 2) ; 
+//		    
+//		    double der2 = der * Math.exp(-1 * zUpper * zUpper / 2) ; 
+//		   if ( der1 == 0)
+//		   {
+//			   double data2 = data;
+//			   double mean = m_Mean;
+//			   double std = m_StandardDev;
+//			   
+//			   double z = (data2 - mean - (m_Precision / 2));
+//			   z = z / std;
+//			   
+//			   System.out.println(zLower * zLower);
+//			   System.out.println(Math.exp(zLower * zLower));
+//			   System.out.println(Math.exp(-1 * zLower * zLower / 2) );
+//			   pLower_derivative = Statistics.normalProbability_derivative(zLower);
+//
+//			   
+//		   }
+//		   if ( pLower_derivative == pUpper_derivative){
+//			   double pLower = Statistics.normalProbability(zLower);
+//			    double pUpper = Statistics.normalProbability(zUpper);
+//			     pLower_derivative = Statistics.normalProbability_derivative(zLower);
+//			     pUpper_derivative = Statistics.normalProbability_derivative(zUpper);
+//
+//			    System.out.println();
+//			    
+//		   }
+		    return p_derivative;
+		  }
+	
+/********************
+ * Finish Implemented By Sina
+ ********************/
+	
 
   /** for serialization */
   private static final long serialVersionUID = 93584379632315841L;
@@ -138,11 +190,12 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
   public double getProbability(double data) {
 
     data = round(data);
-    double zLower = (data - m_Mean - (m_Precision / 2)) / m_StandardDev;
-    double zUpper = (data - m_Mean + (m_Precision / 2)) / m_StandardDev;
-
+    double zLower = (data - m_Mean - (m_Precision / 2)) /(  m_StandardDev + 0.1);
+    double zUpper = (data - m_Mean + (m_Precision / 2)) /( m_StandardDev + 0.1);
+    double check = (1 / Math.sqrt(2* Math.PI) * Math.exp(-1 * zLower * zLower / 2));
     double pLower = Statistics.normalProbability(zLower);
     double pUpper = Statistics.normalProbability(zUpper);
+    
     return pUpper - pLower;
   }
 

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import utils.Constants;
+import utils._utils;
 import weka.classifiers.trees.ht.LeafNode;
 import weka.core.Attribute;
 import weka.core.Capabilities;
@@ -90,7 +91,6 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 	protected double[] classProb;
 	public int depth = 0;
 	public int numInstances;
-	private Matrix[] covMatirx;
 
 	public double[][] getMu() {
 		return this.mu;
@@ -104,12 +104,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		return this.classProb;
 	}
 
-	public Matrix[] getCovMatrix() {
-		return covMatirx;
-	}
 
-//	public double getSu(Instance instance, boolean isOutputLayerActivation) throws Exception {
-//	}
 	public double[] predicateDerviativ(Instance instance, boolean isOutputLayerActivation) throws Exception {
 
 		return predicateDerivative_log(instance, isOutputLayerActivation);
@@ -424,26 +419,7 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 	
 //	
-	  public  double calcPooledMean(double mu1, double n1 , double mu2, double n2) {
-		  double temp =  mu1*n1 + mu2*n2;
-		  return temp / (n1 + n2);
-	  }
-	  
-	  public  double calcPooledSTD(double std1 , double n1, double std2, double n2) {
-		  
-		  double temp = (n1-1) * Math.pow(std1, 2) + (n2-1) * Math.pow(std2, 2);
-		  temp /= (n1+n2-2);
-		  temp = Math.sqrt(temp);
-		  if ( Double.isInfinite(Math.pow(std2, 2)))
-		  {
-			  System.out.println("ehe he");
-		  }
-		  
-		  if ( Double.isInfinite(temp) ) {
-			  System.out.println("haaaa?");
-		  }
-		  return Math.max(0.00001, temp);
-	  }
+	
 	  
 	  public void update ( Instances data) throws Exception {
 		
@@ -531,15 +507,15 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 				
 				int c = Integer.parseInt(data.classAttribute().value(j));
 
-				classProb[c] = calcPooledMean(classProb[c], numInstances, classProb2[c], numInstances2);
+				classProb[c] = _utils.calcPooledMean(classProb[c], numInstances, classProb2[c], numInstances2);
 				
 				for (int i = 0; i < data.numAttributes(); i++) {
 
 					if (!data.attribute(i).equals(data.classAttribute())) {
 
-						mu[i][c] = calcPooledMean(mu[i][c], numInstances, mu2[i][c], numInstances2);
+						mu[i][c] = _utils.calcPooledMean(mu[i][c], numInstances, mu2[i][c], numInstances2);
 
-						sd[i][c] = calcPooledSTD(sd[i][c], numInstances, sd2[i][c], numInstances2);
+						sd[i][c] = _utils.calcPooledSTD(sd[i][c], numInstances, sd2[i][c], numInstances2);
 
 					}
 				}

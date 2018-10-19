@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package neuralnetwork;
+package neuralnetwork.HoeffdingTree;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -40,6 +40,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
+
+import neuralnetwork.CustomLayer;
 import scala.collection.immutable.Stream.Cons;
 import utils.Constants;
 import weka.classifiers.trees.J48;
@@ -50,7 +52,7 @@ import weka.core.Instances;
  * 
  * @author Adam Gibson
  */
-public class BayesTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer>
+public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer>
 extends AbstractLayer<CustomLayer> {
 
 	/**
@@ -67,11 +69,11 @@ extends AbstractLayer<CustomLayer> {
 	protected Solver solver;
 
 	protected int LayerNumber;
-	protected HashMap<Integer, BayesTreeActivationFunction> activationModels = new HashMap<>();
+	protected HashMap<Integer, HoeffdingTreeActivationFunction> activationModels = new HashMap<>();
 
 	protected Map<String, INDArray> weightNoiseParams = new HashMap<>();
 
-	public BayesTreeLayer(NeuralNetConfiguration conf, Instances train, Instances test, int layernumber) {
+	public HoeffdingTreeLayer(NeuralNetConfiguration conf, Instances train, Instances test, int layernumber) {
 		super(conf);
 		this.LayerNumber = layernumber;
 
@@ -418,7 +420,7 @@ extends AbstractLayer<CustomLayer> {
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 
 			if (!activationModels.containsKey(neuron))
-				activationModels.put(neuron, new BayesTreeActivationFunction(this.LayerNumber, false, neuron));
+				activationModels.put(neuron, new HoeffdingTreeActivationFunction(this.LayerNumber, false, neuron));
 
 			INDArray weight = W.getColumn(neuron);
 

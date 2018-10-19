@@ -238,4 +238,10 @@ public class MahalanobisEstimator extends Estimator implements IncrementalEstima
       System.out.println(e.getMessage());
     }
   }
+
+@Override
+public double getProbability_derivative(double data) {
+	// TODO Auto-generated method stub
+	return 0;
+}
 }

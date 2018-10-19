@@ -38,6 +38,31 @@ import weka.core.Instances;
  */
 public class NBNodeAdaptive extends NBNode implements LearningNode,
     Serializable {
+	
+	
+	
+	/***************************
+	 * Implemented By Sina
+	 * @throws Exception 
+	 ***************************/
+	 @Override
+	  public double[] getDistribution_derivative (Instance inst, Attribute classAtt) throws Exception{
+//	    if (m_majClassCorrectWeight > m_nbCorrectWeight) {
+//	    	System.out.println("bypassNB @ nbNodeAdaptive ");
+//	      return super.bypassNB(inst, classAtt);
+//	    }
+
+	    
+//	    return super.getDistribution(inst, classAtt);
+	    return m_bayes.distributionForInstance_derivative(inst);
+	  }
+	 
+	 
+	 /***********************
+	  * Finished Implemented By Sina
+	  ***********************/
+	
+	
 
   /**
    * For serialization

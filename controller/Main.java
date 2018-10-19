@@ -42,6 +42,7 @@ import utils._utils;
 import weka.attributeSelection.PrincipalComponents;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.bayes.net.estimate.BayesNetEstimator;
+import weka.classifiers.trees.HoeffdingTree;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.REPTree;
 import weka.classifiers.trees.j48.NBTreeClassifierTree;
@@ -100,6 +101,28 @@ public class Main {
 		Instances training = new Instances(dataset, 0, trainSize);
 		Instances test = new Instances(dataset, trainSize, testSize);
 
+//		test Hoeffding Tree
+		
+		NaiveBayes nb = new NaiveBayes();
+		nb.buildClassifier(training);
+		System.out.println(nb.classifyInstance(test.get(0)));
+		
+		System.out.println( test.get(0).classValue());
+		HoeffdingTree hf = new  HoeffdingTree();
+		hf.buildClassifier(training);	
+		System.out.println(hf.m_root.isLeaf());
+		System.out.println(hf.classifyInstance(test.get(0)));
+		System.out.println(hf.predicate_derivative(test.get(0)));
+		System.out.println(hf.distributionForInstance(test.get(0)));
+		
+		System.out.println();
+		
+		J48 j48 = new J48();
+		j48.buildClassifier(training);
+		double [] results = j48.predicate(test.get(0), true);
+		for ( int i =0 ; i < results.length ; i++)
+			System.out.print( results[i] + ",  ");
+		System.out.println();
 		DataSet trainingData = _utils.instancesToDataSet(training);
 		DataSet testData = _utils.instancesToDataSet(test);			
 		int  batchNum = trainingData.numExamples() / batchSize;

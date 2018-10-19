@@ -347,6 +347,7 @@ public abstract class Estimator implements Cloneable, Serializable,
    * @return the estimated probability of the supplied value
    */
   public abstract double getProbability(double data);
+  public abstract double getProbability_derivative(double data);
 
   /**
    * Build an estimator using the options. The data is given in the options.

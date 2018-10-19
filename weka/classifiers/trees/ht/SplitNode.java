@@ -24,6 +24,7 @@ package weka.classifiers.trees.ht;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import weka.core.Attribute;
 import weka.core.Instance;
 
 /**
@@ -228,6 +229,13 @@ public String getSplitAtt () {
 	  
 	  
 	  return m_split.m_splitAttNames.get(0);
+}
+
+@Override
+public double[] getDistribution_derivative(Instance inst, Attribute classAtt) {
+	System.out.println("in Split NOde");
+	System.exit(0);
+	return null;
 }
 
 

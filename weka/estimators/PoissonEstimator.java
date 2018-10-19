@@ -167,4 +167,12 @@ public class PoissonEstimator
       System.out.println(e.getMessage());
     }
   }
+
+@Override
+public double getProbability_derivative(double data) {
+
+	System.out.println("In Poisson Estimator");
+	System.exit(0);
+	return 0;
+}
 }

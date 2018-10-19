@@ -163,6 +163,115 @@ public class HoeffdingTree extends AbstractClassifier implements
     UpdateableClassifier, WeightedInstancesHandler, OptionHandler,
     RevisionHandler, TechnicalInformationHandler, Drawable, Serializable {
 
+	
+	/******************
+	 * Implemented By Sina
+	 ******************/	
+	  public double[] predicate(Instance instance) throws Exception {
+
+	    double[] dist = distributionForInstance(instance);
+	    if (dist == null) {
+	      throw new Exception("Null distribution predicted");
+	    }
+	    
+	    return dist;
+	    
+//	    switch (instance.classAttribute().type()) {
+//	    
+//	    case Attribute.NOMINAL:
+//	      double max = 0;
+//	      int maxIndex = 0;
+//
+//	      for (int i = 0; i < dist.length; i++) {
+//	        if (dist[i] > max) {
+//	          maxIndex = i;
+//	          max = dist[i];
+//	        }
+//	      }
+//	      if (max > 0) {
+//	        return maxIndex;
+//	      } else {
+//	        return Utils.missingValue();
+//	      }
+//	    case Attribute.NUMERIC:
+//	    case Attribute.DATE:
+//	      return dist[0];
+//	    default:
+//	      return Utils.missingValue();
+//	    }
+	    
+	    
+	  }
+	
+	  public double[] predicate_derivative(Instance instance) throws Exception {
+
+	    double[] dist = distributionForInstance_derivative(instance);
+	    if (dist == null) {
+	      throw new Exception("Null distribution predicted");
+	    }
+	    return dist;
+	    
+//	    switch (instance.classAttribute().type()) {
+//	    
+//	    case Attribute.NOMINAL:
+//	      double max = 0;
+//	      int maxIndex = 0;
+//
+//	      for (int i = 0; i < dist.length; i++) {
+//	        if (dist[i] > max) {
+//	          maxIndex = i;
+//	          max = dist[i];
+//	        }
+//	      }
+//	      if (max > 0) {
+//	        return maxIndex;
+//	      } else {
+//	        return Utils.missingValue();
+//	      }
+//	    case Attribute.NUMERIC:
+//	    case Attribute.DATE:
+//	      return dist[0];
+//	    default:
+//	      return Utils.missingValue();
+//	    }
+	    
+	    
+	  }
+
+	
+	  public double[] distributionForInstance_derivative(Instance inst) throws Exception {
+
+		    Attribute classAtt = inst.classAttribute();
+		    double[] pred = new double[classAtt.numValues()];
+
+		    if (m_root != null) {
+		      LeafNode l = m_root.leafForInstance(inst, null, null);
+		      HNode actualNode = l.m_theNode;
+
+		      if (actualNode == null) {
+		        actualNode = l.m_parentNode;
+		      }
+		      
+
+		      pred = actualNode.getDistribution_derivative(inst, classAtt);
+
+		    } else {
+		      // all class values equally likely
+		      for (int i = 0; i < classAtt.numValues(); i++) {
+		        pred[i] = 1;
+		      }
+		      Utils.normalize(pred);
+		    }
+
+		    // Utils.normalize(pred);
+		    return pred;
+		  }
+
+	
+	
+	/******************
+	 * Finished Implemented Bys Sina
+	 ******************/
   /**
    * For serialization
    */
@@ -170,7 +279,7 @@ public class HoeffdingTree extends AbstractClassifier implements
 
   protected Instances m_header;
   public HNode m_root;
-  public ArrayList<Double>[] cutpoints ;
+//  public ArrayList<Double>[] cutpoints ;
 
   /** The number of instances a leaf should observe between split attempts */
   protected double m_gracePeriod = 200;
@@ -770,6 +879,8 @@ public class HoeffdingTree extends AbstractClassifier implements
     }
 
     if (m_root == null) {
+    	
+//    	TODO :  create Learning node
       m_root = newLearningNode();
     }
 
@@ -817,6 +928,7 @@ public class HoeffdingTree extends AbstractClassifier implements
       if (actualNode == null) {
         actualNode = l.m_parentNode;
       }
+      
 
       pred = actualNode.getDistribution(inst, classAtt);
 
@@ -949,11 +1061,12 @@ public class HoeffdingTree extends AbstractClassifier implements
           String att = newSplit.getSplitAtt();
           int numericAtt = Integer.parseInt( "" + att.charAt(att.length() -1));
           int index =  numericAtt;
-      	if( this.cutpoints[index]    == null)
-      		this.cutpoints[index] = new ArrayList<>();
-      	double cutpoint = ((UnivariateNumericBinarySplit)best.m_splitTest).m_splitPoint;
-      	if(! this.cutpoints[index].contains( cutpoint ))
-      		this.cutpoints[index].add(cutpoint);
+//         
+//      	if( this.cutpoints[index]    == null)
+//      		this.cutpoints[index] = new ArrayList<>();
+//      	double cutpoint = ((UnivariateNumericBinarySplit)best.m_splitTest).m_splitPoint;
+//      	if(! this.cutpoints[index].contains( cutpoint ))
+//      		this.cutpoints[index].add(cutpoint);
 
         }
       }

@@ -299,4 +299,11 @@ public class DiscreteEstimator extends Estimator implements
       System.out.println(e.getMessage());
     }
   }
+
+@Override
+public double getProbability_derivative(double data) {
+	System.out.println("In Discrete Estimator:))");
+	System.exit(0);
+	return 0;
+}
 }

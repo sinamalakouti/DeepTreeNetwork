@@ -48,7 +48,7 @@ public class DecisionTree extends HoeffdingTree {
 	public void updateClassifier(Instances arg0, ActivationFunction activation) throws Exception {
 		//		if (m_root.isLeaf() == false) {
 
-		_utils.setAttCardinality(cutpoints, activation);
+//		_utils.setAttCardinality(cutpoints, activation);
 		//			if ( activation.attCardinality.size() == 2 &&! activation.attCardinality.contains(0) ) {
 		FourierUtils.setFourierSeriesWeights(m_root, activation);
 
