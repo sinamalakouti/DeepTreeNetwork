@@ -1,9 +1,7 @@
 package controller;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +36,9 @@ import weka.core.WekaException;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
-public class Network {
+public class Network2 {
 
-	private static Logger log = LoggerFactory.getLogger(Network.class);
+	private static Logger log = LoggerFactory.getLogger(Network2.class);
 
 	@SuppressWarnings("unused")
 	private static Instances createProperDataset(INDArray in, boolean training) {
@@ -253,65 +251,74 @@ public class Network {
 		//
 		// training = _utils.ndArrayToInstances(ar);
 		// Constants.testInstancesLabel = ar.getColumns(784);
+		Instances trainSet2 = null, trainTemp = null;
+		int c = 0;
 
+		while (mnistTrain.hasNext()) {
+			DataSet set = mnistTrain.next();
+			if (c == 0){
+				trainSet2 = _utils.dataset2Instances(set);
+			}
+			else{
+				trainTemp = _utils.dataset2Instances(set);
+			for (int i = 0; i < trainTemp.size(); i++)
+				trainSet2.add(trainTemp.get(i));
+			}
+			
+			c++;
+		}
+		mnistTrain.reset();
+		
+	   convert = new NumericToNominal();
+		options = new String[2];
+		options[0] = "-R";
+		options[1] = "" + (trainSet2.numAttributes()); // range of variables to
+		convert.setOptions(options);
+		convert.setInputFormat(trainSet2);
+		trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
+		trainSet2.setClassIndex(trainSet2.numAttributes()-1);
+		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
+				
+		
 		for (int i = 0; i < 150; i++) {
-			// for ( int b = 0; b < batchNum ; b ++) {
+			for (int b = 0; b < batchNum; b++) {
 
-			// DataSet set = getBatchTrainSet(b, batchSize, trainingData,
-			// training);
-			//
-			// int counter = 0 ;
-			while (mnistTrain.hasNext()) {
-				DataSet set = mnistTrain.next();
-				Constants.model.fit(set);
-				// counter ++;
+				 DataSet set = getBatchTrainSet(b, batchSize, tempTrainSet,trainSet2);
+
+				 Constants.model.fit(set);
 			}
-			mnistTrain.reset();
 
-			// }
-			// model.fit(trainingData);
+				if (i % 2 == 0) {
+					Constants.isEvaluating = true;
+					log.info("Evaluate model....");
+	
+					Evaluation eval = new Evaluation(outputNum); // create an
+	
+					while (mnistTest.hasNext()) {
 
-			if (i % 2 == 0) {
-				Constants.isEvaluating = true;
-				// Evaluation eval = new Evaluation(outputNum);
-				// System.out.println(mnistTest.());
-				// INDArray output =
-				// Constants.model.output(testData.getFeatures());
-				System.out.println("sdaf");
-				// eval.eval(testData.getLabels(), output);
+						DataSet next = mnistTest.next();
+						System.out.println(Constants.isEvaluating);
+						_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
+						INDArray output = Constants.model.output(next.getFeatures());
 
-				log.info("Evaluate model....");
-				// counter = 0;
-				Evaluation eval = new Evaluation(outputNum); // create an
-				// evaluation
-				// object with
-				// 10 possible
-				// classes
-				while (mnistTest.hasNext()) {
+						eval.eval(next.getLabels(), output);
+					}
+					mnistTest.reset();
 
-					DataSet next = mnistTest.next();
-					System.out.println(Constants.isEvaluating);
-					_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
-					INDArray output = Constants.model.output(next.getFeatures());
+					// String path =
+					// "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
+					// + i;
+					// File file = new File(path);
+					// BufferedWriter out = new BufferedWriter(new
+					// FileWriter(file));
+					// out.write(eval.stats() + "\n" + Constants.model.score());
+					System.out.println(eval.stats());
 
-					eval.eval(next.getLabels(), output);
+					// out.close();
+					Constants.isEvaluating = false;
+
 				}
-				mnistTest.reset();
-
-				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
-				 + i;
-				 File file = new File(path);
-				 BufferedWriter out = new BufferedWriter(new
-				 FileWriter(file));
-				 out.write(eval.stats() + "\n" + Constants.model.score());
-//				System.out.println(eval.stats());
-
-				out.close();
-				Constants.isEvaluating = false;
-
-			}
-
+		
 		}
 
 		Constants.isEvaluating = true;

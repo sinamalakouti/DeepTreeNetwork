@@ -380,12 +380,12 @@ extends AbstractLayer<CustomLayer> {
 		
 //		normalization: 
 	
-/*
+
 		double mu = W.meanNumber().doubleValue();
 		double std = Math.sqrt(W.varNumber().doubleValue());
 		W = W.subi(mu);
 		W = W.divi(std);
-*/
+
 		
 		double [][] zprim = W.toDoubleMatrix();
 		for  ( int i =0 ; i  < zprim.length ; i++)

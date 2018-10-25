@@ -22,13 +22,13 @@
 package weka.classifiers.trees.j48;
 
 import java.io.Serializable;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.bytedeco.javacpp.mkldnn.sum;
+
 import utils.Constants;
 import utils._utils;
-import weka.classifiers.trees.ht.LeafNode;
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.CapabilitiesHandler;
@@ -38,7 +38,6 @@ import weka.core.Instances;
 import weka.core.RevisionHandler;
 import weka.core.RevisionUtils;
 import weka.core.Utils;
-import weka.core.matrix.Matrix;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemoveWithValues;
 
@@ -116,6 +115,16 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		ClassifierTree node = getBayesParameters(instance);
 
 		double[] pdf_log = getGaussianPDF_log(instance, node.classProb, node.mu, node.sd, node.m_train);
+		
+		for  ( int i =0 ; i  < pdf_log.length ; i++)
+			
+			{
+				if ( Double.isNaN(pdf_log[i]) ||Double.isInfinite(pdf_log[i])) {
+					System.out.println("PDF_LOG is NAN or INFINITE in Classifier Tree");
+					System.out.println(pdf_log[i]);
+					System.exit(0);
+				}
+			}
 		double[] gradient = new double[pdf_log.length];
 
 // calculate ak_derivaitive		
@@ -125,7 +134,19 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			for (int a = 0; a < instance.numAttributes(); a++) {
 				if (!instance.attribute(a).equals(instance.classAttribute()))
 					temp += (node.mu[a][c] - instance.value(a)) / (Math.pow(node.sd[a][c], 2));
+				
+				if (Double.isNaN(temp) || Double.isInfinite(temp)){
+					System.out.println("Gradeint is NAN or INFINITE in Classifier Tree");
+					System.out.println(temp);
+					System.out.println("class is\t"+ c);
+					System.out.println("att is \t"+ a );
+					System.out.println("mu is\t" + node.mu[a][c]);
+					System.out.println("sd is\t" + node.sd[a][c]);
+					System.out.println("data is\t"+  instance.value(a));
+					System.exit(0);
+				}
 			}
+			
 			gradient[c] = temp;
 
 		}
@@ -148,7 +169,28 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 			sumPDF_log += Math.exp(pdf_log[i] - maxPDF_log);
 
 		}
-		sumPDF_log = Math.log(sumPDF_log);
+		if ( sumPDF_log <= 0 )
+		{
+			System.out.println("sumPDF_LOG < 0  in Classifier Tree" );
+			for( int i =0 ; i < pdf_log.length ; i++){
+				System.out.print(pdf_log[i]+"  ");
+			}
+			System.out.println();
+			System.exit(0);
+		}
+		
+		sumPDF_log = Math.log(sumPDF_log + 0.01);
+		
+		if(Double.isNaN(sumPDF_log) || Double.isInfinite(sumPDF_log)){
+			System.out.println("sumPDF_log is nan or infinitive in classifier Tree");
+			System.out.println(sumPDF_log);
+			System.exit(0);
+		}
+		if ( Double.isNaN(maxPDF_log) || Double.isInfinite(maxPDF_log)){
+			System.out.println("maxPDF_log is  nan or infinitive in Classifier Tree");
+			System.out.println(maxPDF_log);
+			System.exit(0);
+		}
 		sumPDF_log += maxPDF_log;
 
 		double[] prob = new double[pdf_log.length];
@@ -157,11 +199,13 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 			double temp = pdf_log[i] - sumPDF_log;
 			prob[i] = Math.exp(temp);
+			if ( Double.isNaN(prob[i]) || Double.isInfinite(prob[i])){
+				System.out.println("prob[i] is nan or infinitive in Classifier Tree");
+				System.out.println(prob[i]);
+				System.exit(0);
+			}
 			if (prob[i] == 0d)
 				prob[i] = 0.00001d;
-//			if ( prob[i] == 1)
-//				prob[i] -= 0.00001d;
-
 		}
 
 		if (maxPDF_LogIndex == -1) {
@@ -184,6 +228,11 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 
 		for (int c = 0; c < pdf_log.length; c++) {
 			result[c] = gradient[c] - (gradient[maxPDF_LogIndex] + (numerator / denominator));
+			if ( Double.isInfinite(result[c]) || Double.isNaN(result[c])){
+				System.out.println("result[c] is Nan or infinite at Classifier Tree");
+				System.out.println(denominator);
+				System.exit(0);
+			}
 			result[c] *= prob[c];
 
 		}

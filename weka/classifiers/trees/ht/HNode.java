@@ -74,6 +74,8 @@ public abstract class HNode implements Serializable {
 	
 	 public abstract double[] getDistribution_derivative(Instance inst, Attribute classAtt) throws Exception;
 
+	 
+	 
 	protected void setParameters(Instances data) throws Exception {
 		double[][] mu2 = new double[data.numAttributes() - 1][Constants.numClasses];
 		double[][] sd2 = new double[data.numAttributes() - 1][Constants.numClasses];

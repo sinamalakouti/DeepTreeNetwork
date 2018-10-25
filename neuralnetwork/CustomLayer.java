@@ -17,6 +17,9 @@
 
 package neuralnetwork;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.ParamInitializer;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -29,12 +32,7 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
-import neuralnetwork.HoeffdingTree.HoeffdingTreeLayer;
-import sigmoid.SigmoidLayer;
 import utils.Constants;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Dense layer: a standard fully connected feed forward layer
@@ -56,7 +54,7 @@ public class CustomLayer extends FeedForwardLayer {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
         
         HoeffdingTreeLayer ret = new HoeffdingTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
- 
+//        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);
         ret.setParamsViewArray(layerParamsView);

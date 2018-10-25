@@ -44,44 +44,20 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
  *******************/
 	 public double getProbability_derivative(double data) {
 
+		 	
 		    data = round(data);
-//		    double zLower = (data - m_Mean - (m_Precision / 2)) / ( m_StandardDev + 0.01);
-//		    double zUpper = (data - m_Mean + (m_Precision / 2)) / ( m_StandardDev + 0.01);
-
 		    double z = ( data - m_Mean ) / (m_StandardDev + 0.01);
-		    double p_derivative = Statistics.normalProbability_derivative(z);
-//		    double pLower_derivative = Statistics.normalProbability_derivative(zLower);
-//		    double pUpper_derivative = Statistics.normalProbability_derivative(zUpper);
-//		    
-//		    double der  = 1 / ( Math.sqrt(2 * Math.PI));
-//		    double der1 = der * Math.exp(-1 * zLower * zLower / 2) ; 
-//		    
-//		    double der2 = der * Math.exp(-1 * zUpper * zUpper / 2) ; 
-//		   if ( der1 == 0)
-//		   {
-//			   double data2 = data;
-//			   double mean = m_Mean;
-//			   double std = m_StandardDev;
-//			   
-//			   double z = (data2 - mean - (m_Precision / 2));
-//			   z = z / std;
-//			   
-//			   System.out.println(zLower * zLower);
-//			   System.out.println(Math.exp(zLower * zLower));
-//			   System.out.println(Math.exp(-1 * zLower * zLower / 2) );
-//			   pLower_derivative = Statistics.normalProbability_derivative(zLower);
-//
-//			   
-//		   }
-//		   if ( pLower_derivative == pUpper_derivative){
-//			   double pLower = Statistics.normalProbability(zLower);
-//			    double pUpper = Statistics.normalProbability(zUpper);
-//			     pLower_derivative = Statistics.normalProbability_derivative(zLower);
-//			     pUpper_derivative = Statistics.normalProbability_derivative(zUpper);
-//
-//			    System.out.println();
-//			    
-//		   }
+		    if ( m_StandardDev < 0 ){
+		    	System.out.println("in Normal Esitmator get std < 0 ");
+		    	System.exit(0);
+		    }		    
+		  
+		    double der  = 1 / ( Math.sqrt(2 * Math.PI));
+		    double p_derivative = der * Math.exp(-1 * z * z / 2);
+		    if ( p_derivative < 0 || p_derivative > 1){
+		    	System.out.println("besmellah e rahman e rahim");
+		    	System.exit(0);
+		    }
 		    return p_derivative;
 		  }
 	
@@ -103,10 +79,10 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
   private double m_SumOfValuesSq;
 
   /** The current mean */
-  private double m_Mean;
+  public double m_Mean;
 
   /** The current standard deviation */
-  private double m_StandardDev;
+  public double m_StandardDev;
 
   /** The precision of numeric values ( = minimum std dev permitted) */
   private double m_Precision;
@@ -155,7 +131,7 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
     }
     data = round(data);
     m_SumOfWeights += weight;
-    m_SumOfValues += data * weight;
+    m_SumOfValues += data * weight;	
     m_SumOfValuesSq += data * data * weight;
 
     computeParameters();
@@ -189,10 +165,10 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
   @Override
   public double getProbability(double data) {
 
+	  
     data = round(data);
     double zLower = (data - m_Mean - (m_Precision / 2)) /(  m_StandardDev + 0.1);
     double zUpper = (data - m_Mean + (m_Precision / 2)) /( m_StandardDev + 0.1);
-    double check = (1 / Math.sqrt(2* Math.PI) * Math.exp(-1 * zLower * zLower / 2));
     double pLower = Statistics.normalProbability(zLower);
     double pUpper = Statistics.normalProbability(zUpper);
     

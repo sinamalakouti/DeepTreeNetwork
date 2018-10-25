@@ -175,67 +175,16 @@ public class HoeffdingTree extends AbstractClassifier implements
 	    }
 	    
 	    return dist;
-	    
-//	    switch (instance.classAttribute().type()) {
-//	    
-//	    case Attribute.NOMINAL:
-//	      double max = 0;
-//	      int maxIndex = 0;
-//
-//	      for (int i = 0; i < dist.length; i++) {
-//	        if (dist[i] > max) {
-//	          maxIndex = i;
-//	          max = dist[i];
-//	        }
-//	      }
-//	      if (max > 0) {
-//	        return maxIndex;
-//	      } else {
-//	        return Utils.missingValue();
-//	      }
-//	    case Attribute.NUMERIC:
-//	    case Attribute.DATE:
-//	      return dist[0];
-//	    default:
-//	      return Utils.missingValue();
-//	    }
-	    
-	    
 	  }
 	
 	  public double[] predicate_derivative(Instance instance) throws Exception {
 
 	    double[] dist = distributionForInstance_derivative(instance);
 	    if (dist == null) {
-	      throw new Exception("Null distribution predicted");
+	      throw new Exception("Null distribution  derivative predicted");
 	    }
 	    return dist;
-	    
-//	    switch (instance.classAttribute().type()) {
-//	    
-//	    case Attribute.NOMINAL:
-//	      double max = 0;
-//	      int maxIndex = 0;
-//
-//	      for (int i = 0; i < dist.length; i++) {
-//	        if (dist[i] > max) {
-//	          maxIndex = i;
-//	          max = dist[i];
-//	        }
-//	      }
-//	      if (max > 0) {
-//	        return maxIndex;
-//	      } else {
-//	        return Utils.missingValue();
-//	      }
-//	    case Attribute.NUMERIC:
-//	    case Attribute.DATE:
-//	      return dist[0];
-//	    default:
-//	      return Utils.missingValue();
-//	    }
-	    
-	    
+	   	    
 	  }
 
 	

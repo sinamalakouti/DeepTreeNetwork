@@ -109,8 +109,9 @@ extends AbstractLayer<CustomLayer> {
 			for (int j =0 ; j < zprim[i].length; j ++)
 			{
 				if ( Double.isNaN(zprim[i][j]) ||Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number one");
+					System.out.println("stop stage number one1111");
 					System.out.println(zprim[i][j]);
+					z = bacpropOutput(true, workspaceMgr, W); // Note: using preOutput(INDArray) can't be used as this does a
 					System.exit(0);
 				}
 			}
@@ -183,6 +184,18 @@ extends AbstractLayer<CustomLayer> {
 		weightNoiseParams.clear();
 
 		epsilonNext = backpropDropOutIfPresent(epsilonNext);
+		zprim = epsilonNext.toDoubleMatrix();
+		for  ( int i =0 ; i  < zprim.length ; i++)
+			for (int j =0 ; j < zprim[i].length; j ++)
+			{
+				if ( Double.isNaN(zprim[i][j]) ||Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number nine111");
+					System.out.println(zprim[i][j]);
+					System.exit(0);
+				}
+			}
+
+	
 		return new Pair<>(ret, epsilonNext);
 	}
 

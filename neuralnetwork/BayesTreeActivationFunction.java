@@ -40,12 +40,12 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 	private static final long serialVersionUID = -6622285329198225782L;
 	private J48 activationModel;
 	J48 classifier;
-	HoeffdingTree hf ;
+//	HoeffdingTree hf ;
 	int layernumber = 0;
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 	int neuronNumber = 0;
-	boolean createdHF = false;
+//	boolean createdHF = false;
 
 	public BayesTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
@@ -77,6 +77,15 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				Instance next = it.nextElement();
 //				TODO : add mapping again [Constants.classChosedArray.get(layernumber).get(neuronNumber)]
 				double[] predictionDerivative = activationModel.predicateDerivative(next, true);
+				
+				for( int jj =0 ; jj< predictionDerivative.length; jj++){
+					if( Double.isNaN(predictionDerivative[jj])){
+						System.out.println("predictionDerivation is NAN in Bayes Tree ACtivation ");
+						System.exit(0);
+					}
+
+					
+				}
 				
 //			for mapping : 	result [i] = predictionDerivative[0]; should changed true -> false in the line above
 				
@@ -137,10 +146,40 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 		
 			output =  output.sub(min);
 			output =  output.div(max - min);
+			
+			if ( max == min ){
+				System.out.println("min == max in bayes Tree Activation Function");
+				System.exit(0);
+			}
+			
+			double [][] checker = output.toDoubleMatrix();
+			for ( int f =0 ; f< checker.length ; f++)
+				for( int s =0 ; s < checker[0].length ; s++)
+					
+					if ( Double.isNaN( checker[f][s]) || Double.isInfinite(checker[f][s])  )
+					{
+						System.out.println(" the checker is nan or infinite in BayesTreeActivation");
+						System.out.println(checker[f][s]);
+						System.exit(0);
+					}
+					
+				
 
 			return new Pair<>(output, null);
 		} else {
 //			System.out.println("mage darim ");
+			
+			double [][] checker = outputLayerResult;
+			for ( int f =0 ; f< checker.length ; f++)
+				for( int s =0 ; s < checker[0].length ; s++)
+					
+					if ( Double.isNaN( checker[f][s]) || Double.isInfinite(checker[f][s])  )
+					{
+						System.out.println(" the checker is nan or infinite in BayesTreeActivation 1111");
+						System.out.println(checker[f][s]);
+						System.exit(0);
+					}
+					
 			return new Pair<>(Nd4j.create(outputLayerResult), null);
 		}
 	}
@@ -148,6 +187,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 
 		
 
+	
 	
 	public INDArray getActivation(INDArray in, boolean training) {
 		
@@ -157,40 +197,40 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 		// in = inputData .* weights 
 	
 		Instances trainInstaces = createProperDataset(in.dup(), training);
-		if ( hf == null)
-		{
-			hf = new HoeffdingTree();
-			this.createdHF = true;
-			try {
-				hf.buildClassifier(trainInstaces);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}else{
-			for( int i =0 ; i< trainInstaces.size(); i ++)
-				try {
-					if ( hf == null)
-						System.out.println("shoot");
-					hf.updateClassifier(trainInstaces.get(i));
-					
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-		}
-		
-		if ( hf.m_root.isLeaf() == false){
-			System.out.println("lets do it my frendinto");
-			try {
-				hf.classifyInstance(trainInstaces.get(0));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		if ( hf == null)
+//		{
+////			hf = new HoeffdingTree();
+////			this.createdHF = true;
+//			try {
+//				hf.buildClassifier(trainInstaces);
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		}else{
+//			for( int i =0 ; i< trainInstaces.size(); i ++)
+//				try {
+//					if ( hf == null)
+//						System.out.println("shoot");
+//					hf.updateClassifier(trainInstaces.get(i));
+//					
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			
+//		}
+//		
+//		if ( hf.m_root.isLeaf() == false){
+//			System.out.println("lets do it my frendinto");
+//			try {
+//				hf.classifyInstance(trainInstaces.get(0));
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		double[] result = new double[trainInstaces.size()];
 		
 
@@ -302,7 +342,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			if (training == false)
 				label = Constants.testInstancesLabel;		
 			else{
-				_utils.setLabels(Constants.model.getLabels(), false,training);
+//				_utils.setLabels(Constants.model.getLabels(), false,training);
 				label = Constants.trainInstancesLabel;
 
 			}

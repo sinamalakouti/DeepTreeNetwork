@@ -56,6 +56,11 @@ public class Statistics implements RevisionHandler {
 	        y = - y;
 	      }
 	    }
+	    
+	    if ( Double.isInfinite(y) || Double.isNaN(y)){
+	    	System.out.println("in statsitics got NAN or INFINITY");
+	    	
+	    }
 	    	return y;
 	  }
 	  
@@ -63,6 +68,11 @@ public class Statistics implements RevisionHandler {
   public static double errorFunction_derivative(double x) {
 //	  
 	  double coef = 2 / Math.sqrt(Math.PI);
+	  double gaussVar = gauss(x);
+	  if ( Double.isNaN(gaussVar) || Double.isInfinite(gaussVar)){
+		  System.out.println("got infinite or NAN gaussVar in Statistics");
+		   gaussVar = gauss(x);
+	  }
 	  double result = coef * gauss(x);
 	  return result;
   }
@@ -79,7 +89,7 @@ public class Statistics implements RevisionHandler {
   {
    
 	  
-	  return 1 - Math.pow(x, 2) /1 + Math.pow(x, 4) / 2 - Math.pow(x, 6)/6  + Math.pow(x, 8) / 24 - Math.pow(x, 10)/ 120; 
+	  return 1 - Math.pow(x, 2)  + (Math.pow(x, 4) / 2) - Math.pow(x, 6)/6  + Math.pow(x, 8) / 24 - Math.pow(x, 10)/ 120; 
   }
   
   
