@@ -283,9 +283,16 @@ public class Network2 {
 		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
 				
 		
+		batchSize = 100;
+		trainSize = trainSet2.size();
+		batchNum = trainSize / batchSize;
+		System.out.println(trainSet2.size());
+		System.out.println(tempTrainSet.numExamples());
+		System.out.println(batchNum);
+		System.out.println(batchSize);
 		for (int i = 0; i < 150; i++) {
 			for (int b = 0; b < batchNum; b++) {
-
+				
 				 DataSet set = getBatchTrainSet(b, batchSize, tempTrainSet,trainSet2);
 
 				 Constants.model.fit(set);
