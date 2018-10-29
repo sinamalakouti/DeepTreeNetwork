@@ -1,5 +1,8 @@
 package controller;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -305,17 +308,17 @@ public class Network2 {
 					}
 					mnistTest.reset();
 
-					// String path =
-					// "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
-					// + i;
-					// File file = new File(path);
-					// BufferedWriter out = new BufferedWriter(new
-					// FileWriter(file));
-					// out.write(eval.stats() + "\n" + Constants.model.score());
-					System.out.println(eval.stats());
+					String path =
+							 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
+							 + i;
+							 File file = new File(path);
+							 BufferedWriter out = new BufferedWriter(new
+							 FileWriter(file));
+							 out.write(eval.stats() + "\n" + Constants.model.score());
+//							System.out.println(eval.stats());
 
-					// out.close();
-					Constants.isEvaluating = false;
+							out.close();
+							Constants.isEvaluating = false;
 
 				}
 		

@@ -32,6 +32,7 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import neuralnetwork.HoeffdingTree.HoeffdingTreeLayer;
 import utils.Constants;
 
 /**
@@ -53,8 +54,8 @@ public class CustomLayer extends FeedForwardLayer {
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
         
-        HoeffdingTreeLayer ret = new HoeffdingTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
-//        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
+//        HoeffdingTreeLayer ret = new HoeffdingTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
+        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);
         ret.setParamsViewArray(layerParamsView);

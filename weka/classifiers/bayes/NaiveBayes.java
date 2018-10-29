@@ -314,7 +314,9 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 			}
 
 		}
-
+		
+		for ( int s = 0 ; s < probs.length ; s++)
+			probs[s]+= 0.001;
 		Utils.normalize(probs);
 		return probs;
 

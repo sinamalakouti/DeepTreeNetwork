@@ -79,7 +79,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				double[] predictionDerivative = activationModel.predicateDerivative(next, true);
 				
 				for( int jj =0 ; jj< predictionDerivative.length; jj++){
-					if( Double.isNaN(predictionDerivative[jj])){
+					if( Double.isNaN(predictionDerivative[jj]) || Double.isInfinite(predictionDerivative[jj])){
 						System.out.println("predictionDerivation is NAN in Bayes Tree ACtivation ");
 						System.exit(0);
 					}
@@ -141,30 +141,16 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 			output = Nd4j.create(result).transpose();
 // normalization : ( 0, 1 )
 			
-			double min = output.minNumber().doubleValue();
-			double max = output.maxNumber().doubleValue();
-		
-			output =  output.sub(min);
-			output =  output.div(max - min);
+//			double min = output.minNumber().doubleValue();
+//			double max = output.maxNumber().doubleValue();
+//		
+//			output =  output.sub(min);
+//			output =  output.div(max - min);
 			
-			if ( max == min ){
-				System.out.println("min == max in bayes Tree Activation Function");
-				System.exit(0);
-			}
-			
-			double [][] checker = output.toDoubleMatrix();
-			for ( int f =0 ; f< checker.length ; f++)
-				for( int s =0 ; s < checker[0].length ; s++)
-					
-					if ( Double.isNaN( checker[f][s]) || Double.isInfinite(checker[f][s])  )
-					{
-						System.out.println(" the checker is nan or infinite in BayesTreeActivation");
-						System.out.println(checker[f][s]);
-						System.exit(0);
-					}
-					
-				
-
+//			if ( max == min ){
+//				System.out.println("min == max in bayes Tree Activation Function");
+//				System.exit(0);
+//			}
 			return new Pair<>(output, null);
 		} else {
 //			System.out.println("mage darim ");
