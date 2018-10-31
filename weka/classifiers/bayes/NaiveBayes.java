@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.apache.commons.math3.analysis.function.Constant;
+
 import utils.Constants;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Aggregateable;
@@ -592,8 +594,11 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 		}
 
 		// Reserve space for the distributions
-		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][m_Instances.numClasses()];
-		m_ClassDistribution = new DiscreteEstimator(m_Instances.numClasses(), true);
+//		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][m_Instances.numClasses()];
+//		m_ClassDistribution = new DiscreteEstimator(m_Instances.numClasses(), true);
+		
+		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][Constants.numClasses];
+		m_ClassDistribution = new DiscreteEstimator(Constants.numClasses, true);
 		int attIndex = 0;
 		Enumeration<Attribute> enu = m_Instances.enumerateAttributes();
 		while (enu.hasMoreElements()) {
@@ -626,11 +631,13 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 				}
 			}
 
-			for (int j = 0; j < m_Instances.numClasses(); j++) {
+			for (int j = 0; j < Constants.numClasses; j++) {
 				switch (attribute.type()) {
 				case Attribute.NUMERIC:
 					if (m_UseKernelEstimator) {
 						m_Distributions[attIndex][j] = new KernelEstimator(numPrecision);
+						
+						
 					} else {
 						m_Distributions[attIndex][j] = new NormalEstimator(numPrecision);
 					}
@@ -699,6 +706,13 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 			instance = m_Disc.output();
 		}
 		double[] probs = new double[m_NumClasses];
+		if ( m_NumClasses != Constants.numClasses){
+			System.err.println("in NaiveBayes we don't have same number of classes -> error");
+			System.err.println("correct number of classes\t"+ Constants.numClasses);
+			System.err.println("number of classes in naive bayes\t"+ m_NumClasses);
+			System.err.println("in distribution number of classes\t" + m_Distributions[0].length);
+			
+		}
 		for (int j = 0; j < m_NumClasses; j++) {
 			probs[j] = m_ClassDistribution.getProbability(j);
 		}

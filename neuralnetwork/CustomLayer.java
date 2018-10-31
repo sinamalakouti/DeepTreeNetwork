@@ -54,8 +54,8 @@ public class CustomLayer extends FeedForwardLayer {
                     int layerIndex, INDArray layerParamsView, boolean initializeParams) {
         LayerValidation.assertNInNOutSet("CustomLayer", getLayerName(), layerIndex, getNIn(), getNOut());
         
-//        HoeffdingTreeLayer ret = new HoeffdingTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
-        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
+        HoeffdingTreeLayer ret = new HoeffdingTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
+//        BayesTreeLayer ret = new BayesTreeLayer(conf, Constants.train, Constants.test,Integer.parseInt(layerName.substring(layerName.length()-1)));
         ret.setListeners(trainingListeners);
         ret.setIndex(layerIndex);
         ret.setParamsViewArray(layerParamsView);

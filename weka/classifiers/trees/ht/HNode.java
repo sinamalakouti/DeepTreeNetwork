@@ -206,6 +206,7 @@ public abstract class HNode implements Serializable {
    */
   public HNode(Map<String, WeightMass> classDistrib) {
     m_classDistribution = classDistrib;
+    
   }
 
   /**

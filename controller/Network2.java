@@ -121,7 +121,7 @@ public class Network2 {
 		Constants.maximumDepth = 3;
 		// for weights normalization
 		Constants.weightLayerMin = new double[2];
-		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
+		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;	
 		Constants.weightLayerMin[1] = Double.POSITIVE_INFINITY;
 		Constants.weightLayerMax = new double[2];
 		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
@@ -290,6 +290,7 @@ public class Network2 {
 		System.out.println(tempTrainSet.numExamples());
 		System.out.println(batchNum);
 		System.out.println(batchSize);
+	//	System.out.println(mnistTest.getLabels().size());
 		for (int i = 0; i < 150; i++) {
 			for (int b = 0; b < batchNum; b++) {
 				
@@ -315,16 +316,16 @@ public class Network2 {
 					}
 					mnistTest.reset();
 
-					String path =
-							 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
-							 + i;
-							 File file = new File(path);
-							 BufferedWriter out = new BufferedWriter(new
-							 FileWriter(file));
-							 out.write(eval.stats() + "\n" + Constants.model.score());
-//							System.out.println(eval.stats());
+//					String path =
+//							 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
+//							 + i;
+//							 File file = new File(path);
+//							 BufferedWriter out = new BufferedWriter(new
+//							 FileWriter(file));
+//							 out.write(eval.stats() + "\n" + Constants.model.score());
+							System.out.println(eval.stats());
 
-							out.close();
+//							out.close();
 							Constants.isEvaluating = false;
 
 				}

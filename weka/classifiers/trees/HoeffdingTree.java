@@ -28,6 +28,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
+import scala.reflect.internal.Depth;
+import utils.Constants;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.UpdateableClassifier;
 import weka.classifiers.trees.ht.ActiveHNode;
@@ -830,14 +832,18 @@ public class HoeffdingTree extends AbstractClassifier implements
     if (m_root == null) {
     	
 //    	TODO :  create Learning node
-      m_root = newLearningNode();
+      m_root = newLearningNode(0);
     }
 
     LeafNode l = m_root.leafForInstance(inst, null, null);
+    
     HNode actualNode = l.m_theNode;
     if (actualNode == null) {
+    	System.out.println(m_root.isLeaf());
       actualNode = new ActiveHNode();
       l.m_parentNode.setChild(l.m_parentBranch, actualNode);
+  		System.out.println(m_root.isLeaf());
+
     }
 
     if (actualNode instanceof LearningNode) {
@@ -846,12 +852,18 @@ public class HoeffdingTree extends AbstractClassifier implements
       if (/* m_growthAllowed && */actualNode instanceof ActiveHNode) {
         double totalWeight = actualNode.totalWeight();
         if (totalWeight
-            - ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval > m_gracePeriod) {
+            - ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval > m_gracePeriod && actualNode.depth < Constants.maximumDepth) {
 
           // try a split
           trySplit((ActiveHNode) actualNode, l.m_parentNode, l.m_parentBranch);
 
           ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval = totalWeight;
+        }else{
+        	if ( actualNode.depth >= Constants.maximumDepth){
+        		int a = actualNode.depth;
+        		int b =  a;
+        	}
+        	
         }
       }
     }
@@ -903,7 +915,7 @@ public class HoeffdingTree extends AbstractClassifier implements
   protected void deactivateNode(ActiveHNode toDeactivate, SplitNode parent,
       String parentBranch) {
     HNode leaf = new InactiveHNode(toDeactivate.m_classDistribution);
-
+    
     if (parent == null) {
       m_root = leaf;
     } else {
@@ -964,13 +976,14 @@ public class HoeffdingTree extends AbstractClassifier implements
         SplitCandidate secondBest = bestSplits.get(bestSplits.size() - 2);
 
         if (best.m_splitMerit - secondBest.m_splitMerit > hoeffdingBound
-            || hoeffdingBound < m_hoeffdingTieThreshold) {
+            || hoeffdingBound < m_hoeffdingTieThreshold ) {
           doSplit = true;
         }
 
         // TODO - remove poor attributes stuff?
       }
-
+      
+     
       if (doSplit) {
         SplitCandidate best = bestSplits.get(bestSplits.size() - 1);
         
@@ -980,9 +993,11 @@ public class HoeffdingTree extends AbstractClassifier implements
         } else {
           SplitNode newSplit = new SplitNode(node.m_classDistribution,
               best.m_splitTest);
+          newSplit.depth = node.depth;
 
           for (int i = 0; i < best.numSplits(); i++) {
-            ActiveHNode newChild = newLearningNode();
+            ActiveHNode newChild = newLearningNode(newSplit.depth+1);
+            newChild.depth = newSplit.depth +1;
             newChild.m_classDistribution = best.m_postSplitClassDistributions
                 .get(i);
             newChild.m_weightSeenAtLastSplitEval = newChild.totalWeight();
@@ -1029,16 +1044,19 @@ public class HoeffdingTree extends AbstractClassifier implements
    * @return a new learning node
    * @throws Exception if a problem occurs
    */
-  protected ActiveHNode newLearningNode() throws Exception {
+  protected ActiveHNode newLearningNode(int depth) throws Exception {
     ActiveHNode newChild;
 
     if (m_leafStrategy == LEAF_MAJ_CLASS) {
       newChild = new ActiveHNode();
+      System.out.println("not creating NB node");
+      newChild =  new NBNodeAdaptive(m_header, m_nbThreshold);
     } else if (m_leafStrategy == LEAF_NB) {
       newChild = new NBNode(m_header, m_nbThreshold);
     } else {
-      newChild = new NBNodeAdaptive(m_header, m_nbThreshold);
+        newChild = new NBNodeAdaptive(m_header, m_nbThreshold);
     }
+    newChild.depth = depth;
 
     return newChild;
   }

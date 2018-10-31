@@ -239,9 +239,9 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 				}
 				}else {
 					try {
-						activationModel = new J48();
-						activationModel.buildClassifier(trainInstaces);
-//						activationModel.m_root.update(trainInstaces);;
+//						activationModel = new J48();
+//						activationModel.buildClassifier(trainInstaces);
+						activationModel.m_root.update(trainInstaces);;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

@@ -73,12 +73,17 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			try {
 				Instance next = it.nextElement();
 //				TODO : add mapping again [Constants.classChosedArray.get(layernumber).get(neuronNumber)]
+				
 				double[] predictionDerivative = activationModel.predicate_derivative(next);
 				
 //			for mapping : 	result [i] = predictionDerivative[0]; should changed true -> false in the line above
 				
-			
-			result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+			if ( predictionDerivative.length != Constants.numClasses && Constants.classChosedArray.get(layernumber).get(neuronNumber) >= predictionDerivative.length )
+			{
+				System.err.println("inja ham bayad doros shavad dar moshtagh e gerami");
+				result[i] =0;
+			}else
+				result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
 			
 			
 
@@ -235,14 +240,22 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			try {
 				Instance next = it.next();
 //				Instance next2 = it2.next();
-
+				if( activationModel.m_root.isLeaf() == false){
+					int a = 0;
+				}
 				prediction = activationModel.predicate(next);
 			//	prediciton2 = activationModel.predicate(next , isOutputLayerActivation);
 				
 				double res;
+				
 				if ( isOutputLayerActivation == false) {
 					
-					res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+					if ( prediction.length != Constants.numClasses && Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length)
+					{
+						System.err.println("in doostemoon bayad bezoodi hal beshe :))");
+						res =0;
+					}else
+						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
 					
 //					TODO adding the mapping again
 //					INDArray pred = Nd4j.create(prediciton2);
@@ -253,6 +266,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 
 					result[i] = res;
+					
 					
 					if ( res < 0  || res - 1 > 0.01) {
 						System.out.println("ya khode khoda probablity not valid");
