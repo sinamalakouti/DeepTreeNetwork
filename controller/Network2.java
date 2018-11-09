@@ -144,7 +144,7 @@ public class Network2 {
 				.layer(1, new CustomLayer.Builder().nIn(40).nOut(40).activation(Activation.SIGMOID).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-						.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
+								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
@@ -297,8 +297,9 @@ public class Network2 {
 			if (i == 0) {
 				DataSet testSet = mnistTest.next();
 				mnistTest.reset();
-				double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet);
-				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet);
+				Instances testInstances = _utils.dataset2Instances(testSet);
+				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
+				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
 				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
 						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt" + i;
 				File file = new File(path);
@@ -395,15 +396,12 @@ public class Network2 {
 
 	}
 
-	// each tree accuracy on batch and bagging of trees
-	private static double batch_test(int batchNum, int batchSize, DataSet trainSet, Instances training, DataSet testSet)
+	// each tree accuracy on =0h and bagging of trees
+	private static double batch_test(int batchNum, int batchSize, DataSet trainSet, Instances training, DataSet testSet, Instances testInstances)
 			throws Exception {
 
-		// ArrayList<HoeffdingTree> baggingTrees = new ArrayList<>();
-		// double [] batchTests = new double[batchNum];
-		// double [] bagging_batches = new double[batchNum];
+		
 		double avgAccuracy = 0d;
-		Instances test = _utils.dataset2Instances(testSet);
 
 		for (int b = 0; b < batchNum; b++) {
 			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
@@ -411,7 +409,7 @@ public class Network2 {
 			HoeffdingTree hf = new HoeffdingTree();
 			hf.buildClassifier(train);
 			weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
-			eval.evaluateModel(hf, test);
+			eval.evaluateModel(hf, testInstances);
 			avgAccuracy += eval.pctCorrect();
 		}
 
@@ -420,15 +418,17 @@ public class Network2 {
 	}
 
 	private static double bagging_test(int batchNum, int batchSize, DataSet trainSet, Instances training,
-			DataSet testSet) throws Exception {
+			DataSet testSet, Instances testInstances) throws Exception {
 		double avgAccuracy = 0d;
-		Instances test = _utils.dataset2Instances(testSet);
 		ArrayList<HoeffdingTree> trees;
+		
+		
 		for (int b = 0; b < batchNum; b++) {
-			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
+			
+			DataSet trainDataset = getBatchTrainSet(b, batchSize, trainSet, training);
 			trees = new ArrayList<>();
-			for ( int i = 0 ; i < 40 ; i++){
-				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), set);
+			for (int i = 0; i < 40; i++) {
+				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), trainDataset);
 
 				Instances train = _utils.ndArrayToInstances(bag);
 				HoeffdingTree hf = new HoeffdingTree();
@@ -436,36 +436,51 @@ public class Network2 {
 				trees.add(hf);
 			}
 
-			Iterator<Instance> it = test.iterator();
 			double correct = 0d;
-			while (it.hasNext()) {
+			int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
+			for (int j = 0; j < trees.size(); j++) {
+				INDArray temp = _utils.getSubDataset(Constants.attributesIndexes.get(j), testSet);
+				Instances test = _utils.ndArrayToInstances(temp);
+				Iterator<Instance> it = test.iterator();
+				int counter = 0;
+				while (it.hasNext()) {
 
-				Instance inst = it.next();
-				int[] classPredicted = new int[trees.size()];
-				for (int i = 0; i < trees.size(); i++) {
-					classPredicted[(int) trees.get(i).classifyInstance(inst)]++;
+					Instance inst = it.next();
+//					for (int i = 0; i < trees.size(); i++) {
+//						if (i == 26) {
+//							System.out.println("i == 26");
+//						}
+//						if ((int) trees.get(i).classifyInstance(inst) == 26)
+//							System.out.println("(int) trees.get(i).classifyInstance(inst) == 26");
+						classPredicted[counter][(int) trees.get(j).classifyInstance(inst)]++;
+//					}
+						counter ++;
 				}
 
+			}
+			
+			
+			for (int i = 0; i < classPredicted.length; i++) {
 				int max = Integer.MIN_VALUE;
 				int max_indx = -1;
-
-				for (int i = 0; i < classPredicted.length; i++) {
-					if (classPredicted[i] > max) {
-						max = classPredicted[i];
+				for ( int j =0 ; j < Constants.numClasses ; j ++){
+					if (classPredicted[i][j] > max) {
+						max = classPredicted[i][j];
 						max_indx = i;
-					}
-
+					}	
+					
 				}
-				if (max_indx == (int) inst.classValue())
+				
+				if (max_indx == (int) testInstances.get(i).classValue())
 					correct++;
+
 
 			}
 
-			avgAccuracy += correct / test.size();
-
+			avgAccuracy += correct / testSet.numExamples();
 
 		}
 
-		return avgAccuracy/batchNum;
+		return avgAccuracy / batchNum;
 	}
 }
