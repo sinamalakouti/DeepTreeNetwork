@@ -1,31 +1,18 @@
 package utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 
-import javax.swing.JPasswordField;
-
-import org.apache.commons.cli.GnuParser;
-import org.leores.plot.JGnuplot;
-import org.leores.plot.JGnuplot.Plot;
-import org.leores.util.data.DataTableSet;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
-import com.panayotis.gnuplot.JavaPlot;
-
 import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
-import weka.classifiers.trees.ht.LeafNode;
 import weka.classifiers.trees.ht.SplitNode;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -248,7 +235,7 @@ public class _utils {
 		return new DataSet(data, outcomes);
 	}
 
-	public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
+	public static Instances ndArrayToInstances(INDArray ndArray) throws Exception {
 
 		// NDArray nd = new NDArray();
 		// nd.std(1,2);
@@ -280,6 +267,17 @@ public class _utils {
 			instances.add(inst);
 		}
 
+		
+		NumericToNominal convert = new NumericToNominal();
+		convert = new NumericToNominal();
+		String[] options = new String[2];
+		options[0] = "-R";
+		options[1] = "" + (instances.numAttributes()); // range of variables to
+		convert.setOptions(options);
+		convert.setInputFormat(instances);
+		instances = weka.filters.Filter.useFilter(instances, convert);
+		instances.setClassIndex(instances.numAttributes()-1);
+		
 		return instances;
 	}
 
@@ -307,57 +305,57 @@ public class _utils {
 		return Math.max(0.00001, temp);
 	}
 	
-	public static void draw_accuracy_fscore(String name, String path, int first, int last) throws FileNotFoundException{
-		
-		JGnuplot jg = new JGnuplot();
-		Plot plot = new Plot(name);
-		int n = ( last - first) / 2 + 1;
-		double[] x = new double [n];
-		double[][] fscore = new double[n][2];
-		double[][] accuracy = new double[n][2];
-		double [][] score = new double[n] [2];
-		int counter = 0;
-		for ( int i = 0 ; i < n ; i ++ ){
-			counter = (i * 2);
-			x[i] = counter + 1;
-			
-			File file = new File(path +"/resultIteration_" + i );
-			Scanner scan = new Scanner(file);
-			String line = null;
-			while (scan.hasNextLine()){
-			    line = scan.nextLine();
-//		        String delim = "[^a-zA-Z1-9.]+";
-				String delim = "\\S+";
-				String [] tokens = line.split(delim);
-				if ( tokens[0].toLowerCase().compareTo("accuracy:") == 0){
-					accuracy[i][1] = counter+1;	
-				 accuracy[i][1] = Double.parseDouble(tokens[1]);
-				}else if ( tokens[0].toLowerCase().compareTo("f1") == 0){
-					fscore[i][0] = counter +1;
-					fscore[i][1] = Double.parseDouble(tokens[2]);
-				}
-				else 
-					continue;
-				
-						
-			}
-			score[i][0] = counter +1;
-			score[i][1]= Double.parseDouble(line);
-			
-		}
-		DataTableSet dts = plot.addNewDataTableSet("");
-		
-		JavaPlot jp = new JavaPlot();
-		jp.addPlot(accuracy);
-		jp.addPlot(fscore);
-		jp.addPlot(score);
-		jp.plot();
-//		dts.addNewDataTable("sadfs",x);
-//		dts.addNewDataTable("f1score", x, y2);
-//		dts.addNewDataTable("f1score", x, y2);
-//		jg.execute(plot, jg.plot2d);
-
-			
-	}
+//	public static void draw_accuracy_fscore(String name, String path, int first, int last) throws FileNotFoundException{
+//		
+//		JGnuplot jg = new JGnuplot();
+//		Plot plot = new Plot(name);
+//		int n = ( last - first) / 2 + 1;
+//		double[] x = new double [n];
+//		double[][] fscore = new double[n][2];
+//		double[][] accuracy = new double[n][2];
+//		double [][] score = new double[n] [2];
+//		int counter = 0;
+//		for ( int i = 0 ; i < n ; i ++ ){
+//			counter = (i * 2);
+//			x[i] = counter + 1;
+//			
+//			File file = new File(path +"/resultIteration_" + i );
+//			Scanner scan = new Scanner(file);
+//			String line = null;
+//			while (scan.hasNextLine()){
+//			    line = scan.nextLine();
+////		        String delim = "[^a-zA-Z1-9.]+";
+//				String delim = "\\S+";
+//				String [] tokens = line.split(delim);
+//				if ( tokens[0].toLowerCase().compareTo("accuracy:") == 0){
+//					accuracy[i][1] = counter+1;	
+//				 accuracy[i][1] = Double.parseDouble(tokens[1]);
+//				}else if ( tokens[0].toLowerCase().compareTo("f1") == 0){
+//					fscore[i][0] = counter +1;
+//					fscore[i][1] = Double.parseDouble(tokens[2]);
+//				}
+//				else 
+//					continue;
+//				
+//						
+//			}
+//			score[i][0] = counter +1;
+//			score[i][1]= Double.parseDouble(line);
+//			
+//		}
+//		DataTableSet dts = plot.addNewDataTableSet("");
+//		
+//		JavaPlot jp = new JavaPlot();
+//		jp.addPlot(accuracy);
+//		jp.addPlot(fscore);
+//		jp.addPlot(score);
+//		jp.plot();
+////		dts.addNewDataTable("sadfs",x);
+////		dts.addNewDataTable("f1score", x, y2);
+////		dts.addNewDataTable("f1score", x, y2);
+////		jg.execute(plot, jg.plot2d);
+//
+//			
+//	}
 
 }
