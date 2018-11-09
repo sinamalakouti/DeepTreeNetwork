@@ -144,7 +144,7 @@ public class Network2 {
 				.layer(1, new CustomLayer.Builder().nIn(40).nOut(40).activation(Activation.SIGMOID).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
+						.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
@@ -421,45 +421,51 @@ public class Network2 {
 
 	private static double bagging_test(int batchNum, int batchSize, DataSet trainSet, Instances training,
 			DataSet testSet) throws Exception {
-
+		double avgAccuracy = 0d;
 		Instances test = _utils.dataset2Instances(testSet);
-		ArrayList<HoeffdingTree> trees = new ArrayList<>();
+		ArrayList<HoeffdingTree> trees;
 		for (int b = 0; b < batchNum; b++) {
 			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
-			INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), trainSet);
+			trees = new ArrayList<>();
+			for ( int i = 0 ; i < 40 ; i++){
+				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), set);
 
-			Instances train = _utils.ndArrayToInstances(bag);
-			HoeffdingTree hf = new HoeffdingTree();
-			hf.buildClassifier(train);
-			weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
-			trees.add(hf);
-
-		}
-		Iterator<Instance> it = test.iterator();
-		double correct = 0;
-		while (it.hasNext()) {
-
-			Instance inst = it.next();
-			int[] classPredicted = new int[trees.size()];
-			for (int i = 0; i < trees.size(); i++) {
-				classPredicted[(int) trees.get(i).classifyInstance(inst)]++;
+				Instances train = _utils.ndArrayToInstances(bag);
+				HoeffdingTree hf = new HoeffdingTree();
+				hf.buildClassifier(train);
+				trees.add(hf);
 			}
 
-			int max = Integer.MIN_VALUE;
-			int max_indx = -1;
+			Iterator<Instance> it = test.iterator();
+			double correct = 0d;
+			while (it.hasNext()) {
 
-			for (int i = 0; i < classPredicted.length; i++) {
-				if (classPredicted[i] > max) {
-					max = classPredicted[i];
-					max_indx = i;
+				Instance inst = it.next();
+				int[] classPredicted = new int[trees.size()];
+				for (int i = 0; i < trees.size(); i++) {
+					classPredicted[(int) trees.get(i).classifyInstance(inst)]++;
 				}
 
+				int max = Integer.MIN_VALUE;
+				int max_indx = -1;
+
+				for (int i = 0; i < classPredicted.length; i++) {
+					if (classPredicted[i] > max) {
+						max = classPredicted[i];
+						max_indx = i;
+					}
+
+				}
+				if (max_indx == (int) inst.classValue())
+					correct++;
+
 			}
-			if (max_indx == (int) inst.classValue())
-				correct++;
+
+			avgAccuracy += correct / test.size();
+
 
 		}
 
-		return correct / test.size();
+		return avgAccuracy/batchNum;
 	}
 }
