@@ -207,7 +207,7 @@ public class Network2 {
 		// setupe the project :
 
 		DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 6);
-		DataSetIterator mnistTest = new MnistDataSetIterator(1000, false, 6);
+		DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
 		int counter = 0;
 		INDArray ar = null;
@@ -298,16 +298,16 @@ public class Network2 {
 				DataSet testSet = mnistTest.next();
 				mnistTest.reset();
 				Instances testInstances = _utils.dataset2Instances(testSet);
-				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
+//				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
 				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
 				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
 						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt" + i;
 				File file = new File(path);
 				BufferedWriter out = new BufferedWriter(new FileWriter(file));
-				out.write("number of batches :\t" + batchNum);
-				out.write("size of batches :\t" + batchSize);
-				out.write("size of testSet :\t" + testSet.numExamples());
-				out.write("avg batch result:\t" + batchTest);
+				out.write("number of batches :\t" + batchNum+"\n");
+				out.write("size of batches :\t" + batchSize+"\n");
+				out.write("size of testSet :\t" + testSet.numExamples()+"\n");
+//				out.write("avg batch result:\t" + batchTest+"\n	");
 				out.write("bagging result:\t" + baggingTest);
 				out.close();
 
@@ -428,7 +428,7 @@ public class Network2 {
 			DataSet trainDataset = getBatchTrainSet(b, batchSize, trainSet, training);
 			trees = new ArrayList<>();
 			for (int i = 0; i < 40; i++) {
-				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), trainDataset);
+				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(i), trainDataset);
 
 				Instances train = _utils.ndArrayToInstances(bag);
 				HoeffdingTree hf = new HoeffdingTree();
@@ -443,6 +443,11 @@ public class Network2 {
 				Instances test = _utils.ndArrayToInstances(temp);
 				Iterator<Instance> it = test.iterator();
 				int counter = 0;
+				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(j), trainDataset);
+				Instances train = _utils.ndArrayToInstances(bag);
+				weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
+				eval.evaluateModel(trees.get(j), test);
+				System.out.println(eval.pctCorrect());
 				while (it.hasNext()) {
 
 					Instance inst = it.next();
@@ -452,6 +457,7 @@ public class Network2 {
 //						}
 //						if ((int) trees.get(i).classifyInstance(inst) == 26)
 //							System.out.println("(int) trees.get(i).classifyInstance(inst) == 26");
+						System.out.println(trees.get(j).classifyInstance(inst));
 						classPredicted[counter][(int) trees.get(j).classifyInstance(inst)]++;
 //					}
 						counter ++;
@@ -466,13 +472,15 @@ public class Network2 {
 				for ( int j =0 ; j < Constants.numClasses ; j ++){
 					if (classPredicted[i][j] > max) {
 						max = classPredicted[i][j];
-						max_indx = i;
+						max_indx = j;
 					}	
 					
-				}
+				}	
+				
 				
 				if (max_indx == (int) testInstances.get(i).classValue())
 					correct++;
+			
 
 
 			}
