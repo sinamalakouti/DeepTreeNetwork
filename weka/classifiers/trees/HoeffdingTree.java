@@ -851,8 +851,14 @@ public class HoeffdingTree extends AbstractClassifier implements
 
       if (/* m_growthAllowed && */actualNode instanceof ActiveHNode) {
         double totalWeight = actualNode.totalWeight();
-        if (totalWeight
-            - ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval > m_gracePeriod && actualNode.depth < Constants.maximumDepth) {
+        
+//        TODO : setting depth limit or what :))
+        
+//        if (totalWeight
+//            - ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval > m_gracePeriod  && actualNode.depth < Constants.maximumDepth) {
+//        	
+        	if (totalWeight
+                    - ((ActiveHNode) actualNode).m_weightSeenAtLastSplitEval > m_gracePeriod) {
 
           // try a split
           trySplit((ActiveHNode) actualNode, l.m_parentNode, l.m_parentBranch);
@@ -976,9 +982,12 @@ public class HoeffdingTree extends AbstractClassifier implements
         SplitCandidate secondBest = bestSplits.get(bestSplits.size() - 2);
 
         if (best.m_splitMerit - secondBest.m_splitMerit > hoeffdingBound
-            || hoeffdingBound < m_hoeffdingTieThreshold ) {
+            || hoeffdingBound < m_hoeffdingTieThreshold  ) {
           doSplit = true;
         }
+//        TODO : MAXIMUM DEPTH LIMIT 
+//        if ( node.depth > Constants.maximumDepth)
+//        	doSplit = false;
 
         // TODO - remove poor attributes stuff?
       }

@@ -17,6 +17,7 @@ import org.leores.plot.JGnuplot.Plot;
 import org.leores.util.data.DataTableSet;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -62,8 +63,28 @@ public class _utils {
 		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
 		Instances instances = _utils.ndArrayToInstances(features_labels);
+		NumericToNominal convert = new NumericToNominal();
+		convert = new NumericToNominal();
+		String[] options = new String[2];
+		options[0] = "-R";
+		options[1] = "" + (instances.numAttributes()); // range of variables to
+		convert.setOptions(options);
+		convert.setInputFormat(instances);
+		instances = weka.filters.Filter.useFilter(instances, convert);
+		instances.setClassIndex(instances.numAttributes()-1);
+	
 
 		return instances;
+	}
+	
+	public static INDArray getSubDataset(int[] featursIndx , DataSet ds){
+		INDArray features = ds.getFeatures().getColumns(featursIndx);
+		INDArray labels = ds.getLabels();
+		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
+		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
+		
+		return features_labels;
+		
 	}
 
 	public static INDArray convertActivtionOutput(INDArray arg0, double[][] prediction) throws Exception {

@@ -4,9 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
+import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
@@ -118,10 +119,10 @@ public class Network2 {
 		DataSet trainingData = _utils.instancesToDataSet(training);
 		DataSet testData = _utils.instancesToDataSet(test);
 		int batchNum = trainingData.numExamples() / batchSize;
-		Constants.maximumDepth = 3;
+		// Constants.maximumDepth = 5;
 		// for weights normalization
 		Constants.weightLayerMin = new double[2];
-		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;	
+		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
 		Constants.weightLayerMin[1] = Double.POSITIVE_INFINITY;
 		Constants.weightLayerMax = new double[2];
 		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
@@ -206,7 +207,7 @@ public class Network2 {
 		// setupe the project :
 
 		DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 6);
-		DataSetIterator mnistTest = new MnistDataSetIterator(batchSize, false, 6);
+		DataSetIterator mnistTest = new MnistDataSetIterator(1000, false, 6);
 
 		int counter = 0;
 		INDArray ar = null;
@@ -259,30 +260,28 @@ public class Network2 {
 
 		while (mnistTrain.hasNext()) {
 			DataSet set = mnistTrain.next();
-			if (c == 0){
+			if (c == 0) {
 				trainSet2 = _utils.dataset2Instances(set);
-			}
-			else{
+			} else {
 				trainTemp = _utils.dataset2Instances(set);
-			for (int i = 0; i < trainTemp.size(); i++)
-				trainSet2.add(trainTemp.get(i));
+				for (int i = 0; i < trainTemp.size(); i++)
+					trainSet2.add(trainTemp.get(i));
 			}
-			
+
 			c++;
 		}
 		mnistTrain.reset();
-		
-	   convert = new NumericToNominal();
+
+		convert = new NumericToNominal();
 		options = new String[2];
 		options[0] = "-R";
 		options[1] = "" + (trainSet2.numAttributes()); // range of variables to
 		convert.setOptions(options);
 		convert.setInputFormat(trainSet2);
 		trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
-		trainSet2.setClassIndex(trainSet2.numAttributes()-1);
+		trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
 		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
-				
-		
+
 		batchSize = 100;
 		trainSize = trainSet2.size();
 		batchNum = trainSize / batchSize;
@@ -290,46 +289,63 @@ public class Network2 {
 		System.out.println(tempTrainSet.numExamples());
 		System.out.println(batchNum);
 		System.out.println(batchSize);
-	//	System.out.println(mnistTest.getLabels().size());
-		for (int i = 0; i < 150; i++) {
-			for (int b = 0; b < batchNum; b++) {
-				
-				 DataSet set = getBatchTrainSet(b, batchSize, tempTrainSet,trainSet2);
+		// System.out.println(mnistTest.getLabels().size());
 
-				 Constants.model.fit(set);
+		for (int i = 0; i < 150; i++) {
+			// in the first iteration do the bagging test and the each batch
+			// test :D
+			if (i == 0) {
+				DataSet testSet = mnistTest.next();
+				mnistTest.reset();
+				double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet);
+				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet);
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
+						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt" + i;
+				File file = new File(path);
+				BufferedWriter out = new BufferedWriter(new FileWriter(file));
+				out.write("number of batches :\t" + batchNum);
+				out.write("size of batches :\t" + batchSize);
+				out.write("size of testSet :\t" + testSet.numExamples());
+				out.write("avg batch result:\t" + batchTest);
+				out.write("bagging result:\t" + baggingTest);
+				out.close();
+
+			}
+			for (int b = 0; b < batchNum; b++) {
+
+				DataSet set = getBatchTrainSet(b, batchSize, tempTrainSet, trainSet2);
+				Constants.model.fit(set);
 			}
 
-				if (i % 2 == 0) {
-					Constants.isEvaluating = true;
-					log.info("Evaluate model....");
-	
-					Evaluation eval = new Evaluation(outputNum); // create an
-	
-					while (mnistTest.hasNext()) {
+			if (i % 2 == 0) {
+				Constants.isEvaluating = true;
+				log.info("Evaluate model....");
 
-						DataSet next = mnistTest.next();
-						System.out.println(Constants.isEvaluating);
-						_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
-						INDArray output = Constants.model.output(next.getFeatures());
+				Evaluation eval = new Evaluation(outputNum); // create an
 
-						eval.eval(next.getLabels(), output);
-					}
-					mnistTest.reset();
+				while (mnistTest.hasNext()) {
 
-//					String path =
-//							 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/new/without_normalization/resultIteration_"
-//							 + i;
-//							 File file = new File(path);
-//							 BufferedWriter out = new BufferedWriter(new
-//							 FileWriter(file));
-//							 out.write(eval.stats() + "\n" + Constants.model.score());
-							System.out.println(eval.stats());
+					DataSet next = mnistTest.next();
+					System.out.println(Constants.isEvaluating);
+					_utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
+					INDArray output = Constants.model.output(next.getFeatures());
 
-//							out.close();
-							Constants.isEvaluating = false;
-
+					eval.eval(next.getLabels(), output);
 				}
-		
+				mnistTest.reset();
+
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/without_depth_limit/without_normalization/resultIteration_"
+						+ i;
+				File file = new File(path);
+				BufferedWriter out = new BufferedWriter(new FileWriter(file));
+				out.write(eval.stats() + "\n" + Constants.model.score());
+				// System.out.println(eval.stats());
+
+				out.close();
+				Constants.isEvaluating = false;
+
+			}
+
 		}
 
 		Constants.isEvaluating = true;
@@ -377,5 +393,73 @@ public class Network2 {
 
 		return set;
 
+	}
+
+	// each tree accuracy on batch and bagging of trees
+	private static double batch_test(int batchNum, int batchSize, DataSet trainSet, Instances training, DataSet testSet)
+			throws Exception {
+
+		// ArrayList<HoeffdingTree> baggingTrees = new ArrayList<>();
+		// double [] batchTests = new double[batchNum];
+		// double [] bagging_batches = new double[batchNum];
+		double avgAccuracy = 0d;
+		Instances test = _utils.dataset2Instances(testSet);
+
+		for (int b = 0; b < batchNum; b++) {
+			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
+			Instances train = _utils.dataset2Instances(set);
+			HoeffdingTree hf = new HoeffdingTree();
+			hf.buildClassifier(train);
+			weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
+			eval.evaluateModel(hf, test);
+			avgAccuracy += eval.pctCorrect();
+		}
+
+		return avgAccuracy / batchNum;
+
+	}
+
+	private static double bagging_test(int batchNum, int batchSize, DataSet trainSet, Instances training,
+			DataSet testSet) throws Exception {
+
+		Instances test = _utils.dataset2Instances(testSet);
+		ArrayList<HoeffdingTree> trees = new ArrayList<>();
+		for (int b = 0; b < batchNum; b++) {
+			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
+			INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(b), trainSet);
+
+			Instances train = _utils.ndArrayToInstances(bag);
+			HoeffdingTree hf = new HoeffdingTree();
+			hf.buildClassifier(train);
+			weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
+			trees.add(hf);
+
+		}
+		Iterator<Instance> it = test.iterator();
+		double correct = 0;
+		while (it.hasNext()) {
+
+			Instance inst = it.next();
+			int[] classPredicted = new int[trees.size()];
+			for (int i = 0; i < trees.size(); i++) {
+				classPredicted[(int) trees.get(i).classifyInstance(inst)]++;
+			}
+
+			int max = Integer.MIN_VALUE;
+			int max_indx = -1;
+
+			for (int i = 0; i < classPredicted.length; i++) {
+				if (classPredicted[i] > max) {
+					max = classPredicted[i];
+					max_indx = i;
+				}
+
+			}
+			if (max_indx == (int) inst.classValue())
+				correct++;
+
+		}
+
+		return correct / test.size();
 	}
 }
