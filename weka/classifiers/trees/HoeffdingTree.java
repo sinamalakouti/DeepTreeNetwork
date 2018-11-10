@@ -30,6 +30,7 @@ import java.util.Vector;
 
 import scala.reflect.internal.Depth;
 import utils.Constants;
+import views.html.defaultpages.todo;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.UpdateableClassifier;
 import weka.classifiers.trees.ht.ActiveHNode;
@@ -920,6 +921,7 @@ public class HoeffdingTree extends AbstractClassifier implements
    */
   protected void deactivateNode(ActiveHNode toDeactivate, SplitNode parent,
       String parentBranch) {
+	  
     HNode leaf = new InactiveHNode(toDeactivate.m_classDistribution);
     
     if (parent == null) {
@@ -997,8 +999,8 @@ public class HoeffdingTree extends AbstractClassifier implements
         SplitCandidate best = bestSplits.get(bestSplits.size() - 1);
         
         if (best.m_splitTest == null) {
-          // preprune
-          deactivateNode(node, parent, parentBranch);
+//          // preprune
+//          deactivateNode(node, parent, parentBranch);
         } else {
           SplitNode newSplit = new SplitNode(node.m_classDistribution,
               best.m_splitTest);

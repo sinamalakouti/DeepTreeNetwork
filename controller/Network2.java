@@ -298,7 +298,7 @@ public class Network2 {
 				DataSet testSet = mnistTest.next();
 				mnistTest.reset();
 				Instances testInstances = _utils.dataset2Instances(testSet);
-//				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
+				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
 				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
 				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
 						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt" + i;
@@ -307,7 +307,7 @@ public class Network2 {
 				out.write("number of batches :\t" + batchNum+"\n");
 				out.write("size of batches :\t" + batchSize+"\n");
 				out.write("size of testSet :\t" + testSet.numExamples()+"\n");
-//				out.write("avg batch result:\t" + batchTest+"\n	");
+				out.write("avg batch result:\t" + batchTest+"\n	");
 				out.write("bagging result:\t" + baggingTest);
 				out.close();
 
