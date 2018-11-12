@@ -23,6 +23,8 @@ public class Constants {
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
 	public static int maximumDepth;
+	public static int numberOfLayers;
+	public static int numberOfNeurons;
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
 	public static	MultiLayerNetwork model;

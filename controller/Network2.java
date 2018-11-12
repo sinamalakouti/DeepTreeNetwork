@@ -19,6 +19,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.buffer.DataBuffer.Type;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -26,10 +27,10 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.nd4j.linalg.util.ND4JTestUtils;
 import org.nd4j.linalg.util.NDArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
@@ -85,8 +86,8 @@ public class Network2 {
 
 		// TODO Nd4j.setDataType(Type.DOUBLE);
 
+		 Nd4j.setDataType(Type.DOUBLE);
 		// <mnistdataset>
-
 		DataSource source = new DataSource("mnist.arff");
 		Instances dataset = source.getDataSet();
 		System.out.println(dataset.size());
@@ -117,7 +118,7 @@ public class Network2 {
 		dataset = null;
 
 		DataSet trainingData = _utils.instancesToDataSet(training);
-		DataSet testData = _utils.instancesToDataSet(test);
+//		DataSet testData = _utils.instancesToDataSet(test);
 		int batchNum = trainingData.numExamples() / batchSize;
 		// Constants.maximumDepth = 5;
 		// for weights normalization
@@ -132,6 +133,8 @@ public class Network2 {
 		final int numInputs = 784;
 		int outputNum = 10;
 		log.info("Build model....");
+		Constants.numberOfLayers =30;
+		Constants.numberOfNeurons = 30;
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -140,11 +143,11 @@ public class Network2 {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
-				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(Activation.SIGMOID).build())
-				.layer(1, new CustomLayer.Builder().nIn(40).nOut(40).activation(Activation.SIGMOID).build())
-				.layer(2,
-						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
+				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons).activation(Activation.SIGMOID).build())
+				.layer(1, new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons).activation(Activation.SIGMOID).build())
+				.layer(2, new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons).activation(Activation.SIGMOID).build())
+				.layer(3,new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+								.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
@@ -165,9 +168,17 @@ public class Network2 {
 		for (int i = 0; i < training.numAttributes() - 1; i++) {
 			arr.add(i);
 		}
-		int max = 784 / 30;
+/**
+ * 
+ * TODO : here we set the number of the attributes that is going to be chosed for each neurons ( max number) 
+ * 	=> we need to find some automatic way  
+ * 
+ * 
+ */
+		
+		int max = 35;
 		HashMap<Integer, Boolean> attInexes = new HashMap<>();
-		for (int j = 0; j < 40; j++) {
+		for (int j = 0; j < Constants.numberOfNeurons; j++) {
 			Collections.shuffle(arr);
 			int[] temp = new int[max];
 			for (int i = 0; i < max; i++) {
@@ -176,41 +187,39 @@ public class Network2 {
 			}
 
 			Constants.attributesIndexes.put(j, temp);
-
+  
 		}
 
 		// class configuration for each neuron
-		ArrayList<Integer> tmp1 = new ArrayList<Integer>(40);
-		ArrayList<Integer> tmp2 = new ArrayList<Integer>(40);
-
-		for (int i = 0; i < 10; i++) {
-			tmp1.add(i);
-			tmp1.add(i);
-			tmp1.add(i);
-			tmp1.add(i);
-
-			tmp2.add(i);
-			tmp2.add(i);
-			tmp2.add(i);
-			tmp2.add(i);
+		
+		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
+		
+			for (int c = 0; c < Constants.numClasses -1; c++) {
+				// for 4 classes -> it is set only for mnist dataset ( to be changed )
+				for ( int i = 0 ; i < (int) (Constants.numberOfNeurons / Constants.numClasses) ; i ++){	
+					tmp1.add(c);
+				}
 		}
-
-		Collections.shuffle(tmp1);
-		Collections.shuffle(tmp2);
-
-		Constants.classChosedArray.put(0, tmp1);
-		Constants.classChosedArray.put(1, tmp2);
-		//
+			
+		while ( tmp1.size() < Constants.numberOfNeurons)
+			tmp1.add(Constants.numClasses -1);
+		
+		for ( int l = 0 ; l < Constants.numberOfLayers  ; l ++){
+			
+			@SuppressWarnings("unchecked")
+			ArrayList<Integer> tmp2 =(ArrayList<Integer> ) tmp1.clone();
+			Collections.shuffle(tmp2);
+			Constants.classChosedArray.put(l, tmp2);
+		}
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
 		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
 
-		// setupe the project :
+		// set-up the project :
 
 		DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 6);
 		DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
 		int counter = 0;
-		INDArray ar = null;
 		// while ( mnistTrain.hasNext()){
 		//
 		// DataSet set = mnistTrain.next();
@@ -295,21 +304,21 @@ public class Network2 {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
 			if (i == 0) {
-				DataSet testSet = mnistTest.next();
-				mnistTest.reset();
-				Instances testInstances = _utils.dataset2Instances(testSet);
-				 double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
-				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
-						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt" + i;
-				File file = new File(path);
-				BufferedWriter out = new BufferedWriter(new FileWriter(file));
-				out.write("number of batches :\t" + batchNum+"\n");
-				out.write("size of batches :\t" + batchSize+"\n");
-				out.write("size of testSet :\t" + testSet.numExamples()+"\n");
-				out.write("avg batch result:\t" + batchTest+"\n	");
-				out.write("bagging result:\t" + baggingTest);
-				out.close();
+//				DataSet testSet = mnistTest.next();
+//				mnistTest.reset();
+//				Instances testInstances = _utils.dataset2Instances(testSet);
+//				double batchTest = batch_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
+//				double baggingTest = bagging_test(batchNum, batchSize, tempTrainSet, trainSet2, testSet,testInstances);
+//				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
+//						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt";
+//				File file = new File(path);
+//				BufferedWriter out = new BufferedWriter(new FileWriter(file));
+//				out.write("number of batches :\t" + batchNum+"\n");
+//				out.write("size of batches :\t" + batchSize+"\n");
+//				out.write("size of testSet :\t" + testSet.numExamples()+"\n");
+//				out.write("avg batch result:\t" + batchTest+"\n	");
+//				out.write("bagging result:\t" + baggingTest);
+//				out.close();
 
 			}
 			for (int b = 0; b < batchNum; b++) {
@@ -335,7 +344,7 @@ public class Network2 {
 				}
 				mnistTest.reset();
 
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/without_depth_limit/without_normalization/resultIteration_"
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/without_depth_limit/without_normalization/2/resultIteration_"
 						+ i;
 				File file = new File(path);
 				BufferedWriter out = new BufferedWriter(new FileWriter(file));
@@ -427,7 +436,7 @@ public class Network2 {
 			
 			DataSet trainDataset = getBatchTrainSet(b, batchSize, trainSet, training);
 			trees = new ArrayList<>();
-			for (int i = 0; i < 40; i++) {
+			for (int i = 0; i < Constants.numberOfNeurons; i++) {
 				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(i), trainDataset);
 
 				Instances train = _utils.ndArrayToInstances(bag);
@@ -481,8 +490,6 @@ public class Network2 {
 				if (max_indx == (int) testInstances.get(i).classValue())
 					correct++;
 			
-
-
 			}
 
 			avgAccuracy += correct / testSet.numExamples();
