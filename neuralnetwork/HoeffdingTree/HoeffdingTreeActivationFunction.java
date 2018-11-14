@@ -135,6 +135,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// in = inputData .* weights
 
 		Instances trainInstaces = createProperDataset(in.dup(), training);
+		System.out.println(trainInstaces.numAttributes());
 		// if ( hf == null)
 		// {
 		// hf = new HoeffdingTree();
@@ -176,6 +177,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// J48 originalTree = new J48();
 
 		if (Constants.isEvaluating == false) {
+			System.out.println("training");
 			if (activationModel == null) {
 				activationModel = new HoeffdingTree();
 				try {
@@ -274,8 +276,10 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		try {
 			INDArray label = null;
 
-			if (training == false)
+			if (training == false){
 				label = Constants.testInstancesLabel;
+				System.out.println(label.shapeInfoToString());
+			}
 			else {
 				_utils.setLabels(Constants.model.getLabels(), false, training);
 				label = Constants.trainInstancesLabel;

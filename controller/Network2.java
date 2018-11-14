@@ -156,8 +156,8 @@ public class Network2 {
 		Constants.model.init();
 		Constants.model.setListeners(new ScoreIterationListener(5));
 
-		Constants.test = test;
-		Constants.train = training;
+//		Constants.test = test;
+//		Constants.train = training;
 
 		// RandomSub ils.instancesToDataSet(ins);
 		System.out.println("start");
@@ -168,6 +168,7 @@ public class Network2 {
 		for (int i = 0; i < training.numAttributes() - 1; i++) {
 			arr.add(i);
 		}
+		System.out.println(arr.size());
 /**
  * 
  * TODO : here we set the number of the attributes that is going to be chosed for each neurons ( max number) 
@@ -212,7 +213,7 @@ public class Network2 {
 			Constants.classChosedArray.put(l, tmp2);
 		}
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
-		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
+//		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();
 
 		// set-up the project :
 
@@ -393,14 +394,7 @@ public class Network2 {
 		double[] labels_list = new double[list.size()];
 		for (int i = 0; i < list.size(); i++)
 			labels_list[i] = list.get(i).classValue();
-		// System.out.println(labels.length());
-		// System.out.println(batchTrain_labels.shapeInfoToString());
-		// System.out.println(batchTrain_labels);
-		// System.out.println(labels_list[labels_list.length - 1]);
 		Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
-		// System.out.println(Constants.trainInstancesLabel.shapeInfoToString());
-		// System.out.println(set.numExamples());
-
 		return set;
 
 	}
@@ -456,7 +450,7 @@ public class Network2 {
 				Instances train = _utils.ndArrayToInstances(bag);
 				weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
 				eval.evaluateModel(trees.get(j), test);
-				System.out.println(eval.pctCorrect());
+//				System.out.println(eval.pctCorrect());
 				while (it.hasNext()) {
 
 					Instance inst = it.next();
@@ -466,7 +460,7 @@ public class Network2 {
 //						}
 //						if ((int) trees.get(i).classifyInstance(inst) == 26)
 //							System.out.println("(int) trees.get(i).classifyInstance(inst) == 26");
-						System.out.println(trees.get(j).classifyInstance(inst));
+//						System.out.println(trees.get(j).classifyInstance(inst));
 						classPredicted[counter][(int) trees.get(j).classifyInstance(inst)]++;
 //					}
 						counter ++;

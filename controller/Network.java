@@ -151,8 +151,8 @@ public class Network {
 		Constants.model.init();
 		Constants.model.setListeners(new ScoreIterationListener(5));
 
-		Constants.test = test;
-		Constants.train = training;
+//		Constants.test = test;
+//		Constants.train = training;
 
 		// RandomSub ils.instancesToDataSet(ins);
 		System.out.println("start");

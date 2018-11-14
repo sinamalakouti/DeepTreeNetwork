@@ -352,7 +352,8 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         for(int neuron  = 0 ; neuron < W.columns() ; neuron ++ ) {
         	
         	if ( ! activationModels.containsKey(neuron))
-        		activationModels.put(neuron, new ActivationFunction(Constants.train, Constants.test , false));
+//        		activationModels.put(neuron, new ActivationFunction(Constants.train, Constants. , false));
+        		activationModels.put(neuron, new ActivationFunction(null, null , false));
         	
         	INDArray weight = W.getColumn(neuron);
         

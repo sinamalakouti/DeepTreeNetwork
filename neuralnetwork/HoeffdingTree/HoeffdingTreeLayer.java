@@ -71,7 +71,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	protected Map<String, INDArray> weightNoiseParams = new HashMap<>();
 
-	public HoeffdingTreeLayer(NeuralNetConfiguration conf, Instances train, Instances test, int layernumber) {
+	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
 		this.LayerNumber = layernumber;
 

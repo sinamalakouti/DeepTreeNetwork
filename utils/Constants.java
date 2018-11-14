@@ -17,14 +17,16 @@ public class Constants {
 //	public static HashMap<ArrayList<String> , Complex > weights ;
 //	public static List<ArrayList<Double>> cutpoints = new ArrayList<>();
 	
-	public static Instances train;
-	public static Instances test;
+//	public static Instances train;
+//	public static Instances test;
 	public static INDArray trainInstancesLabel;
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
 	public static int maximumDepth;
 	public static int numberOfLayers;
 	public static int numberOfNeurons;
+	public static int batchSize;
+	public static int numBatches; 
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
 	public static	MultiLayerNetwork model;
