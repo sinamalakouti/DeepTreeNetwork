@@ -55,16 +55,16 @@ public class HGGSNetwork {
 		int numLinesToSkip = 0;
 		char delimiter = ',';
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip, delimiter);
-		recordReader.initialize(new FileSplit( new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/HIGGS.csv")));
+		recordReader.initialize(new FileSplit( new File("/Users/sina/Documents/JGU_Research/ComplexNeuronsProject/datasets/HIGGS.csv")));
+		
 		Constants.numClasses = 2;
-		int datasetSize = 11000000;
+		int datasetSize = 11000;
 		Constants.batchSize = 100;
 		Constants.numBatches = datasetSize / Constants.batchSize;
 		final int numInputs = 28;
 		
 		
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, datasetSize, 0,
-				Constants.numClasses);
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, datasetSize,0,Constants.numClasses);
 		
 
 			DataSet allData = iterator.next();		
@@ -77,6 +77,9 @@ public class HGGSNetwork {
 																			// training
 		DataSet trainingData = testAndTrain.getTrain();
 		DataSet testData = testAndTrain.getTest();
+		
+		System.out.println(trainingData.getLabels().shapeInfoToString());
+		System.out.println(trainingData.getFeatures().shapeInfoToString());
 
 		
 		log.info("Build model....");
@@ -178,7 +181,6 @@ public class HGGSNetwork {
 
 		
 		double trainSize = trainSet2.size();
-		Constants.batchSize = 10;
 		Constants.numBatches =(int) ( trainSize / (double)Constants.batchSize);
 		
 
