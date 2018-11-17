@@ -127,7 +127,9 @@ public class Network2 {
 		Constants.model.setListeners(new ScoreIterationListener(5));
 		System.out.println("start");
 
-		ArrayList<Integer> arr = new ArrayList<>();
+		ArrayList<Integer> featuresVector = new ArrayList<>();
+		for ( int i = 0 ; i < numInputs ; i ++)
+			featuresVector.add(i);
 
 		
 		/**
@@ -142,11 +144,11 @@ public class Network2 {
 		int max = 26;
 		HashMap<Integer, Boolean> attInexes = new HashMap<>();
 		for (int j = 0; j < Constants.numberOfNeurons; j++) {
-			Collections.shuffle(arr);
+			Collections.shuffle(featuresVector);
 			int[] temp = new int[max];
 			for (int i = 0; i < max; i++) {
-				temp[i] = arr.get(i);
-				attInexes.put(arr.get(i), true);
+				temp[i] = featuresVector.get(i);
+				attInexes.put(featuresVector.get(i), true);
 			}
 
 			Constants.attributesIndexes.put(j, temp);
