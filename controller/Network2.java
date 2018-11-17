@@ -325,8 +325,8 @@ public class Network2 {
 
 				
 								
-				out.write("avg batch result:\t" + batchCounter / testInstances.size() + "\n ");
-				out.write("bagging result:\t" + baggingCounter / testInstances.size());
+				out.write("avg batch result:\t" +(double) batchCounter / testInstances.size() + "\n ");
+				out.write("bagging result:\t" + (double)baggingCounter / testInstances.size());
 				out.close();
 			}
 

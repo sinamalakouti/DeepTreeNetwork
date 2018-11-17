@@ -278,7 +278,6 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 			if (training == false){
 				label = Constants.testInstancesLabel;
-				System.out.println(label.shapeInfoToString());
 			}
 			else {
 				_utils.setLabels(Constants.model.getLabels(), false, training);
