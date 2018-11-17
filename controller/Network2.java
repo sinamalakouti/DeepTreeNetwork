@@ -34,6 +34,7 @@ import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.TestInstances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
@@ -258,7 +259,6 @@ public class Network2 {
 
 				DataSet testSet = mnistTest.next();
 				mnistTest.reset();
-				Instances testInstances = _utils.dataset2Instances(testSet);
 
 				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
 						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt";
@@ -269,30 +269,62 @@ public class Network2 {
 				out.write("size of testSet :\t" + testSet.numExamples() + "\n");
 				int batchCounter = 0;
 				int baggingCounter = 0;
+				int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
+				Instances testInstances = null;
+				for (int t = 0; t < baggingTrees.length; t++) {
+					INDArray tempTest = _utils.getSubDataset(Constants.attributesIndexes.get(t), testSet);
+					testInstances = _utils.ndArrayToInstances(tempTest);
+					Iterator<Instance> testIterator = testInstances.iterator();
+					int s = 0;
+					while( testIterator.hasNext()){
+						Instance sample = testIterator.next();
+						classPredicted[s][(int) baggingTrees[t].classifyInstance(sample)]++;
+						s++;
+					}
+					
+					
+				}
+				
+				
+
+				for (int s = 0; s < classPredicted.length; s++) {
+					
+					double max_prediction = Double.MIN_VALUE;
+					int BaggingClass = -1;
+
+					for( c = 0 ; c < Constants.numClasses ; c++ ){
+						if (classPredicted[s][c] > max_prediction) {
+							max_prediction = classPredicted[s][c];
+							BaggingClass = c;
+						}	
+						
+					}
+					
+					if( BaggingClass == testInstances.get(s).classValue())
+						baggingCounter++;
+					
+				}
+					
+
+				
+			    testInstances = _utils.dataset2Instances(testSet);
 				Iterator<Instance> testIterator = testInstances.iterator();
 				while (testIterator.hasNext()) {
 					Instance sample = testIterator.next();
 					double batchPrediction = batchTree.classifyInstance(sample);
-					int[] baggingTreesPrediction = new int[Constants.numClasses];
-					for (int t = 0; t < baggingTrees.length; t++) {
-						baggingTreesPrediction[(int) baggingTrees[t].classifyInstance(sample)]++;
-					}
+					
+						
+					
+					
 					if (batchPrediction == sample.classValue())
 						batchCounter++;
-					double max_prediction = Double.MIN_VALUE;
-					int BaggingClass = -1;
-
-					for (c = 0; c < baggingTreesPrediction.length; c++) {
-						if (baggingTreesPrediction[c] > max_prediction) {
-							max_prediction = baggingTreesPrediction[c];
-							BaggingClass = c;
-						}
-					}
-
-					if (BaggingClass == sample.classValue())
-						baggingCounter++;
+//					if (BaggingClass == sample.classValue())
+//						baggingCounter++;
 
 				}
+
+				
+								
 				out.write("avg batch result:\t" + batchCounter / testInstances.size() + "\n ");
 				out.write("bagging result:\t" + baggingCounter / testInstances.size());
 				out.close();
@@ -416,7 +448,7 @@ public class Network2 {
 				INDArray temp = _utils.getSubDataset(Constants.attributesIndexes.get(j), testSet);
 				Instances test = _utils.ndArrayToInstances(temp);
 				Iterator<Instance> it = test.iterator();
-				int counter = 0;
+			int counter = 0;
 				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(j), trainDataset);
 				Instances train = _utils.ndArrayToInstances(bag);
 				weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
