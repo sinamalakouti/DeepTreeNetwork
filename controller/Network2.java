@@ -88,7 +88,6 @@ public class Network2 {
 		String[] options;
 
 		NumericToNominal convert = new NumericToNominal();
-		int batchNum = 600;
 		
 		Constants.weightLayerMin = new double[2];
 		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
@@ -101,7 +100,7 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 40;
+		Constants.numberOfNeurons = 20;
 		Constants.batchSize = 100;
 		double numberTrainExamples = 60000d;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
@@ -146,7 +145,7 @@ public class Network2 {
 		 * 
 		 */
 
-		int max = 784 / 30;
+		int max = 784 / 10;
 		HashMap<Integer, Boolean> attInexes = new HashMap<>();
 		for (int j = 0; j < Constants.numberOfNeurons; j++) {
 			Collections.shuffle(featuresVector);
@@ -162,52 +161,52 @@ public class Network2 {
 
 		// class configuration for each neuron
 
-//		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
-//
-//		for (int c = 0; c < Constants.numClasses - 1; c++) {
-//			// for 4 classes -> it is set only for mnist dataset ( to be changed
-//			// )
-//			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
-//				tmp1.add(c);
-//			}
-//		}
-//
-//		while (tmp1.size() < Constants.numberOfNeurons)
-//			tmp1.add(Constants.numClasses - 1);
-//
-//		for (int l = 0; l < Constants.numberOfLayers; l++) {
-//
-//			@SuppressWarnings("unchecked")
-//			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
-//			Collections.shuffle(tmp2);
-//			Constants.classChosedArray.put(l, tmp2);
-//		}
-		
-		ArrayList<Integer> tmp1 = new ArrayList<Integer>(40);
-		ArrayList<Integer> tmp2 = new ArrayList<Integer>(40);
+		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-		for (int i = 0; i < 10; i++) {
-			tmp1.add(i);
-			tmp1.add(i);
-			tmp1.add(i);
-			tmp1.add(i);
-
-			tmp2.add(i);
-			tmp2.add(i);
-			tmp2.add(i);
-			tmp2.add(i);
+		for (int c = 0; c < Constants.numClasses - 1; c++) {
+			// for 4 classes -> it is set only for mnist dataset ( to be changed
+			// )
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+				tmp1.add(c);
+			}
 		}
 
-		Collections.shuffle(tmp1);
-		Collections.shuffle(tmp2);
+		while (tmp1.size() < Constants.numberOfNeurons)
+			tmp1.add(Constants.numClasses - 1);
 
-		Constants.classChosedArray.put(0, tmp1);
-		Constants.classChosedArray.put(1, tmp2);
+		for (int l = 0; l < Constants.numberOfLayers; l++) {
+
+			@SuppressWarnings("unchecked")
+			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
+			Collections.shuffle(tmp2);
+			Constants.classChosedArray.put(l, tmp2);
+		}
+		
+////		ArrayList<Integer> tmp1 = new ArrayList<Integer>(40);
+//		ArrayList<Integer> tmp2 = new ArrayList<Integer>(40);
+//
+//		for (int i = 0; i < 10; i++) {
+//			tmp1.add(i);
+//			tmp1.add(i);
+//			tmp1.add(i);
+//			tmp1.add(i);
+//
+//			tmp2.add(i);
+//			tmp2.add(i);
+//			tmp2.add(i);
+//			tmp2.add(i);
+//		}
+//
+//		Collections.shuffle(tmp1);
+//		Collections.shuffle(tmp2);
+//
+//		Constants.classChosedArray.put(0, tmp1);
+//		Constants.classChosedArray.put(1, tmp2);
 
 		// set-up the project :
 
 		DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-		DataSetIterator mnistTest = new MnistDataSetIterator(1000, false, 6);
+		DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
 		int counter = 0;
 		Instances trainSet2 = null, trainTemp = null;
