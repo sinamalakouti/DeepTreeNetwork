@@ -245,117 +245,117 @@ public class Network2 {
 			for (int b = 0; b < Constants.numBatches; b++) {
 
 				DataSet set = getBatchTrainSet(b, Constants.batchSize, tempTrainSet, trainSet2);
-				if (i == 0) {
-
-					Instances batchTrainInstance = _utils.dataset2Instances(set);
-
-					// batch test :
-
-					if (batchTree == null) {
-						batchTree = new HoeffdingTree();
-						batchTree.buildClassifier(batchTrainInstance);
-					} else {
-						Iterator<Instance> it = batchTrainInstance.iterator();
-						while (it.hasNext())
-							batchTree.updateClassifier(it.next());
-					}
-
-					// bagging test:
-					for (int t = 0; t < Constants.numberOfNeurons; t++) {
-						INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(t), set);
-						Instances bagInstances = _utils.ndArrayToInstances(bag);
-						if (baggingTrees[t] == null) {
-							baggingTrees[t] = new HoeffdingTree();
-							baggingTrees[t].buildClassifier(bagInstances);
-						} else {
-							Iterator<Instance> it = bagInstances.iterator();
-							while (it.hasNext()) {
-								baggingTrees[t].updateClassifier(it.next());
-							}
-						}
-
-					}
-
-				}
+//				if (i == 0) {
+//
+//					Instances batchTrainInstance = _utils.dataset2Instances(set);
+//
+//					// batch test :
+//
+//					if (batchTree == null) {
+//						batchTree = new HoeffdingTree();
+//						batchTree.buildClassifier(batchTrainInstance);
+//					} else {
+//						Iterator<Instance> it = batchTrainInstance.iterator();
+//						while (it.hasNext())
+//							batchTree.updateClassifier(it.next());
+//					}
+//
+//					// bagging test:
+//					for (int t = 0; t < Constants.numberOfNeurons; t++) {
+//						INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(t), set);
+//						Instances bagInstances = _utils.ndArrayToInstances(bag);
+//						if (baggingTrees[t] == null) {
+//							baggingTrees[t] = new HoeffdingTree();
+//							baggingTrees[t].buildClassifier(bagInstances);
+//						} else {
+//							Iterator<Instance> it = bagInstances.iterator();
+//							while (it.hasNext()) {
+//								baggingTrees[t].updateClassifier(it.next());
+//							}
+//						}
+//
+//					}
+//
+//				}
 
 				Constants.model.fit(set);
 			}
 
-			if (i == 0) {
-
-				DataSet testSet = mnistTest.next();
-				mnistTest.reset();
-
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
-						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt";
-				File file = new File(path);
-				BufferedWriter out = new BufferedWriter(new FileWriter(file));
-				out.write("number of batches :\t" + Constants.numBatches + "\n");
-				out.write("size of batches :\t" + Constants.batchSize + "\n");
-				out.write("size of testSet :\t" + testSet.numExamples() + "\n");
-				int batchCounter = 0;
-				int baggingCounter = 0;
-				int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
-				Instances testInstances = null;
-				for (int t = 0; t < baggingTrees.length; t++) {
-					INDArray tempTest = _utils.getSubDataset(Constants.attributesIndexes.get(t), testSet);
-					testInstances = _utils.ndArrayToInstances(tempTest);
-					Iterator<Instance> testIterator = testInstances.iterator();
-					int s = 0;
-					while( testIterator.hasNext()){
-						Instance sample = testIterator.next();
-						classPredicted[s][(int) baggingTrees[t].classifyInstance(sample)]++;
-						s++;
-					}
-					
-					
-				}
-				
-				
-
-				for (int s = 0; s < classPredicted.length; s++) {
-					
-					double max_prediction = Double.MIN_VALUE;
-					int BaggingClass = -1;
-
-					for( c = 0 ; c < Constants.numClasses ; c++ ){
-						if (classPredicted[s][c] > max_prediction) {
-							max_prediction = classPredicted[s][c];
-							BaggingClass = c;
-						}	
-						
-					}
-					
-					if( BaggingClass == testInstances.get(s).classValue())
-						baggingCounter++;
-					
-				}
-					
-
-				
-			    testInstances = _utils.dataset2Instances(testSet);
-				Iterator<Instance> testIterator = testInstances.iterator();
-				while (testIterator.hasNext()) {
-					Instance sample = testIterator.next();
-					double batchPrediction = batchTree.classifyInstance(sample);
-					
-						
-					
-					
-					if (batchPrediction == sample.classValue())
-						batchCounter++;
-//					if (BaggingClass == sample.classValue())
+//			if (i == 0) {
+//
+//				DataSet testSet = mnistTest.next();
+//				mnistTest.reset();
+//
+//				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
+//						+ "phase_3/without_depth_limit/without_normalization/batch_&_bagging_results.txt";
+//				File file = new File(path);
+//				BufferedWriter out = new BufferedWriter(new FileWriter(file));
+//				out.write("number of batches :\t" + Constants.numBatches + "\n");
+//				out.write("size of batches :\t" + Constants.batchSize + "\n");
+//				out.write("size of testSet :\t" + testSet.numExamples() + "\n");
+//				int batchCounter = 0;
+//				int baggingCounter = 0;
+//				int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
+//				Instances testInstances = null;
+//				for (int t = 0; t < baggingTrees.length; t++) {
+//					INDArray tempTest = _utils.getSubDataset(Constants.attributesIndexes.get(t), testSet);
+//					testInstances = _utils.ndArrayToInstances(tempTest);
+//					Iterator<Instance> testIterator = testInstances.iterator();
+//					int s = 0;
+//					while( testIterator.hasNext()){
+//						Instance sample = testIterator.next();
+//						classPredicted[s][(int) baggingTrees[t].classifyInstance(sample)]++;
+//						s++;
+//					}
+//					
+//					
+//				}
+//				
+//				
+//
+//				for (int s = 0; s < classPredicted.length; s++) {
+//					
+//					double max_prediction = Double.MIN_VALUE;
+//					int BaggingClass = -1;
+//
+//					for( c = 0 ; c < Constants.numClasses ; c++ ){
+//						if (classPredicted[s][c] > max_prediction) {
+//							max_prediction = classPredicted[s][c];
+//							BaggingClass = c;
+//						}	
+//						
+//					}
+//					
+//					if( BaggingClass == testInstances.get(s).classValue())
 //						baggingCounter++;
-
-				}
-
-				
-//				System.out.println((double) batchCounter / testInstances.size());
-//				System.out.println((double) batchCounter / (double) testInstances.size());
-				out.write("avg batch result:\t" +(double) batchCounter / testInstances.size() + "\n ");
-				out.write("bagging result:\t" + (double)baggingCounter / testInstances.size());
-				out.close();
-			}
+//					
+//				}
+//					
+//
+//				
+//			    testInstances = _utils.dataset2Instances(testSet);
+//				Iterator<Instance> testIterator = testInstances.iterator();
+//				while (testIterator.hasNext()) {
+//					Instance sample = testIterator.next();
+//					double batchPrediction = batchTree.classifyInstance(sample);
+//					
+//						
+//					
+//					
+//					if (batchPrediction == sample.classValue())
+//						batchCounter++;
+////					if (BaggingClass == sample.classValue())
+////						baggingCounter++;
+//
+//				}
+//
+//				
+////				System.out.println((double) batchCounter / testInstances.size());
+////				System.out.println((double) batchCounter / (double) testInstances.size());
+//				out.write("avg batch result:\t" +(double) batchCounter / testInstances.size() + "\n ");
+//				out.write("bagging result:\t" + (double)baggingCounter / testInstances.size());
+//				out.close();
+//			}
 
 			if (i % 2 == 0) {
 				Constants.isEvaluating = true;
@@ -381,10 +381,10 @@ public class Network2 {
 				 BufferedWriter out = new BufferedWriter(new
 				 FileWriter(file));
 				 out.write(eval.stats() + "\n" + Constants.model.score());
-				System.out.println(eval.stats() + "\n" + Constants.model.score());
+//				System.out.println(eval.stats() + "\n" + Constants.model.score());
 				
 
-//				 out.close();
+				 out.close();
 				Constants.isEvaluating = false;
 
 			}

@@ -192,8 +192,9 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				}
 			} else {
 				try {
-					for (int i = 0; i < trainInstaces.size(); i++)
-						activationModel.updateClassifier(trainInstaces.get(i));
+					Iterator<Instance> it = trainInstaces.iterator();
+					while(it.hasNext())
+						activationModel.updateClassifier(it.next());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -214,10 +215,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 			try {
 				Instance next = it.next();
-				// Instance next2 = it2.next();
-				if (activationModel.m_root.isLeaf() == false) {
-					int a = 0;
-				}
+				
 				prediction = activationModel.predicate(next);
 				// prediciton2 = activationModel.predicate(next ,
 				// isOutputLayerActivation);
@@ -232,16 +230,6 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 						res = 0;
 					} else
 						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
-
-					// TODO adding the mapping again
-					// INDArray pred = Nd4j.create(prediciton2);
-					// double maxProb = pred.maxNumber().doubleValue();
-					// int idx = Nd4j.getExecutioner().execAndReturn(new
-					// IAMax(pred)).getFinalResult();
-					// double interval = 1d / trainInstaces.numClasses();
-					// res = prediciton2[0] / 1d * interval + prediciton2[1] *
-					// interval;
-
 					result[i] = res;
 
 					if (res < 0 || res - 1 > 0.01) {
