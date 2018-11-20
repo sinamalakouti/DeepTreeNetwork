@@ -11,8 +11,7 @@ import java.util.List;
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+	import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
@@ -99,7 +98,7 @@ public class Network2 {
 		final int numInputs = 784;
 		int outputNum = 10;
 		log.info("Build model....");
-		Constants.numberOfLayers = 2;
+		Constants.numberOfLayers = 4;
 		Constants.numberOfNeurons = 20;
 		Constants.batchSize = 100;
 		double numberTrainExamples = 60000d;
@@ -120,6 +119,12 @@ public class Network2 {
 						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 								.activation(Activation.SIGMOID).build())
 				.layer(2,
+						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+								.activation(Activation.SIGMOID).build())
+				.layer(3,
+						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+								.activation(Activation.SIGMOID).build())
+				.layer(4,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 								.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
@@ -376,7 +381,7 @@ public class Network2 {
 
 				 String path =
 				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
-						+ "phase_3/without_depth_limit/without_normalization/resultIteration_"+ i;
+						+ "phase_3/without_depth_limit/without_normalization/2/resultIteration_"+ i;
 				 File file = new File(path);
 				 BufferedWriter out = new BufferedWriter(new
 				 FileWriter(file));
