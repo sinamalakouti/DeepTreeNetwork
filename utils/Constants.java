@@ -33,6 +33,7 @@ public class Constants {
 	public static double [] weightLayerMin;
 	public static double [] weightLayerMax;
 	public static int numClasses = 10;
+	public static double [] avgHFDepth;
 	
 	
 	

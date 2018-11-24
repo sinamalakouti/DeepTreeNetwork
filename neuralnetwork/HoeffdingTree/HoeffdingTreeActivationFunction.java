@@ -303,6 +303,10 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 	}
 
+	public HoeffdingTree getActivationModel() {
+		return activationModel;
+	}
+
 	// @Override
 	// public INDArray getActivation(INDArray in, boolean training) {
 	// // TODO Auto-generated method stub

@@ -166,7 +166,7 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 	/******************
 	 * Implemented By Sina
 	 ******************/
-	public int maxDepth = 0;
+	public int treeDepth = 0;
 
 	public double[] predicate(Instance instance) throws Exception {
 
@@ -1009,8 +1009,8 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 							System.out.println(newChild.depth);
 							System.exit(0);
 						}
-						if ( newChild.depth > this.maxDepth)
-							maxDepth = newChild.depth;
+						if ( newChild.depth > this.treeDepth)
+							treeDepth = newChild.depth;
 //						newChild.depth = newSplit.depth + 1;
 						newChild.m_classDistribution = best.m_postSplitClassDistributions.get(i);
 						newChild.m_weightSeenAtLastSplitEval = newChild.totalWeight();
