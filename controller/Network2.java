@@ -258,7 +258,7 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 		HoeffdingTree batchTree = null;
 		HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		for (int i = 0; i <  500; i++) {
+		for (int i = 0; i <  600; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
 			for (int b = 0; b < Constants.numBatches; b++) {
@@ -305,7 +305,7 @@ public class Network2 {
 				DataSet testSet = mnistTest.next();
 				mnistTest.reset();
 
-				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/without_depth_limit/without_normalization/4/batch_&_bagging_results.txt";
+				String path = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/with_depth_limit/without_normalization/1/batch_&_bagging_results.txt";
 				File file = new File(path);
 				BufferedWriter out = new BufferedWriter(new FileWriter(file));
 				out.write("number of batches :\t" + Constants.numBatches + "\n");
@@ -393,7 +393,7 @@ public class Network2 {
 				mnistTest.reset();
 
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/without_depth_limit/without_normalization/4/resultIteration_"+ i;
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/with_depth_limit/without_normalization/1/resultIteration_"+ i;
 				 File file = new File(path);
 				 BufferedWriter out = new BufferedWriter(new
 				 FileWriter(file));
@@ -447,6 +447,10 @@ public class Network2 {
 		for (int i = 0; i < list.size(); i++)
 			labels_list[i] = list.get(i).classValue();
 		Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
+		features = null;
+		labels = null;
+		batchTrain_features = null;
+		batchTrain_labels = null;
 		return set;
 
 	}

@@ -22,7 +22,7 @@ public class Constants {
 	public static INDArray trainInstancesLabel;
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
-	public static int maximumDepth;
+	public static int maximumDepth = 20;
 	public static int numberOfLayers;
 	public static int numberOfNeurons;
 	public static int batchSize;

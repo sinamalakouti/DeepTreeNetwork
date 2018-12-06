@@ -26,10 +26,8 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 	int layernumber = 0;
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
-	int neuronNumber = 0;
-	boolean createdHF = false;
-	
-
+	int neuronNumber = 0;	
+		
 	public HoeffdingTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
 		this.isOutputLayerActivation = isOutpuLayerActivation;

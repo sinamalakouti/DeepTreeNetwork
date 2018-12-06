@@ -381,15 +381,15 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 //		 W = W.subi(mu);
 //		 W = W.divi(std);
 
-		double[][] zprim = W.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number four");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
+//		double[][] zprim = W.toDoubleMatrix();
+//		for (int i = 0; i < zprim.length; i++)
+//			for (int j = 0; j < zprim[i].length; j++) {
+//				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+//					System.out.println("stop stage number four");
+//					System.out.println(zprim[i][j]);
+//					System.exit(0);
+//				}
+//			}
 
 		// Input validation:
 		if (input.rank() != 2 || input.columns() != W.rows()) {
@@ -416,19 +416,19 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 			z = input.mulRowVector(weight.transpose());
 
-			zprim = z.toDoubleMatrix();
-			for (int i = 0; i < zprim.length; i++)
-				for (int j = 0; j < zprim[i].length; j++) {
-					if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-						System.out.println("stop stage number five");
-						System.out.println("at neuron : \t" + neuron);
-						System.out.println("layer number is \t" + LayerNumber);
-						System.out.println("number of features\t " + input.shapeInfoToString());
-						System.out.println(weight);
-						System.out.println(zprim[i][j]);
-						System.exit(0);
-					}
-				}
+//			zprim = z.toDoubleMatrix();
+//			for (int i = 0; i < zprim.length; i++)
+//				for (int j = 0; j < zprim[i].length; j++) {
+//					if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+//						System.out.println("stop stage number five");
+//						System.out.println("at neuron : \t" + neuron);
+//						System.out.println("layer number is \t" + LayerNumber);
+//						System.out.println("number of features\t " + input.shapeInfoToString());
+//						System.out.println(weight);
+//						System.out.println(zprim[i][j]);
+//						System.exit(0);
+//					}
+//				}
 
 			if (neuron == 0) {
 

@@ -985,8 +985,8 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 					doSplit = true;
 				}
 				// TODO : MAXIMUM DEPTH LIMIT
-				// if ( node.depth > Constants.maximumDepth)
-				// doSplit = false;
+				 if ( node.depth > Constants.maximumDepth)
+					 doSplit = false;
 
 				// TODO - remove poor attributes stuff?
 			}
