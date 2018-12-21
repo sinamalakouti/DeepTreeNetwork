@@ -142,7 +142,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		try{
-			_utils.createGNUPLOT_ds("", "", 0, 418);
+			_utils.createGNUPLOT_ds("", "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase_3/with_depth_limit/without_normalization/3", 0, 418);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
