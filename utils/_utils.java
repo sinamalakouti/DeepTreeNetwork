@@ -17,9 +17,6 @@ import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
-import com.panayotis.gnuplot.JavaPlot;
-import com.panayotis.gnuplot.utils.Debug;
-
 import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
 import weka.classifiers.trees.ht.SplitNode;
@@ -316,11 +313,11 @@ public class _utils {
 	
 	
 	public static void createGNUPLOT_ds ( String  name, String path, int first, int last) throws IOException{
-		  JavaPlot p = new JavaPlot();
-	      JavaPlot.getDebugger().setLevel(Debug.VERBOSE);
-	      p.setTitle(name);
-	      p.getAxis("x").setLabel("ITERATION", "Arial", 20);
-	      p.getAxis("y").setLabel("SCORE");
+//		  JavaPlot p = new JavaPlot();
+//	      JavaPlot.getDebugger().setLevel(Debug.VERBOSE);
+//	      p.setTitle(name);
+//	      p.getAxis("x").setLabel("ITERATION", "Arial", 20);
+//	      p.getAxis("y").setLabel("SCORE");
 
 		int n = ( last - first) / 2 + 1;
 		double[] x = new double [n];
