@@ -459,7 +459,7 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 	static final long serialVersionUID = 5995231201785697655L;
 
 	/** The attribute estimators. */
-	protected Estimator[][] m_Distributions;
+	public Estimator[][] m_Distributions;
 
 	/** The class estimator. */
 	protected Estimator m_ClassDistribution;

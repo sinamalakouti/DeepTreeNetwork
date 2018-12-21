@@ -796,7 +796,9 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 
 		data = new Instances(data);
 		data.deleteWithMissingClass();
+		
 		for (int i = 0; i < data.numInstances(); i++) {
+			double [] d = this.predicate(data.get(0));
 			updateClassifier(data.instance(i));
 		}
 
@@ -805,6 +807,30 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 
 	}
 
+	
+	public void buildClassifier2(Instances data) throws Exception {
+		reset();
+
+		m_header = new Instances(data, 0);
+		if (m_selectedSplitMetric == GINI_SPLIT) {
+			m_splitMetric = new GiniSplitMetric();
+		} else {
+			m_splitMetric = new InfoGainSplitMetric(m_minFracWeightForTwoBranchesGain);
+		}
+
+//		data = new Instances(data);
+//		data.deleteWithMissingClass();
+//		
+//		for (int i = 0; i < data.numInstances(); i++) {
+//			double [] d = this.predicate(data.get(0));
+//			updateClassifier(data.instance(i));
+//		}
+//
+//		// can classifier handle the data?
+//		getCapabilities().testWithFail(data);
+
+	}
+	
 	/**
 	 * Updates the classifier with the given instance.
 	 * 

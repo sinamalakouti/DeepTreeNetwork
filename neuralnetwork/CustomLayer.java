@@ -17,7 +17,9 @@
 
 package neuralnetwork;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.deeplearning4j.nn.api.Layer;
@@ -32,6 +34,7 @@ import org.deeplearning4j.nn.params.DefaultParamInitializer;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
 import neuralnetwork.HoeffdingTree.HoeffdingTreeLayer;
 import utils.Constants;
 
@@ -39,8 +42,16 @@ import utils.Constants;
  * Dense layer: a standard fully connected feed forward layer
  */
 
-public class CustomLayer extends FeedForwardLayer {
+public class CustomLayer extends FeedForwardLayer implements Serializable {
     private boolean hasBias = true;
+	
+
+    
+    public CustomLayer() {
+        //We need a no-arg constructor so we can deserialize the configuration from JSON or YAML format
+        // Without this, you will likely get an exception like the following:
+        //com.fasterxml.jackson.databind.JsonMappingException: No suitable constructor found for type [simple type, class org.deeplearning4j.examples.misc.customlayers.layer.CustomLayer]: can not instantiate from JSON object (missing default constructor or creator, or perhaps need to add/enable type information?)
+    }
 
     private CustomLayer(Builder builder) {
         super(builder);
@@ -127,5 +138,22 @@ public class CustomLayer extends FeedForwardLayer {
             return new CustomLayer(this);
         }
     }
+
+
+	public boolean isHasBias() {
+		return hasBias;
+	}
+
+	public void setHasBias(boolean hasBias) {
+		this.hasBias = hasBias;
+	}
+
+//	public HashMap<Integer, HoeffdingTreeActivationFunction> getActivationModels() {
+//		return activationModels;
+//	}
+//
+//	public void setActivationModels(HashMap<Integer, HoeffdingTreeActivationFunction> activationModels) {
+//		this.activationModels = activationModels;
+//	}
 
 }

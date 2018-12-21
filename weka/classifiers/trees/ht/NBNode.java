@@ -43,7 +43,7 @@ public class NBNode extends ActiveHNode implements LearningNode, Serializable {
   private static final long serialVersionUID = -1872415764817690961L;
 
   /** The naive Bayes model at the node */
-  protected NaiveBayesUpdateable m_bayes;
+public NaiveBayesUpdateable m_bayes;
 
   /**
    * The weight of instances that need to be seen by this node before allowing

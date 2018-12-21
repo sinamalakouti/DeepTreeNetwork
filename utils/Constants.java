@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
+import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
+import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instances;
 
 public class Constants {
@@ -22,19 +24,25 @@ public class Constants {
 	public static INDArray trainInstancesLabel;
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
-	public static int maximumDepth = 20;
+	public static int maximumDepth = 5;
 	public static int numberOfLayers;
 	public static int numberOfNeurons;
 	public static int batchSize;
 	public static int numBatches; 
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
-	public static	MultiLayerNetwork model;
+	public static MultiLayerNetwork model;
+	public static boolean isSerialzing = false;
+	public static boolean isDeSerializing = false;
+	
 	public static double [] weightLayerMin;
 	public static double [] weightLayerMax;
 	public static int numClasses ;
 	public static double [] avgHFDepth;
 	
+	public static boolean  isCompare =false;
+	public static ArrayList<HashMap<Integer, HoeffdingTree>>  trees2;
+	public static ArrayList<HashMap<Integer, HoeffdingTreeActivationFunction>>  trees1;
 	
 	
 }

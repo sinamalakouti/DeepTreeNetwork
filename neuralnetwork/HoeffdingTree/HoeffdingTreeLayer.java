@@ -16,6 +16,13 @@
 
 package neuralnetwork.HoeffdingTree;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,12 +58,11 @@ import weka.core.Instances;
  * @author Adam Gibson
  */
 public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer>
-		extends AbstractLayer<CustomLayer> {
+		extends AbstractLayer<CustomLayer>{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	protected INDArray paramsFlattened;
 	protected INDArray gradientsFlattened;
 	protected Map<String, INDArray> params;
@@ -65,12 +71,15 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 	protected ConvexOptimizer optimizer;
 	protected Gradient gradient;
 	protected Solver solver;
+	private HashMap<Integer, HoeffdingTreeActivationFunction> activationModels = new HashMap<>();
 
 	protected int LayerNumber;
-	protected HashMap<Integer, HoeffdingTreeActivationFunction> activationModels = new HashMap<>();
 
 	protected Map<String, INDArray> weightNoiseParams = new HashMap<>();
 
+	public HoeffdingTreeLayer(){
+		
+	}
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
 		this.LayerNumber = layernumber;
@@ -376,10 +385,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		// normalization:
 
-//		 double mu = W.meanNumber().doubleValue();
-//		 double std = Math.sqrt(W.varNumber().doubleValue());
-//		 W = W.subi(mu);
-//		 W = W.divi(std);
+		 double mu = W.meanNumber().doubleValue();
+		 double std = Math.sqrt(W.varNumber().doubleValue());
+		 W = W.subi(mu);
+		 W = W.divi(std);
 
 //		double[][] zprim = W.toDoubleMatrix();
 //		for (int i = 0; i < zprim.length; i++)
@@ -408,6 +417,84 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray result = null;
 
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
+			
+			if ( Constants.isSerialzing == true){
+				
+				FileOutputStream file = null;
+				try {
+					file = new FileOutputStream("hf_Activation_"+ LayerNumber + "_" + neuron);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+	            ObjectOutputStream out = null;
+				try {
+					out = new ObjectOutputStream(file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+	              	            try {
+									out.writeObject(activationModels.get(neuron));
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} 
+	              
+	            try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+	            try {
+					file.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+
+				
+			}
+			
+			
+			if ( Constants.isDeSerializing && ! activationModels.containsKey(neuron)){
+				
+				FileInputStream file = null;
+				ObjectInputStream in = null;
+				try {
+					file = new FileInputStream("hf_Activation_"+ LayerNumber + "_" + neuron);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+				try {
+					in = new ObjectInputStream(file);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+	             HoeffdingTreeActivationFunction object1 = null;
+	            // Method for deserialization of object 
+	            try {
+					object1 = (HoeffdingTreeActivationFunction)in.readObject();
+				} catch (ClassNotFoundException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+	            this.activationModels.put(neuron, object1);
+	            
+	              
+	            try {
+					in.close();
+		            file.close(); 
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+			}
+				
 
 			if (!activationModels.containsKey(neuron))
 				activationModels.put(neuron, new HoeffdingTreeActivationFunction(this.LayerNumber, false, neuron));
@@ -641,5 +728,68 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 	@Override
 	public boolean isPretrainLayer() {
 		return false;
+	}
+	public INDArray getParamsFlattened() {
+		return paramsFlattened;
+	}
+	public void setParamsFlattened(INDArray paramsFlattened) {
+		this.paramsFlattened = paramsFlattened;
+	}
+	public INDArray getGradientsFlattened() {
+		return gradientsFlattened;
+	}
+	public void setGradientsFlattened(INDArray gradientsFlattened) {
+		this.gradientsFlattened = gradientsFlattened;
+	}
+	public Map<String, INDArray> getParams() {
+		return params;
+	}
+	public void setParams(Map<String, INDArray> params) {
+		this.params = params;
+	}
+	public Map<String, INDArray> getGradientViews() {
+		return gradientViews;
+	}
+	public void setGradientViews(Map<String, INDArray> gradientViews) {
+		this.gradientViews = gradientViews;
+	}
+	public double getScore() {
+		return score;
+	}
+	public void setScore(double score) {
+		this.score = score;
+	}
+	public Gradient getGradient() {
+		return gradient;
+	}
+	public void setGradient(Gradient gradient) {
+		this.gradient = gradient;
+	}
+	public Solver getSolver() {
+		return solver;
+	}
+	public void setSolver(Solver solver) {
+		this.solver = solver;
+	}
+	public int getLayerNumber() {
+		return LayerNumber;
+	}
+	public void setLayerNumber(int layerNumber) {
+		LayerNumber = layerNumber;
+	}
+//	public HashMap<Integer, HoeffdingTreeActivationFunction> getActivationModels() {
+//		return ((CustomLayer) conf.getLayer()).activationModels;
+//	}
+//	public void setActivationModels(HashMap<Integer, HoeffdingTreeActivationFunction> activationModels) {
+//		((CustomLayer) conf.getLayer()).activationModels = activationModels;
+//	}
+	public Map<String, INDArray> getWeightNoiseParams() {
+		return weightNoiseParams;
+	}
+	public void setWeightNoiseParams(Map<String, INDArray> weightNoiseParams) {
+		this.weightNoiseParams = weightNoiseParams;
+	}
+	public void setOptimizer(ConvexOptimizer optimizer) {
+		this.optimizer = optimizer;
 	}
 }

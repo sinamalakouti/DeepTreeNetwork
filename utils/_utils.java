@@ -1,15 +1,24 @@
 package utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
+
+import com.panayotis.gnuplot.JavaPlot;
+import com.panayotis.gnuplot.utils.Debug;
 
 import neuralnetwork.ActivationFunction;
 import weka.classifiers.trees.ht.HNode;
@@ -305,57 +314,92 @@ public class _utils {
 		return Math.max(0.00001, temp);
 	}
 	
-//	public static void draw_accuracy_fscore(String name, String path, int first, int last) throws FileNotFoundException{
-//		
-//		JGnuplot jg = new JGnuplot();
-//		Plot plot = new Plot(name);
-//		int n = ( last - first) / 2 + 1;
-//		double[] x = new double [n];
-//		double[][] fscore = new double[n][2];
-//		double[][] accuracy = new double[n][2];
-//		double [][] score = new double[n] [2];
-//		int counter = 0;
-//		for ( int i = 0 ; i < n ; i ++ ){
-//			counter = (i * 2);
-//			x[i] = counter + 1;
-//			
-//			File file = new File(path +"/resultIteration_" + i );
-//			Scanner scan = new Scanner(file);
-//			String line = null;
-//			while (scan.hasNextLine()){
-//			    line = scan.nextLine();
-////		        String delim = "[^a-zA-Z1-9.]+";
-//				String delim = "\\S+";
-//				String [] tokens = line.split(delim);
-//				if ( tokens[0].toLowerCase().compareTo("accuracy:") == 0){
-//					accuracy[i][1] = counter+1;	
-//				 accuracy[i][1] = Double.parseDouble(tokens[1]);
-//				}else if ( tokens[0].toLowerCase().compareTo("f1") == 0){
-//					fscore[i][0] = counter +1;
-//					fscore[i][1] = Double.parseDouble(tokens[2]);
-//				}
-//				else 
-//					continue;
-//				
-//						
-//			}
-//			score[i][0] = counter +1;
-//			score[i][1]= Double.parseDouble(line);
-//			
-//		}
-//		DataTableSet dts = plot.addNewDataTableSet("");
-//		
-//		JavaPlot jp = new JavaPlot();
-//		jp.addPlot(accuracy);
-//		jp.addPlot(fscore);
-//		jp.addPlot(score);
-//		jp.plot();
-////		dts.addNewDataTable("sadfs",x);
-////		dts.addNewDataTable("f1score", x, y2);
-////		dts.addNewDataTable("f1score", x, y2);
-////		jg.execute(plot, jg.plot2d);
-//
-//			
-//	}
+	
+	public static void createGNUPLOT_ds ( String  name, String path, int first, int last) throws IOException{
+		  JavaPlot p = new JavaPlot();
+	      JavaPlot.getDebugger().setLevel(Debug.VERBOSE);
+	      p.setTitle(name);
+	      p.getAxis("x").setLabel("ITERATION", "Arial", 20);
+	      p.getAxis("y").setLabel("SCORE");
+
+		int n = ( last - first) / 2 + 1;
+		double[] x = new double [n];
+		double[][] fscore = new double[n][2];
+		double[][] accuracy = new double[n][2];
+		double [][] score = new double[n] [2];
+		int counter = 0;
+			for ( int i = 0 ; i < n ; i ++ ){
+				
+				counter = (i * 2);
+				x[i] = counter + 1;
+				if ( i == 1)
+					System.out.println("fuck");
+				
+				File file = new File(path +"resultIteration_" + ( i *2) );
+				Scanner scan = new Scanner(file);
+				String line = null;
+				while (scan.hasNextLine()){
+				    line = scan.nextLine();
+				    			
+	//		        String delim = "[^a-zA-Z1-9.]+";
+				    
+					String delim = "\\s+";
+					String [] tokens = line.split(delim);
+					
+					if ( tokens.length < 2)
+						continue;
+					if ( tokens[1].toLowerCase().compareTo("accuracy:") == 0){
+						accuracy[i][0] = counter+1;	
+					 accuracy[i][1] = Double.parseDouble(tokens[2]);
+					}else if ( tokens[1].toLowerCase().compareTo("f1") == 0){
+						fscore[i][0] = counter +1;
+						fscore[i][1] = Double.parseDouble(tokens[3]);
+					}
+					else if ( tokens[0].toLowerCase().compareTo("errors") == 0){
+						score[i][0] = counter +1;
+						score[i][1]= Double.parseDouble(tokens[1]);
+				
+					}
+					else 
+						continue;
+					
+							
+				}
+				
+			}
+			
+			File file = new File("gnu_result.csv");
+		    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		    String str = "";
+		    for ( int i = 0 ; i< n ; i ++){
+		    	if ( fscore[i][0] != score[i][0] )
+		    		System.exit(0);
+				str += fscore[i][0]+", "+ fscore[i][1] +", " + score[i][1] +"\n"; 
+			}
+		    writer.write(str);
+		    writer.close();			
+
+	}
+//	public static void draw_accuracy_fscore(String name, String path, int first, int last) throws FileNotFoundException{sa}
+	
+	
+	public static void serializing() throws IOException{
+		Constants.isSerialzing = true;
+		ModelSerializer.writeModel(Constants.model, new File("NetowrkModel"), true);
+			
+//		MultiLayerNetwork net = ModelSerializer.restoreMultiLayerNetwork(new File("CustomLayerModel.zip"));
+		
+		
+//        System.out.println("Original and restored networks: configs are equal: " + Constants.model.getLayerWiseConfigurations().equals(net.getLayerWiseConfigurations()));
+//        System.out.println("Original and restored networks: parameters are equal: " + net.params().equals(net.params()));
+	}
+	
+	public static void deserializing() throws IOException{
+		Constants.isDeSerializing = true;
+		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File("NetowrkModel"));
+		
+	}
+	
+	
 
 }

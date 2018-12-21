@@ -1,7 +1,5 @@
 package neuralnetwork.HoeffdingTree;
 
-import java.awt.BorderLayout;
-import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -18,22 +16,20 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
-import weka.gui.treevisualizer.PlaceNode2;
-import weka.gui.treevisualizer.TreeVisualizer;
 
-public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
+public class HoeffdingTreeActivationPrequential extends BaseActivationFunction {
 
 	/**
 	 * 
 	 */
-//	private static final long serialVersionUID = -6622285329198225782L;
+	private static final long serialVersionUID = -6622285329198225782L;
 	private HoeffdingTree activationModel;
 	int layernumber = 0;
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 	int neuronNumber = 0;	
 		
-	public HoeffdingTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
+	public HoeffdingTreeActivationPrequential(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
 		this.isOutputLayerActivation = isOutpuLayerActivation;
 		this.neuronNumber = neuronNumber;
@@ -139,45 +135,8 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// in = inputData .* weights
 
 		Instances trainInstaces = createProperDataset(in.dup(), training);
-		// if ( hf == null)
-		// {
-		// hf = new HoeffdingTree();
-		// this.createdHF = true;
-		// try {
-		// hf.buildClassifier(trainInstaces);
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// }else{
-		// for( int i =0 ; i< trainInstaces.size(); i ++)
-		// try {
-		// if ( hf == null)
-		// System.out.println("shoot");
-		// hf.updateClassifier(trainInstaces.get(i));
-		//
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		//
-		// }
-		//
-		// if ( hf.m_root.isLeaf() == false){
-		// System.out.println("lets do it my frendinto");
-		// try {
-		// hf.classifyInstance(trainInstaces.get(0));
-		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
+		
 		double[] result = new double[trainInstaces.size()];
-
-		// Instances trainInstaces2 = createProperDataset(input.dup(),
-		// training);
-		// J48 originalTree = new J48();
 
 		if (Constants.isEvaluating == false) {
 //			System.out.println("trai /ning");
@@ -186,7 +145,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				try {
 					this.isTraind = true;
 
-					activationModel.buildClassifier(trainInstaces);
+					activationModel.buildClassifier2(trainInstaces);
 					// originalTree.buildClassifier(trainInstaces2);
 
 					isTraind = true;
@@ -194,16 +153,28 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} else {
-				try {
-					Iterator<Instance> it = trainInstaces.iterator();
-					while(it.hasNext())
-						activationModel.updateClassifier(it.next());
-				
-									} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			} 
+//			else {
+//				try {
+//					Iterator<Instance> it = trainInstaces.iterator();
+//					while(it.hasNext())
+//						activationModel.updateClassifier(it.next());
+//				
+//									} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+
+//			if ( layernumber == 0 && neuronNumber == 0){
+//				System.out.println(activationModel.m_root.isLeaf());
+//				try {
+//				 double []	d = ((NBNodeAdaptive)activationModel.m_root).m_bayes.distributionForInstance(trainInstaces.get(0));
+//				 System.out.println(d);
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
 
 		}
 
@@ -222,6 +193,11 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				Instance next = it.next();
 				
 				prediction = activationModel.predicate(next);
+//				for (int i = 0; i < data.numInstances(); i++) {
+//					double [] d = this.predicate(data.get(0));
+				if ( Constants.isEvaluating == false)
+					this.activationModel.updateClassifier(next);
+//				}
 				// prediciton2 = activationModel.predicate(next ,
 				// isOutputLayerActivation);
 
@@ -255,33 +231,6 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			i++;
 
 		}
-		
-//		if ( this.layernumber == 0 && neuronNumber ==0){
-//			System.out.println("lets visualize");
-//			   // display classifier
-//		     final javax.swing.JFrame jf = 
-//		       new javax.swing.JFrame("Weka Classifier Tree Visualizer: J48");
-//		     jf.setSize(500,400);
-////		     jf.getContentPane().setLayout(new BorderLayout());
-//		     TreeVisualizer tv = null;
-//			try {
-//				tv = new TreeVisualizer(null,
-//				     activationModel.graph(),
-//				     new PlaceNode2());
-//			} catch (Exception e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//		     jf.getContentPane().add(tv, BorderLayout.CENTER);
-//		     jf.addWindowListener(new java.awt.event.WindowAdapter() {
-//		       public void windowClosing(java.awt.event.WindowEvent e) {
-//		         jf.dispose();
-//		       }
-//		     });
-//
-//		     jf.setVisible(true);
-//		     tv.fitToScreen();
-//		}
 
 		if (isOutputLayerActivation == true)
 			return Nd4j.create(outputLayerOutput);
