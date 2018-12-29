@@ -103,6 +103,7 @@ public class Network3 {
 		Constants.numberOfLayers = 2;
 		Constants.numberOfNeurons = 40;
 		Constants.batchSize = 100;
+		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
 
@@ -117,10 +118,10 @@ public class Network3 {
 				// new BayesTreeActivationFunction(0, false, -1198)
 
 				.layer(0, new CustomLayer.Builder().nIn(numInputs).nOut(40).activation(Activation.SIGMOID).build())
-				.layer(1, new CustomLayer.Builder().nIn(40).nOut(40).activation(Activation.SIGMOID).build())
+				.layer(1, new CustomLayer.Builder().nIn(400).nOut(40).activation(Activation.SIGMOID).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
+								.activation(Activation.SOFTMAX).nIn(400).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
 
 		// run the model
@@ -141,17 +142,41 @@ public class Network3 {
 			arr.add(i);
 		}
 		int max = 784 / 30;
-		HashMap<Integer, Boolean> attInexes = new HashMap<>();
+		HashMap<Integer, int[]> attInexes = new HashMap<>();
 		for (int j = 0; j < 40; j++) {
 			Collections.shuffle(arr);
 			int[] temp = new int[max];
 			for (int i = 0; i < max; i++) {
 				temp[i] = arr.get(i);
-				attInexes.put(arr.get(i), true);
+//				attInexes.put(arr.get(i), true);
 			}
+			
+			attInexes.put(j, temp);
+//			Constants.attributesIndexes.put(j, temp);
 
-			Constants.attributesIndexes.put(j, temp);
+		}
+		Constants.attributesIndexes2.add(attInexes);
+		 arr = new ArrayList<>();
+		for (int i = 0; i < 400; i++) {
+			arr.add(i);
+		}
+		for ( int l = 1 ; l < 2 ; l ++){
+			max = 400 / 30;
+			attInexes = new HashMap<>();
+			for (int j = 0; j < 40; j++) {
+				Collections.shuffle(arr);
+				int[] temp = new int[max];
+				for (int i = 0; i < max; i++) {
+					temp[i] = arr.get(i);
+//					attInexes.put(arr.get(i), true);
+				}
+				
+				attInexes.put(j, temp);
+//				Constants.attributesIndexes.put(j, temp);
 
+			}
+			Constants.attributesIndexes2.add(attInexes);
+			
 		}
 
 		Constants.numClasses= 10;
@@ -413,94 +438,6 @@ public class Network3 {
 
 	}
 
-	// each tree accuracy on =0h and bagging of trees
-	private static double batch_test(int batchNum, int batchSize, DataSet trainSet, Instances training, DataSet testSet,
-			Instances testInstances) throws Exception {
-
-		double avgAccuracy = 0d;
-
-		for (int b = 0; b < batchNum; b++) {
-			DataSet set = getBatchTrainSet(b, batchSize, trainSet, training);
-			Instances train = _utils.dataset2Instances(set);
-			HoeffdingTree hf = new HoeffdingTree();
-			hf.buildClassifier(train);
-			weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
-			eval.evaluateModel(hf, testInstances);
-			avgAccuracy += eval.pctCorrect();
-		}
-
-		return avgAccuracy / batchNum;
-
-	}
-
-	private static double bagging_test(int batchNum, int batchSize, DataSet trainSet, Instances training,
-			DataSet testSet, Instances testInstances) throws Exception {
-		double avgAccuracy = 0d;
-		ArrayList<HoeffdingTree> trees;
-
-		for (int b = 0; b < batchNum; b++) {
-
-			DataSet trainDataset = getBatchTrainSet(b, batchSize, trainSet, training);
-			trees = new ArrayList<>();
-			for (int i = 0; i < Constants.numberOfNeurons; i++) {
-				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(i), trainDataset);
-
-				Instances train = _utils.ndArrayToInstances(bag);
-				HoeffdingTree hf = new HoeffdingTree();
-				hf.buildClassifier(train);
-				trees.add(hf);
-			}
-
-			double correct = 0d;
-			int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
-			for (int j = 0; j < trees.size(); j++) {
-				INDArray temp = _utils.getSubDataset(Constants.attributesIndexes.get(j), testSet);
-				Instances test = _utils.ndArrayToInstances(temp);
-				Iterator<Instance> it = test.iterator();
-			int counter = 0;
-				INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(j), trainDataset);
-				Instances train = _utils.ndArrayToInstances(bag);
-				weka.classifiers.Evaluation eval = new weka.classifiers.Evaluation(train);
-				eval.evaluateModel(trees.get(j), test);
-				// System.out.println(eval.pctCorrect());
-				while (it.hasNext()) {
-
-					Instance inst = it.next();
-					// for (int i = 0; i < trees.size(); i++) {
-					// if (i == 26) {
-					// 	.out.println("i == 26");
-					// }
-					// if ((int) trees.get(i).classifyInstance(inst) == 26)
-					// System.out.println("(int)
-					// trees.get(i).classifyInstance(inst) == 26");
-					// System.out.println(trees.get(j).classifyInstance(inst));
-					classPredicted[counter][(int) trees.get(j).classifyInstance(inst)]++;
-					// }
-					counter++;
-				}
-
-			}
-
-			for (int i = 0; i < classPredicted.length; i++) {
-				int max = Integer.MIN_VALUE;
-				int max_indx = -1;
-				for (int j = 0; j < Constants.numClasses; j++) {
-					if (classPredicted[i][j] > max) {
-						max = classPredicted[i][j];
-						max_indx = j;
-					}
-
-				}
-
-				if (max_indx == (int) testInstances.get(i).classValue())
-					correct++;
-
-			}
-
-			avgAccuracy += correct / testSet.numExamples();
-
-		}
-
-		return avgAccuracy / batchNum;
-	}
 }
+
+	

@@ -44,11 +44,13 @@ import org.deeplearning4j.optimize.Solver;
 import org.deeplearning4j.optimize.api.ConvexOptimizer;
 import org.nd4j.linalg.api.memory.MemoryWorkspace;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 
 import neuralnetwork.CustomLayer;
+import scala.collection.immutable.Stream.Cons;
 import utils.Constants;
 import weka.core.Instances;
 
@@ -58,7 +60,7 @@ import weka.core.Instances;
  * @author Adam Gibson
  */
 public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.layers.BaseLayer>
-		extends AbstractLayer<CustomLayer>{
+		extends AbstractLayer<CustomLayer> {
 
 	/**
 	 * 
@@ -77,9 +79,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	protected Map<String, INDArray> weightNoiseParams = new HashMap<>();
 
-	public HoeffdingTreeLayer(){
-		
+	public HoeffdingTreeLayer() {
+
 	}
+
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
 		this.LayerNumber = layernumber;
@@ -154,8 +157,26 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		Gradient ret = new DefaultGradient();
 
 		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f
-																						// order
-		Nd4j.gemm(input, delta, weightGrad, true, false, 1.0, 0.0);
+		// order
+		double [][] temp_delta = delta.toDoubleMatrix();
+		float[][] new_delta = new float[(int)delta.shape()[0]][(int)delta.shape()[1] / Constants.numClasses];
+		for (int n = 0; n < delta.size(0); n++) {
+			for (int i = 0; i < delta.shape()[1] / Constants.numClasses; i++) {
+				float avg = 0f;
+				for (int c = 0; c < Constants.numClasses; c++) {
+					avg += temp_delta[n][Constants.numClasses * i + c];
+
+				}
+				avg /= Constants.numClasses;
+				new_delta[n][i] = avg;
+			}
+		}
+		INDArray delta2 = Nd4j.create(new_delta);
+		
+		INDArray weighAlaki = Nd4j.zeros(400,400);
+		Nd4j.gemm(input, delta2, weightGrad, true, false, 1.0, 0.0);
+//
+//		Nd4j.gemm( input, detla2, weightGrad, true, false, 1.0, 0.0);
 
 		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
 		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
@@ -172,7 +193,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 					System.exit(0);
 				}
 			}
-		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose();
+		epsilonNext = W.mmuli(delta2.transpose(), epsilonNext).transpose();
 
 		zprim = W.toDoubleMatrix();
 
@@ -385,20 +406,20 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		// normalization:
 
-		 double mu = W.meanNumber().doubleValue();
-		 double std = Math.sqrt(W.varNumber().doubleValue());
-		 W = W.subi(mu);
-		 W = W.divi(std);
+		// double mu = W.meanNumber().doubleValue();
+		// double std = Math.sqrt(W.varNumber().doubleValue());
+		// W = W.subi(mu);
+		// W = W.divi(std);
 
-//		double[][] zprim = W.toDoubleMatrix();
-//		for (int i = 0; i < zprim.length; i++)
-//			for (int j = 0; j < zprim[i].length; j++) {
-//				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-//					System.out.println("stop stage number four");
-//					System.out.println(zprim[i][j]);
-//					System.exit(0);
-//				}
-//			}
+		double[][] zprim = W.toDoubleMatrix();
+		for (int i = 0; i < zprim.length; i++)
+			for (int j = 0; j < zprim[i].length; j++) {
+				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number four");
+					System.out.println(zprim[i][j]);
+					System.exit(0);
+				}
+			}
 
 		// Input validation:
 		if (input.rank() != 2 || input.columns() != W.rows()) {
@@ -417,84 +438,80 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray result = null;
 
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
-			
-			if ( Constants.isSerialzing == true){
-				
+
+			if (Constants.isSerialzing == true) {
+
 				FileOutputStream file = null;
 				try {
-					file = new FileOutputStream("hf_Activation_"+ LayerNumber + "_" + neuron);
+					file = new FileOutputStream("hf_Activation_" + LayerNumber + "_" + neuron);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
-	            ObjectOutputStream out = null;
+				}
+				ObjectOutputStream out = null;
 				try {
 					out = new ObjectOutputStream(file);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
-	              	            try {
-									out.writeObject(activationModels.get(neuron));
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} 
-	              
-	            try {
+				}
+				try {
+					out.writeObject(activationModels.get(neuron));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				try {
 					out.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
-	            try {
+				}
+				try {
 					file.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
 
-				
 			}
-			
-			
-			if ( Constants.isDeSerializing && ! activationModels.containsKey(neuron)){
-				
+
+			if (Constants.isDeSerializing && !activationModels.containsKey(neuron)) {
+
 				FileInputStream file = null;
 				ObjectInputStream in = null;
 				try {
-					file = new FileInputStream("hf_Activation_"+ LayerNumber + "_" + neuron);
+					file = new FileInputStream("hf_Activation_" + LayerNumber + "_" + neuron);
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} 
+				}
 				try {
 					in = new ObjectInputStream(file);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} 
-	             HoeffdingTreeActivationFunction object1 = null;
-	            // Method for deserialization of object 
-	            try {
-					object1 = (HoeffdingTreeActivationFunction)in.readObject();
+				}
+				HoeffdingTreeActivationFunction object1 = null;
+				// Method for deserialization of object
+				try {
+					object1 = (HoeffdingTreeActivationFunction) in.readObject();
 				} catch (ClassNotFoundException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
-	            this.activationModels.put(neuron, object1);
-	            
-	              
-	            try {
+				}
+				this.activationModels.put(neuron, object1);
+
+				try {
 					in.close();
-		            file.close(); 
+					file.close();
 
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
 			}
-				
 
 			if (!activationModels.containsKey(neuron))
 				activationModels.put(neuron, new HoeffdingTreeActivationFunction(this.LayerNumber, false, neuron));
@@ -503,48 +520,64 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 			z = input.mulRowVector(weight.transpose());
 
-//			zprim = z.toDoubleMatrix();
-//			for (int i = 0; i < zprim.length; i++)
-//				for (int j = 0; j < zprim[i].length; j++) {
-//					if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-//						System.out.println("stop stage number five");
-//						System.out.println("at neuron : \t" + neuron);
-//						System.out.println("layer number is \t" + LayerNumber);
-//						System.out.println("number of features\t " + input.shapeInfoToString());
-//						System.out.println(weight);
-//						System.out.println(zprim[i][j]);
-//						System.exit(0);
-//					}
-//				}
+			// zprim = z.toDoubleMatrix();
+			// for (int i = 0; i < zprim.length; i++)
+			// for (int j = 0; j < zprim[i].length; j++) {
+			// if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j]))
+			// {
+			// System.out.println("stop stage number five");
+			// System.out.println("at neuron : \t" + neuron);
+			// System.out.println("layer number is \t" + LayerNumber);
+			// System.out.println("number of features\t " +
+			// input.shapeInfoToString());
+			// System.out.println(weight);
+			// System.out.println(zprim[i][j]);
+			// System.exit(0);
+			// }
+			// }
 
 			if (neuron == 0) {
 
 				INDArray ztemp;
+				// todo : if other layers are dense uncomment the followings
 				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+					// todo: if other layers are dense change follwoing line to
+					// :
+					// ztemp =
+					// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+					ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
 				else
 					ztemp = z.dup();
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
+				// todo : if random class config
+				// result = ret.transpose().dup();
+				// todo : if we want to pass all the predictions
+				result = ret.dup();
 
-				result = ret.transpose().dup();
 			} else {
 				INDArray ztemp;
-				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				else
-					ztemp = z.dup();
+				// todo : if other layers are dense uncomment the followings
+				// if (LayerNumber == 0)
+				// todo: if other layers are dense change follwoing line to
+				// ztemp =
+				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				// else
+				// ztemp = z.dup();
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
-
-				result = Nd4j.concat(1, result, ret.transpose());
+				// if having random class config
+				// result = Nd4j.concat(1, result, ret.transpose());
+				// if we want pass all the predicitons
+				result = Nd4j.concat(1, result, ret);
 			}
 
 		}
-		double avgDepth =0d;
-		for ( int neuron = 0 ; neuron < Constants.numberOfNeurons ; neuron++ )
-			avgDepth += (double) activationModels.get(neuron).getActivationModel().treeDepth ;
-		
+		double avgDepth = 0d;
+		for (int neuron = 0; neuron < Constants.numberOfNeurons; neuron++)
+			avgDepth += (double) activationModels.get(neuron).getActivationModel().treeDepth;
+
 		avgDepth = avgDepth / Constants.numberOfNeurons;
 		Constants.avgHFDepth[this.LayerNumber] = avgDepth;
 		if (maskArray != null) {
@@ -588,19 +621,27 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			if (neuron == 0) {
 
 				INDArray ztemp;
-				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				else
-					ztemp = z;
+				// todo : if other layers are dense uncomment the followings
+				// if (LayerNumber == 0)
+				// todo: if other layers are dense change follwoing line to :
+				// ztemp =
+				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				// else
+				// ztemp = z.dup();
 
 				Pair<INDArray, INDArray> ret = activationModels.get(neuron).backprop(ztemp, null);
 				result = ret.getFirst().dup();
 			} else {
 				INDArray ztemp;
-				if (LayerNumber == 0)
-					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				else
-					ztemp = z.dup();
+				// todo : if other layers are dense uncomment the followings
+				// if (LayerNumber == 0)
+				// todo: if other layers are dense change follwoing line to :
+				// ztemp =
+				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				// else
+				// ztemp = z.dup();
 
 				Pair<INDArray, INDArray> ret = activationModels.get(neuron).backprop(ztemp, null);
 				INDArray tmp = ret.getFirst().dup();
@@ -729,66 +770,87 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 	public boolean isPretrainLayer() {
 		return false;
 	}
+
 	public INDArray getParamsFlattened() {
 		return paramsFlattened;
 	}
+
 	public void setParamsFlattened(INDArray paramsFlattened) {
 		this.paramsFlattened = paramsFlattened;
 	}
+
 	public INDArray getGradientsFlattened() {
 		return gradientsFlattened;
 	}
+
 	public void setGradientsFlattened(INDArray gradientsFlattened) {
 		this.gradientsFlattened = gradientsFlattened;
 	}
+
 	public Map<String, INDArray> getParams() {
 		return params;
 	}
+
 	public void setParams(Map<String, INDArray> params) {
 		this.params = params;
 	}
+
 	public Map<String, INDArray> getGradientViews() {
 		return gradientViews;
 	}
+
 	public void setGradientViews(Map<String, INDArray> gradientViews) {
 		this.gradientViews = gradientViews;
 	}
+
 	public double getScore() {
 		return score;
 	}
+
 	public void setScore(double score) {
 		this.score = score;
 	}
+
 	public Gradient getGradient() {
 		return gradient;
 	}
+
 	public void setGradient(Gradient gradient) {
 		this.gradient = gradient;
 	}
+
 	public Solver getSolver() {
 		return solver;
 	}
+
 	public void setSolver(Solver solver) {
 		this.solver = solver;
 	}
+
 	public int getLayerNumber() {
 		return LayerNumber;
 	}
+
 	public void setLayerNumber(int layerNumber) {
 		LayerNumber = layerNumber;
 	}
-//	public HashMap<Integer, HoeffdingTreeActivationFunction> getActivationModels() {
-//		return ((CustomLayer) conf.getLayer()).activationModels;
-//	}
-//	public void setActivationModels(HashMap<Integer, HoeffdingTreeActivationFunction> activationModels) {
-//		((CustomLayer) conf.getLayer()).activationModels = activationModels;
-//	}
+
+	// public HashMap<Integer, HoeffdingTreeActivationFunction>
+	// getActivationModels() {
+	// return ((CustomLayer) conf.getLayer()).activationModels;
+	// }
+	// public void setActivationModels(HashMap<Integer,
+	// HoeffdingTreeActivationFunction> activationModels) {
+	// ((CustomLayer) conf.getLayer()).activationModels = activationModels;
+	// }
 	public Map<String, INDArray> getWeightNoiseParams() {
 		return weightNoiseParams;
 	}
+
 	public void setWeightNoiseParams(Map<String, INDArray> weightNoiseParams) {
 		this.weightNoiseParams = weightNoiseParams;
 	}
+
 	public void setOptimizer(ConvexOptimizer optimizer) {
 		this.optimizer = optimizer;
 	}

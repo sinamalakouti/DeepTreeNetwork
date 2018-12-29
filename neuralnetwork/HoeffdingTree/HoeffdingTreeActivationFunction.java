@@ -47,7 +47,11 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// assertShape(in, epsilon);
 
 		Instances trainInstaces = createProperDataset(in, true);
-		double[] result = new double[trainInstaces.size()];
+//		if : having random class config:
+//		double[] result = new double[trainInstaces.size()];
+		
+//		if : want to pass whole predictions
+		double [][] result = new double[trainInstaces.size()][Constants.numClasses];
 
 		Enumeration<Instance> it = trainInstaces.enumerateInstances();
 
@@ -64,16 +68,26 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				// [Constants.classChosedArray.get(layernumber).get(neuronNumber)]
 
 				double[] predictionDerivative = activationModel.predicate_derivative(next);
-
+//				double avg = 0d;
+				
+				
 				// for mapping : result [i] = predictionDerivative[0]; should
 				// changed true -> false in the line above
 
 				if (predictionDerivative.length != Constants.numClasses && Constants.classChosedArray.get(layernumber)
 						.get(neuronNumber) >= predictionDerivative.length) {
 					System.err.println("inja ham bayad doros shavad dar moshtagh e gerami");
-					result[i] = 0;
-				} else
-					result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+//					result[i] = 0;
+				} else{
+//					if : having random class config
+//					result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+////					 if want to pass whole prediction :
+//					for ( int c = 0 ; c < predictionDerivative.length ; c++)
+//						avg += predictionDerivative[c];
+//					avg /= predictionDerivative.length;
+
+					result[i] =predictionDerivative.clone();
+				}
 
 				// if (isOutputLayerActivation == false) {
 				// labelIndexes[i] = prediciton[1];
@@ -118,7 +132,10 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			}
 			// result = result.muli(epsilon);
 
-			output = Nd4j.create(result).transpose();
+//			if : having random class config.
+//			output = Nd4j.create(result).transpose();
+//			if : want to pass all prediction
+			output = Nd4j.create(result);
 			// normalization : ( 0, 1 )
 
 			// double min = output.minNumber().doubleValue();
@@ -173,7 +190,13 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// e.printStackTrace();
 		// }
 		// }
-		double[] result = new double[trainInstaces.size()];
+
+		
+//		 having random class config: 
+//		double[] result = new double[trainInstaces.size()];
+
+//		want to pass whole predictions
+		double[][] result = new double[trainInstaces.size()][Constants.numClasses];
 
 		// Instances trainInstaces2 = createProperDataset(input.dup(),
 		// training);
@@ -224,24 +247,33 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				prediction = activationModel.predicate(next);
 				// prediciton2 = activationModel.predicate(next ,
 				// isOutputLayerActivation);
-
-				double res;
+				
+//				 if we have only random class config then uncumment the following
+//				double res;
+				
+//				 we want to pass predictions
+				double [] res = null;
+				
 
 				if (isOutputLayerActivation == false) {
 
 					if (prediction.length != Constants.numClasses
 							&& Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length) {
 						System.err.println("in doostemoon bayad bezoodi hal beshe :))");
-						res = 0;
+//						res = 0;
 					} else
-						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+//						having random class config:
+//						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+						
+//						passing whole predicitions:
+						res = prediction.clone();
 					result[i] = res;
 
-					if (res < 0 || res - 1 > 0.01) {
-						System.out.println("ya khode khoda probablity not valid");
-						System.out.println(res);
-						System.exit(0);
-					}
+//					if (res < 0 || res - 1 > 0.01) {
+//						System.out.println("ya khode khoda probablity not valid");
+//						System.out.println(res);
+//						System.exit(0);
+//					}
 				} else {
 					System.out.println("WHY HERE IN  Loss FUNCTION -> output layer");
 					System.exit(0);

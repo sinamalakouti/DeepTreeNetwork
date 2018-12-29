@@ -31,6 +31,7 @@ public class Constants {
 	public static int numBatches; 
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
+	public static ArrayList<HashMap<Integer,int[]>> attributesIndexes2 = new ArrayList<>();
 	public static MultiLayerNetwork model;
 	public static boolean isSerialzing = false;
 	public static boolean isDeSerializing = false;
