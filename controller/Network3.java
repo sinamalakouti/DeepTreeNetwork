@@ -381,17 +381,16 @@ public class Network3 {
 				}
 				mnistTest.reset();
 
-////				 String path =
-////				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
-////						+ "phase_3/without_depth_limit/without_normalization/resultIteration_"+ i;
-////				 File file = new File(path);
-////				 BufferedWriter out = new BufferedWriter(new
-////				 FileWriter(file));
-//				 out.write(eval.stats() + "\n" + Constants.model.score());
+				 String path =
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/passingAllPredictions/1/resultIteration_"+ i;
+				 File file = new File(path);
+				 BufferedWriter out = new BufferedWriter(new
+				 FileWriter(file));
+				 out.write(eval.stats() + "\n" + Constants.model.score());
 				System.out.println(eval.stats() + "\n" + Constants.model.score());
 				
 
-//				 out.close();
+				 out.close();
 				Constants.isEvaluating = false;
 
 			}
