@@ -393,7 +393,7 @@ public class Network2 {
 				mnistTest.reset();
 
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/passingAllPredictions/2/resultIteration_"+ i;
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/1/resultIteration_"+ i;
 //				String path =
 //						 "resultIteration_"+ i;
 				 File file = new File(path);
