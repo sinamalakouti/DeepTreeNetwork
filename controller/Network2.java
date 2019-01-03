@@ -99,7 +99,7 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons =20;
+		Constants.numberOfNeurons =40;
 		Constants.batchSize = 100;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
@@ -111,7 +111,7 @@ public class Network2 {
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
 
 				.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
+				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.01)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
 				.layer(0,
@@ -164,7 +164,7 @@ public class Network2 {
 		 * 
 		 */
 	
-		int max = numInputs / 20;
+		int max = numInputs / 30;
 		HashMap<Integer, Boolean> attInexes = new HashMap<>();
 		for (int j = 0; j < Constants.numberOfNeurons; j++) {
 			Collections.shuffle(featuresVector);
@@ -258,7 +258,7 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 		HoeffdingTree batchTree = null;
 		HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		for (int i = 0; i <  600; i++) {
+		for (int i = 0; i <  200; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
 			for (int b = 0; b < Constants.numBatches; b++) {
@@ -392,10 +392,10 @@ public class Network2 {
 				}
 				mnistTest.reset();
 
-//				 String path =
-//				 "/home/sina/eclipse-workspace/Comp	xNeuronsProject/result/phase_3/with_depth_limit/without_normalization/1/resultIteration_"+ i;
-				String path =
-						 "resultIteration_"+ i;
+				 String path =
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/passingAllPredictions/2/resultIteration_"+ i;
+//				String path =
+//						 "resultIteration_"+ i;
 				 File file = new File(path);
 				 BufferedWriter out = new BufferedWriter(new
 				 FileWriter(file));
@@ -403,7 +403,7 @@ public class Network2 {
 				 for ( int l = 0 ; l<Constants.numberOfLayers; l++)
 					 avglayersTreesDepth = avglayersTreesDepth + "   " + Constants.avgHFDepth[l];
 				 out.write(eval.stats() + "\n" + Constants.model.score() + "\n" + avglayersTreesDepth);
-				System.out.println(eval.stats() + "\n" + Constants.model.score() + "\n" + avglayersTreesDepth);
+//				System.out.println(eval.stats() + "\n" + Constants.model.score() + "\n" + avglayersTreesDepth);
 				
 
 				 out.close();

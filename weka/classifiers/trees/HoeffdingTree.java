@@ -199,6 +199,7 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 
 			if (actualNode == null) {
 				actualNode = l.m_parentNode;
+				System.out.println("inside if ");
 			}
 
 			pred = actualNode.getDistribution_derivative(inst, classAtt);

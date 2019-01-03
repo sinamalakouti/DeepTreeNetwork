@@ -233,9 +233,23 @@ public String getSplitAtt () {
 
 @Override
 public double[] getDistribution_derivative(Instance inst, Attribute classAtt) {
-	System.out.println("in Split NOde");
-	System.exit(0);
-	return null;
+	LeafNode l = this.leafForInstance(inst, null, null);
+	HNode actualNode = l.m_theNode;
+
+	if (actualNode == null) {
+		actualNode = l.m_parentNode;
+		System.out.println("inside if ");
+	}
+
+	double[] pred = null;
+	try {
+		pred = actualNode.getDistribution_derivative(inst, classAtt);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	return pred;
 }
 
 

@@ -105,7 +105,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		assertInputSet(true);
 
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, true, workspaceMgr);
-		INDArray z = bacpropOutput(true, workspaceMgr, W); // Note: using
+		INDArray z = bacpropout(true, workspaceMgr, W); // Note: using
 															// preOutput(INDArray)
 															// can't be used as
 															// this does a
@@ -158,25 +158,26 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		INDArray weightGrad = gradientViews.get(DefaultParamInitializer.WEIGHT_KEY); // f
 		// order
-		double [][] temp_delta = delta.toDoubleMatrix();
-		float[][] new_delta = new float[(int)delta.shape()[0]][(int)delta.shape()[1] / Constants.numClasses];
-		for (int n = 0; n < delta.size(0); n++) {
-			for (int i = 0; i < delta.shape()[1] / Constants.numClasses; i++) {
-				float avg = 0f;
-				for (int c = 0; c < Constants.numClasses; c++) {
-					avg += temp_delta[n][Constants.numClasses * i + c];
-
-				}
-				avg /= Constants.numClasses;
-				new_delta[n][i] = avg;
-			}
-		}
-		INDArray delta2 = Nd4j.create(new_delta);
-		
-		INDArray weighAlaki = Nd4j.zeros(400,400);
-		Nd4j.gemm(input, delta2, weightGrad, true, false, 1.0, 0.0);
+//		TODO  pass all the predicions
+//		double [][] temp_delta = delta.toDoubleMatrix();
+//		float[][] new_delta = new float[(int)delta.shape()[0]][(int)delta.shape()[1] / Constants.numClasses];
+//		for (int n = 0; n < delta.size(0); n++) {
+//			for (int i = 0; i < delta.shape()[1] / Constants.numClasses; i++) {
+//				float avg = 0f;
+//				for (int c = 0; c < Constants.numClasses; c++) {
+//					avg += temp_delta[n][Constants.numClasses * i + c];
 //
-//		Nd4j.gemm( input, detla2, weightGrad, true, false, 1.0, 0.0);
+//				}
+//				avg /= Constants.numClasses;
+//				new_delta[n][i] = avg;
+//			}
+//		}
+//		INDArray ` = Nd4j.create(new_delta);
+		
+//		INDArray weighAlaki = Nd4j.zeros(400,400);
+//		Nd4j.gemm(input, delta2, weightGrad, true, false, 1.0, 0.0);
+// TODO : random class config
+		Nd4j.gemm( input, delta, weightGrad, true, false, 1.0, 0.0);
 
 		ret.gradientForVariable().put(DefaultParamInitializer.WEIGHT_KEY, weightGrad);
 		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
@@ -193,8 +194,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 					System.exit(0);
 				}
 			}
-		epsilonNext = W.mmuli(delta2.transpose(), epsilonNext).transpose();
-
+//		TODO : random class config
+		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose();
+//		TODO : pass all predicitons
+//		epsilonNext = W.mmuli(delta2.transpose(), epsilonNext).transpose();
 		zprim = W.toDoubleMatrix();
 
 		for (int i = 0; i < zprim.length; i++)
@@ -543,34 +546,34 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				if (LayerNumber == 0)
 					// todo: if other layers are dense change follwoing line to
 					// :
-					// ztemp =
-					// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-					ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+					 ztemp =
+					 z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+//					ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
 				else
 					ztemp = z.dup();
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				// todo : if random class config
-				// result = ret.transpose().dup();
+				 result = ret.transpose().dup();
 				// todo : if we want to pass all the predictions
-				result = ret.dup();
+//				result = ret.dup();
 
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				// if (LayerNumber == 0)
+				 if (LayerNumber == 0)
 				// todo: if other layers are dense change follwoing line to
-				// ztemp =
-				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
-				// else
-				// ztemp = z.dup();
+				 ztemp =
+				 z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+//				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				 else
+				 ztemp = z.dup();
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				// if having random class config
-				// result = Nd4j.concat(1, result, ret.transpose());
+				 result = Nd4j.concat(1, result, ret.transpose());
 				// if we want pass all the predicitons
-				result = Nd4j.concat(1, result, ret);
+//				result = Nd4j.concat(1, result, ret);
 			}
 
 		}
@@ -595,7 +598,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		return ret;
 	}
 
-	protected INDArray bacpropOutput(boolean training, LayerWorkspaceMgr workspaceMgr, INDArray W) {
+	protected INDArray bacpropout(boolean training, LayerWorkspaceMgr workspaceMgr, INDArray W) {
 		assertInputSet(false);
 		applyDropOutIfNecessary(true, workspaceMgr);
 		// Input validation:
@@ -622,26 +625,26 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				// if (LayerNumber == 0)
+				 if (LayerNumber == 0)
 				// todo: if other layers are dense change follwoing line to :
-				// ztemp =
-				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
-				// else
-				// ztemp = z.dup();
+				 ztemp =
+				 z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+//				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				 else
+				 ztemp = z.dup();
 
 				Pair<INDArray, INDArray> ret = activationModels.get(neuron).backprop(ztemp, null);
 				result = ret.getFirst().dup();
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				// if (LayerNumber == 0)
+				 if (LayerNumber == 0)
 				// todo: if other layers are dense change follwoing line to :
-				// ztemp =
-				// z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
-				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
-				// else
-				// ztemp = z.dup();
+				 ztemp =
+				 z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+//				ztemp = z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
+				 else
+				 ztemp = z.dup();
 
 				Pair<INDArray, INDArray> ret = activationModels.get(neuron).backprop(ztemp, null);
 				INDArray tmp = ret.getFirst().dup();
