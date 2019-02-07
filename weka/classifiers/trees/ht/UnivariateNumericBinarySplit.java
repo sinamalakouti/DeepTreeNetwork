@@ -22,6 +22,7 @@
 package weka.classifiers.trees.ht;
 
 import java.io.Serializable;
+import java.util.Random;
 
 import weka.core.Attribute;
 import weka.core.Instance;
@@ -61,6 +62,10 @@ public class UnivariateNumericBinarySplit extends Split implements Serializable 
     if (att == null || inst.isMissing(att)) {
       // TODO -------------
       return null;
+    	
+//    	TODO : randomly chose one of the children : 
+    	
+    	
     }
 
     if (inst.value(att) <= m_splitPoint) {

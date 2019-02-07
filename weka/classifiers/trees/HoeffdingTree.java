@@ -201,6 +201,8 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 				actualNode = l.m_parentNode;
 				System.out.println("inside if ");
 			}
+			
+			
 
 			pred = actualNode.getDistribution_derivative(inst, classAtt);
 
@@ -907,7 +909,6 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 
 		Attribute classAtt = inst.classAttribute();
 		double[] pred = new double[classAtt.numValues()];
-
 		if (m_root != null) {
 			LeafNode l = m_root.leafForInstance(inst, null, null);
 			HNode actualNode = l.m_theNode;
@@ -916,6 +917,7 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 				actualNode = l.m_parentNode;
 			}
 
+			
 			pred = actualNode.getDistribution(inst, classAtt);
 
 		} else {
@@ -1025,7 +1027,9 @@ public class HoeffdingTree extends AbstractClassifier implements UpdateableClass
 					// // preprune
 					// deactivateNode(node, parent, parentBranch);
 				} else {	
+					
 					SplitNode newSplit = new SplitNode(node.m_classDistribution, best.m_splitTest);
+//					newSplit.m_header = this.m_header;
 					newSplit.depth = node.depth;
 
 					for (int i = 0; i < best.numSplits(); i++) {

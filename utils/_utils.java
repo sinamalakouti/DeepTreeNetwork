@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.indexaccum.IAMax;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -53,7 +55,10 @@ public class _utils {
 
 		INDArray features = ds.getFeatures();
 		INDArray labels = ds.getLabels();
+		
+		
 		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
+		
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
 		Instances instances = _utils.ndArrayToInstances(features_labels);
 		NumericToNominal convert = new NumericToNominal();
@@ -66,7 +71,7 @@ public class _utils {
 		instances = weka.filters.Filter.useFilter(instances, convert);
 		instances.setClassIndex(instances.numAttributes()-1);
 	
-
+		
 		return instances;
 	}
 	
@@ -329,8 +334,6 @@ public class _utils {
 				
 				counter = (i * 2);
 				x[i] = counter + 1;
-				if ( i == 1)
-					System.out.println("fuck");
 				
 				File file = new File(path +"resultIteration_" + ( i *2) );
 				Scanner scan = new Scanner(file);
@@ -369,8 +372,10 @@ public class _utils {
 		    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		    String str = "";
 		    for ( int i = 0 ; i< n ; i ++){
-		    	if ( fscore[i][0] != score[i][0] )
+		    	if ( fscore[i][0] != score[i][0] ){
+		    		System.out.println("chera saram jigh mizani????");
 		    		System.exit(0);
+		    	}
 				str += fscore[i][0]+", "+ fscore[i][1] +", " + score[i][1] +"\n"; 
 			}
 		    writer.write(str);

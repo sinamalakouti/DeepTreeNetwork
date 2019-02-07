@@ -14,17 +14,18 @@ import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
+import org.deeplearning4j.datasets.iterator.impl.TinyImageNetDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
+import org.jfree.data.general.Dataset;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -43,14 +44,15 @@ import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
+import weka.classifiers.trees.J48;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
-public class Skyserver {
+public class Letter {
 
-	private static Logger log = LoggerFactory.getLogger(Skyserver.class);
+	private static Logger log = LoggerFactory.getLogger(Letter.class);
 
 
 
@@ -73,22 +75,22 @@ public class Skyserver {
 		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
 		Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
 
-		final int numInputs = 9;
-		int outputNum = 3;
+		final int numInputs = 16;
+		int outputNum = 26;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 5;
+		Constants.numberOfNeurons = 4;
 		Constants.maximumDepth =20;
 		int neuron_feature_ratio = 2;
-		Constants.batchSize = 100;
+		Constants.batchSize = 200;
 		Constants.isSerialzing = false;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
-		double numberOfExamples = 10000d;
-		double numberTrainExamples = 7000d;
+		double numberOfExamples = 20000;
+		double numberTrainExamples = 14000d;
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 3;
+		Constants.numClasses = 26;
 
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
@@ -98,38 +100,14 @@ public class Skyserver {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
-				  .layer(0, new ConvolutionLayer.Builder(5, 5)
-				            .nIn(1)
-				            .stride(1, 1)
-				            .nOut(20)
-				            .activation(Activation.IDENTITY)
-				            .build())	
-				  .layer(1,
+				.layer(0,
 						new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
-				.layer(2,
+				.layer(1,
 						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
-//				.layer(2,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//
-//				.layer(3,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(4,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(5,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(6,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(7,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-				.layer(3,
+
+				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
@@ -202,21 +180,34 @@ public class Skyserver {
 
 		// set-up the project :
 		//
-		//		DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-		//		DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+				DataSetIterator imageSetTrain = new TinyImageNetDataSetIterator(Constants.batchSize);
+				DataSet ds = imageSetTrain.next();
+				System.out.println(ds.numExamples());
+				System.out.println("num outputs: \t"+ ds.numOutcomes());
+				System.out.println("num inputs:\t"+ ds.numInputs());
+				DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 		int numLinesToSkip = 1;
 		char delimiter = ',';
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
 
-		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/skyserverTest.csv")));
+		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/Letter.csv")));
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,16,Constants.numClasses);
 		
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,9,Constants.numClasses);
 		DataSet allData = iterator.next();
 		allData.shuffle();
 		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.7);  //Use 70% of data for training
 
 
 		DataSet trainingData = testAndTrain.getTrain();
+		System.out.println("hello1\t" + trainingData.numOutcomes());
+		Instances train = _utils.dataset2Instances(trainingData);
+		J48 hf = new J48();
+		hf.buildClassifier(train);
+		weka.classifiers.Evaluation eval1 = new weka.classifiers.Evaluation(train);
+		eval1.evaluateModel(hf, _utils.dataset2Instances(testAndTrain.getTest()));
+		System.out.println(eval1.errorRate());
+		
+		System.out.println("hello2\t" + train.numClasses());
 		DataSet testData = testAndTrain.getTest();
 		//        TODO:
 		DataNormalization normalizer = new NormalizerStandardize();
@@ -230,6 +221,12 @@ public class Skyserver {
 
 		trainSet2 =_utils.dataset2Instances(trainingData);
 
+//		DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
+//		DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+
+//		HoeffdingTree hf = new HoeffdingTree();
+
+//		INDArray ind = (mnistTrain.next()).getFeatures();		System.out.println((mnistTrain.next()).getFeatures());
 		convert = new NumericToNominal();
 		options = new String[2];
 		options[0] = "-R";
@@ -618,6 +615,17 @@ public class Skyserver {
 		for (int i = 0; i < list.size(); i++)
 			labels_list[i] = list.get(i).classValue();
 		Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
+		Instances train = null;
+		try {
+			train = _utils.dataset2Instances(set);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if ( train.numClasses() != set.numOutcomes()){
+			System.out.println("fuck");
+			System.exit(0);
+		}
 		return set;
 
 	}

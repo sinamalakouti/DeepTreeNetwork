@@ -23,9 +23,13 @@ package weka.classifiers.trees.ht;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
+import utils.Constants;
 import weka.core.Attribute;
 import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.Utils;
 
 /**
  * Class for a node that splits the data in a Hoeffding tree
@@ -43,6 +47,8 @@ public class SplitNode extends HNode {
 
   /** The split itself */
   protected Split m_split;
+//  private NBNodeAdaptive leaf; 
+//	Instances m_header ;
 
   /** Child nodes */
   public Map<String, HNode> m_children = new LinkedHashMap<String, HNode>();
@@ -57,6 +63,16 @@ public class SplitNode extends HNode {
     super(classDistrib);
 
     m_split = split;
+//	m_header = new Instances(this.m_header, 0);
+
+    
+//	try {
+//		leaf = new NBNodeAdaptive(this.m_header, 0.0);
+//	} catch (Exception e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+
   }
 
   /**
@@ -232,25 +248,67 @@ public String getSplitAtt () {
 }
 
 @Override
-public double[] getDistribution_derivative(Instance inst, Attribute classAtt) {
-	LeafNode l = this.leafForInstance(inst, null, null);
-	HNode actualNode = l.m_theNode;
-
-	if (actualNode == null) {
-		actualNode = l.m_parentNode;
-		System.out.println("inside if ");
-	}
-
-	double[] pred = null;
-	try {
-		pred = actualNode.getDistribution_derivative(inst, classAtt);
-	} catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-
-	return pred;
+public double[] getDistribution_derivative(Instance inst, Attribute classAtt) throws Exception {
+	// TODO Auto-generated method stub
+	return null;
 }
+
+//@Override
+//public double[] getDistribution_derivative(Instance inst, Attribute classAtt) {
+//	LeafNode l = this.leafForInstance(inst, null, null);
+//	HNode actualNode = l.m_theNode;
+//
+//	if (actualNode == null) {
+//		actualNode = l.m_parentNode;
+//		System.out.println("inside if ");
+//	}
+//	
+//	if ( actualNode.equals(this)){
+//		double[] pred = new double [Constants.numClasses];
+////		for ( int  i = 0 ; i< Constants.numClasses ; i++)
+////			try {
+////				pred = leaf.getDistribution_derivative(inst, this.m_header.classAttribute());
+////			} catch (Exception e) {
+////				// TODO Auto-generated catch block
+////				e.printStackTrace();
+////			}
+////		return pred;
+////		
+//		
+//    	
+//		HNode child1  = ((SplitNode)actualNode).m_children.get("left");
+//    	this.
+//		HNode child2 = ((SplitNode)actualNode).m_children.get("right");
+//		if ( child1.  (inst, inst.classAttribute()) > child2.getDistribution(inst, inst.classAttribute()))
+//			
+//	}
+//
+//	double[] pred = null;
+//	try {
+//		pred = actualNode.getDistribution_derivative(inst, classAtt);
+//	} catch (Exception e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+//
+//	return pred;
+//}
+
+//public double[] getDistribution_derivative(Instance inst, Attribute classAtt) {
+//	    double[] dist = new double[classAtt.numValues()];
+//
+//	    for (int i = 0; i < classAtt.numValues(); i++) {
+//	      WeightMass w = m_classDistribution.get(classAtt.value(i));
+//	      if (w != null) {
+//	        dist[i] = w.m_weight;
+//	      } else {
+//	        dist[i] = 0;
+//	      }
+//	    }
+//
+//	    Utils.normalize(dist);
+//	    return dist;
+//	  }
 
 
 

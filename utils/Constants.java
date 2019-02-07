@@ -24,7 +24,7 @@ public class Constants {
 	public static INDArray trainInstancesLabel;
 	public static INDArray testInstancesLabel;
 	public static boolean isEvaluating = false;
-	public static int maximumDepth = 5;
+	public static int maximumDepth ;
 	public static int numberOfLayers;
 	public static int numberOfNeurons;
 	public static int batchSize;
@@ -44,6 +44,9 @@ public class Constants {
 	public static boolean  isCompare =false;
 	public static ArrayList<HashMap<Integer, HoeffdingTree>>  trees2;
 	public static ArrayList<HashMap<Integer, HoeffdingTreeActivationFunction>>  trees1;
+	public static HashMap<Integer, ArrayList<Integer>> dropout = new HashMap<>();
+	public static double dropoutRate;
+	public static boolean isDropoutEnable  = false;
 	
 	
 }

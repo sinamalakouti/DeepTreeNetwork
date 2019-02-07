@@ -41,20 +41,23 @@ public class MySigmoidActivationFunction extends BaseActivationFunction {
 
 	@Override
 	public Pair<INDArray, INDArray> backprop(INDArray in, INDArray epsilon1) {
-		INDArray n = in.sum(1);
+//		INDArray n = in.sum(1);
+//
+//        INDArray dLdz = Nd4j.getExecutioner().execAndReturn(new SigmoidDerivative(n));
 
-        INDArray dLdz = Nd4j.getExecutioner().execAndReturn(new SigmoidDerivative(n));
 
-        return new Pair<>(dLdz, null);
+//        return new Pair<>(dLdz, null);
 
+		  INDArray dLdz = Nd4j.getExecutioner().execAndReturn(new SigmoidDerivative(in));
+	        dLdz.muli(epsilon1);
+	        return new Pair<>(dLdz, null);
 	}
 
 	@Override
 	public INDArray getActivation(INDArray in, boolean training) {
-		INDArray n = in.sum(1);
-        Nd4j.getExecutioner().execAndReturn(new Sigmoid(n));
-		
-		return n;
+//		INDArray n = in.sum(1);
+        Nd4j.getExecutioner().execAndReturn(new Sigmoid(in));
+		return in;
 	}
 
 //	private Instances createProperDataset(INDArray in, boolean training) {}
