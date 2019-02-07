@@ -286,8 +286,8 @@ public class Conv_Test {
 					 for ( int l = 0 ; l<Constants.numberOfLayers; l++)
 					 avglayersTreesDepth = avglayersTreesDepth + " " +
 					 Constants.avgHFDepth[l];
-					// out.write(eval.stats() + "\n" + Constants.model.score() + "\n"
-//					 + avglayersTreesDepth);
+					 out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+
 					 System.out.println(eval.stats() + "\n" + "errors:  "+
 					 Constants.model.score() + "\n" + avglayersTreesDepth);
 					
