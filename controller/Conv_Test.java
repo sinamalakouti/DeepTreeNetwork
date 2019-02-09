@@ -40,6 +40,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Nesterovs;
+import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.nd4j.linalg.schedule.MapSchedule;
 import org.nd4j.linalg.schedule.ScheduleType;
@@ -139,31 +140,37 @@ public class Conv_Test {
 	DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
     log.info("Network configuration and training...");
-    Map<Integer, Double> lrSchedule = new HashMap<>();
-    lrSchedule.put(0, 0.06); // iteration #, learning rate
-    lrSchedule.put(200, 0.05);
-    lrSchedule.put(600, 0.028);
-    lrSchedule.put(800, 0.0060);
-    lrSchedule.put(1000, 0.001);
+//    Map<Integer, Double> lrSchedule = new HashMap<>();
+//    lrSchedule.put(0, 0.06); // iteration #, learning rate
+//    lrSchedule.put(200, 0.05);
+//    lrSchedule.put(600, 0.028);
+//    lrSchedule.put(800, 0.0060);
+//    lrSchedule.put(1000, 0.001);
 
     MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
         .seed(seed)
 		.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
         .l2(0.0005)
-        .updater(new Nesterovs(new MapSchedule(ScheduleType.ITERATION, lrSchedule)))
+        .updater(new Sgd(0.01))
         .weightInit(WeightInit.XAVIER)
         .list()
-        .layer(0, new ConvolutionLayer.Builder(6, 6)
+        .layer(0, new ConvolutionLayer.Builder(3, 3)
             .nIn(channels)
-            .stride(3, 3)
+            .stride(2, 2)
             .nOut(1)
             .activation(Activation.IDENTITY)
             .build())
+        .layer(1, new ConvolutionLayer.Builder(3, 3)
+                .nIn(channels)
+                .stride(2, 2)
+                .nOut(1)
+                .activation(Activation.IDENTITY)
+                .build())
 
-		.layer(1,
-				new CustomLayer.Builder().nIn(64).nOut(Constants.numberOfNeurons)
-						.activation(Activation.SIGMOID).build())
 		.layer(2,
+				new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
+						.activation(Activation.SIGMOID).build())
+		.layer(3,
 				new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
         
@@ -277,7 +284,7 @@ public class Conv_Test {
 					 mnistTest.reset();
 					
 					 String path =
-					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/1/resultIteration_"+ i;
+					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/3/resultIteration_"+ i;
 					// String path =
 					// "resultIteration_"+ i;
 					 File file = new File(path);

@@ -90,7 +90,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
-		this.LayerNumber = layernumber -1 ;
+		this.LayerNumber = layernumber -2 ;
 
 	}
 	
