@@ -389,7 +389,7 @@ public class EMG {
 				//				}
 				//				mnistTest.reset();
 
-								 String path ="/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/1/resultIteration_"+ i;
+								 String path ="/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/1/resultIteration_"+ i;
 //								 
 //								 	String path ="resultIteration_"+ i;
 
