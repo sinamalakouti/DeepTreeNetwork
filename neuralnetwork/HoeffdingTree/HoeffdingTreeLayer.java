@@ -90,7 +90,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
-		this.LayerNumber = layernumber -2 ;
+		this.LayerNumber = layernumber  ;
 
 	}
 	
@@ -410,10 +410,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		// normalization:
 
-		 double mu = W.meanNumber().doubleValue();
-		 double std = Math.sqrt(W.varNumber().doubleValue());
-		 W = W.subi(mu);
-		 W = W.divi(std);
+		//		 double mu = W.meanNumber().doubleValue();
+		//		 double std = Math.sqrt(W.varNumber().doubleValue());
+		//		 W = W.subi(mu);
+		//		 W = W.divi(std);
 
 		double[][] zprim = W.toDoubleMatrix();
 		for (int i = 0; i < zprim.length; i++)
@@ -560,7 +560,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == -1 )
+				if (LayerNumber == 0 )
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
@@ -578,7 +578,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == -1)
+				if (LayerNumber == 0)
 					// todo: if other layers are dense change follwoing line to
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
 				// ztemp =
@@ -671,7 +671,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == -1)
+				if (LayerNumber == 0)
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
@@ -685,7 +685,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == -1)
+				if (LayerNumber == 0)
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();

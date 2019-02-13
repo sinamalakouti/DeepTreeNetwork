@@ -154,23 +154,17 @@ public class Conv_Test {
         .updater(new Sgd(0.01))
         .weightInit(WeightInit.XAVIER)
         .list()
-        .layer(0, new ConvolutionLayer.Builder(3, 3)
+        .layer(0, new ConvolutionLayer.Builder(6, 6)
             .nIn(channels)
-            .stride(2, 2)
+            .stride(3, 3)
             .nOut(1)
             .activation(Activation.IDENTITY)
             .build())
-        .layer(1, new ConvolutionLayer.Builder(3, 3)
-                .nIn(channels)
-                .stride(2, 2)
-                .nOut(1)
-                .activation(Activation.IDENTITY)
-                .build())
 
-		.layer(2,
+		.layer(1,
 				new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
-		.layer(3,
+		.layer(2,
 				new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
         

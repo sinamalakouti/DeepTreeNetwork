@@ -39,6 +39,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
@@ -48,9 +49,9 @@ import weka.core.Instances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
-public class Skyserver {
+public class EMG {
 
-	private static Logger log = LoggerFactory.getLogger(Skyserver.class);
+	private static Logger log = LoggerFactory.getLogger(EMG.class);
 
 
 
@@ -73,22 +74,22 @@ public class Skyserver {
 		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
 		Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
 
-		final int numInputs = 9;
-		int outputNum = 3;
+		final int numInputs = 3000;
+		int outputNum = 6;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 5;
+		Constants.numberOfNeurons = 30;
 		Constants.maximumDepth =20;
-		int neuron_feature_ratio = 2;
-		Constants.batchSize = 100;
+		int neuron_feature_ratio = 9;
+		Constants.batchSize = 63;
 		Constants.isSerialzing = false;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
-		double numberOfExamples = 10000d;
-		double numberTrainExamples = 7000d;
+		double numberTrainExamples = 1260d;
+		double numberTestExamples = 540d;
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 3;
+		Constants.numClasses = 6;
 
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
@@ -98,32 +99,12 @@ public class Skyserver {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
-				  	
 				  .layer(0,
 						new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
 				.layer(1,
 						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
-//				.layer(2,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//
-//				.layer(3,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(4,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(5,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(6,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
-//				.layer(7,
-//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//						.activation(Activation.SIGMOID).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
@@ -203,17 +184,23 @@ public class Skyserver {
 		char delimiter = ',';
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
 
-		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/skyserverTest.csv")));
+		//Xtrain
+		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/train.csv")));
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTrainExamples,3000,Constants.numClasses);
+		DataSet trainingData = iterator.next();
+			
 		
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,9,Constants.numClasses);
-		DataSet allData = iterator.next();
-		allData.shuffle();
-		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.7);  //Use 70% of data for training
-
-
-		DataSet trainingData = testAndTrain.getTrain();
-		DataSet testData = testAndTrain.getTest();
+		//Xtest
+		recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
+		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/test.csv")));
+		 iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTestExamples,3000,Constants.numClasses);
+		DataSet testData = iterator.next();
+		
 		//        TODO:
+		System.out.println("*******"); 
+		System.out.println("BEFORE");
+	
+		System.out.println(trainingData.getFeatures());
 		DataNormalization normalizer = new NormalizerStandardize();
 		normalizer.fit(trainingData);           //Collect the statistics (mean/stdev) from the training data. This does not modify the input data
 		normalizer.transform(trainingData);     //Apply normalization to the training data
@@ -221,8 +208,9 @@ public class Skyserver {
 		int counter = 0;
 		Instances trainSet2 = null;
 		int c = 0;
-
-
+		System.out.println("AFTER");
+		System.out.println(trainingData.getFeatures());
+		System.out.println("*******");
 		trainSet2 =_utils.dataset2Instances(trainingData);
 
 		convert = new NumericToNominal();
@@ -234,6 +222,8 @@ public class Skyserver {
 		trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
 		trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
 		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
+		
+		
 		HoeffdingTree batchTree = null;
 		HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
 		for (int i = 0; i < 150; i++) {
@@ -399,11 +389,9 @@ public class Skyserver {
 				//				}
 				//				mnistTest.reset();
 
-//								 String path =
-//								 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
-//										+ "phase_3/without_depth_limit/without_normalization/3/resultIteration_"+ i;
+								 String path ="/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/1/resultIteration_"+ i;
 //								 
-								 String path ="resultIteration_"+ i;
+//								 	String path ="resultIteration_"+ i;
 
 								 File file = new File(path);
 								 BufferedWriter out = new BufferedWriter(new
