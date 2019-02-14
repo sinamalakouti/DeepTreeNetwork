@@ -78,10 +78,10 @@ public class EMG {
 		int outputNum = 6;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 30;
+		Constants.numberOfNeurons = 40;
 		Constants.maximumDepth =20;
-		int neuron_feature_ratio = 9;
-		Constants.batchSize = 63;
+		int neuron_feature_ratio = 5;
+		Constants.batchSize = 126;
 		Constants.isSerialzing = false;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 1260d;
@@ -389,7 +389,7 @@ public class EMG {
 				//				}
 				//				mnistTest.reset();
 
-								 String path ="/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/1/resultIteration_"+ i;
+								 String path ="/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/2/resultIteration_"+ i;
 //								 
 //								 	String path ="resultIteration_"+ i;
 
