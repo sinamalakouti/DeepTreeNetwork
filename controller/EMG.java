@@ -77,7 +77,7 @@ public class EMG {
 		final int numInputs = 3000;
 		int outputNum = 6;
 		log.info("Build model....");
-		Constants.numberOfLayers = 2;
+		Constants.numberOfLayers = 3;
 		Constants.numberOfNeurons = 40;
 		Constants.maximumDepth =20;
 		int neuron_feature_ratio = 5;
@@ -99,13 +99,16 @@ public class EMG {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
-				  .layer(0,
+				 .layer(0,
 						new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
 				.layer(1,
 						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
 				.layer(2,
+						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+						.activation(Activation.SIGMOID).build())
+				.layer(3,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
