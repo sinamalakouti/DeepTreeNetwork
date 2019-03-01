@@ -57,6 +57,8 @@ public class MySigmoidActivationFunction extends BaseActivationFunction {
 	public INDArray getActivation(INDArray in, boolean training) {
 //		INDArray n = in.sum(1);
         Nd4j.getExecutioner().execAndReturn(new Sigmoid(in));
+        
+        System.out.println(in.shapeInfoToString());
 		return in;
 	}
 

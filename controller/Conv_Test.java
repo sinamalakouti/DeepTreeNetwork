@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.http.nio.params.NIOReactorPNames;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
 import org.datavec.api.split.FileSplit;
 import org.datavec.image.loader.NativeImageLoader;
@@ -32,11 +33,13 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.activations.IActivation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Nesterovs;
@@ -48,6 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import neuralnetwork.CustomLayer;
+import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
+import sigmoid.MySigmoidActivationFunction;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
@@ -60,24 +65,21 @@ import weka.filters.unsupervised.attribute.NumericToNominal;
  * This example will download 15 Mb of data on the first run.
  * Supervised learning best modeled by CNN.
  *
- * @author hanlon
+ * @author 	
  * @author agibsonccc
  * @author fvaleri
  */
 public class Conv_Test {
 
   private static final Logger log = LoggerFactory.getLogger(Conv_Test.class);
-  private static final String basePath = System.getProperty("java.io.tmpdir") + "/mnist";
-  private static final String dataUrl = "http://github.com/myleott/mnist_png/raw/master/mnist_png.tar.gz";
+  
+  
 
   public static void main(String[] args) throws Exception {
-    int height = 28;
-    int width = 28;
+    
+    
     int channels = 1; // single channel for grayscale images
-    int outputNum = 10; // 10 digits classification
-    int batchSize = 54;
-    int nEpochs = 1;
-    int iterations = 1;
+    
 
     int seed = 1234;
     Random randNumGen = new Random(seed);
@@ -111,7 +113,7 @@ public class Conv_Test {
 //    testIter.setPreProcessor(scaler); // same normalization for better results
 
     
-    Constants.numberOfLayers = 2;
+    Constants.numberOfLayers = 2 ;
 	Constants.numberOfNeurons = 40;
 	Constants.batchSize = 100;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
@@ -119,33 +121,65 @@ public class Conv_Test {
 	Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 	Constants.numClasses = 10;
 	Constants.maximumDepth = 20;
+	int outputnum =10;
+	
+	int numInputs =2880;
+	ArrayList<Integer> featuresVector = new ArrayList<>();
+	for (int i = 0; i < numInputs; i++)
+		featuresVector.add(i);
+	
+	int max = numInputs / 30;
+	HashMap<Integer, Boolean> attInexes = new HashMap<>();
+	for (int j = 0; j < Constants.numberOfNeurons; j++) {
+		Collections.shuffle(featuresVector);
+		int[] temp = new int[max];
+		for (int i = 0; i < max; i++) {
+			temp[i] = featuresVector.get(i);
+			attInexes.put(featuresVector.get(i), true);
+		}
+
+		Constants.attributesIndexes.put(j, temp);
+
+	}
+	
 	
 	ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-	
+
+	for (int c = 0; c < Constants.numClasses - 1; c++) {
+		// for 4 classes -> it is set only for mnist dataset ( to be changed
+		// )
+		for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			tmp1.add(c);
+		}
+	}
+
 	while (tmp1.size() < Constants.numberOfNeurons)
 		tmp1.add(Constants.numClasses - 1);
 
-	for (int l = 0; l < Constants.numberOfLayers; l++) {
-
-		@SuppressWarnings("unchecked")
-		ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
-		Collections.shuffle(tmp2);
-		Constants.classChosedArray.put(l, tmp2);
-	}
+		for (int l = 0; l < Constants.numberOfLayers; l++) {
+	
+			@SuppressWarnings("unchecked")
+			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
+			Collections.shuffle(tmp2);
+			Constants.classChosedArray.put(l, tmp2);
+		}
 
 	
 
-    DataSetIterator mnistTrain = new MnistDataSetIterator(100, true, 6);
+    DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
 	DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+	
+
+
+
+	    // pixel values from 0-255 to 0-1 (min-max scaling)
+	    DataNormalization scaler = new NormalizerStandardize();
+	    scaler.fit(mnistTrain);
+	    mnistTrain.setPreProcessor(scaler);	 
+	    mnistTest.setPreProcessor(scaler); // same normalization for better results
 
     log.info("Network configuration and training...");
-//    Map<Integer, Double> lrSchedule = new HashMap<>();
-//    lrSchedule.put(0, 0.06); // iteration #, learning rate
-//    lrSchedule.put(200, 0.05);
-//    lrSchedule.put(600, 0.028);
-//    lrSchedule.put(800, 0.0060);
-//    lrSchedule.put(1000, 0.001);
 
     MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
         .seed(seed)
@@ -154,24 +188,25 @@ public class Conv_Test {
         .updater(new Sgd(0.01))
         .weightInit(WeightInit.XAVIER)
         .list()
-        .layer(0, new ConvolutionLayer.Builder(6, 6)
-            .nIn(channels)
-            .stride(3, 3)
-            .nOut(1)
-            .activation(Activation.IDENTITY)
-            .build())
-
-		.layer(1,
-				new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
-						.activation(Activation.SIGMOID).build())
-		.layer(2,
-				new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-						.activation(Activation.SIGMOID).build())
-        
-        .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-            .nOut(outputNum)
-            .activation(Activation.SOFTMAX)
-            .build())
+        .layer(0, new ConvolutionLayer.Builder(5, 5)
+                .nIn(channels)
+                .stride(1, 1)
+                .nOut(20)
+                .activation(Activation.IDENTITY)
+                .build())
+            .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+                .kernelSize(2, 2)
+                .stride(2, 2)
+                .build())
+            .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+                    .nOut(Constants.numberOfNeurons).build())
+            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+                    .nOut(Constants.numberOfNeurons).build())
+            
+                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                		.nOut(outputnum)
+                        .activation(Activation.SOFTMAX)
+                        .build())
         .setInputType(InputType.convolutionalFlat(28, 28, 1)) // InputType.convolutional for normal image
         .backprop(true).pretrain(false).build();
 
@@ -263,7 +298,7 @@ public class Conv_Test {
 					 Constants.isEvaluating = true;
 					 log.info("Evaluate model....");
 					
-					 Evaluation eval = new Evaluation(outputNum); // create an
+					 Evaluation eval = new Evaluation(outputnum); // create an
 					
 					 while (mnistTest.hasNext()) {
 					
@@ -278,9 +313,9 @@ public class Conv_Test {
 					 mnistTest.reset();
 					
 					 String path =
-					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/3/resultIteration_"+ i;
-					// String path =
-					// "resultIteration_"+ i;
+					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/4/resultIteration_"+ i;
+//					 String path =
+//					 "resultIteration_"+ i;
 					 File file = new File(path);
 					 BufferedWriter out = new BufferedWriter(new FileWriter(file));
 					 String avglayersTreesDepth = "";
@@ -288,12 +323,12 @@ public class Conv_Test {
 					 avglayersTreesDepth = avglayersTreesDepth + " " +
 					 Constants.avgHFDepth[l];
 					 out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
-
+//
 					 System.out.println(eval.stats() + "\n" + "errors:  "+
 					 Constants.model.score() + "\n" + avglayersTreesDepth);
 					
 					
-					 out.close();
+//					 out.close();
 					 Constants.isEvaluating = false;
 					
 					 }

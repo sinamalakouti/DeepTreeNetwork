@@ -155,6 +155,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 		// in = inputData .* weights
 
+
 		Instances trainInstaces = createProperDataset(in.dup(), training);
 
 		// having random class config:
@@ -289,7 +290,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 	private Instances createProperDataset(INDArray in, boolean training) {
 		Instances instances = null;
-
+//			in = in.reshape(in.shape()[0], in.shape()[2] * in.shape()[3]);
 		try {
 			INDArray label = null;
 

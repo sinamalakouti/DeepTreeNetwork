@@ -90,7 +90,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
-		this.LayerNumber = layernumber  ;
+		this.LayerNumber = layernumber - 2	 ;
 
 	}
 	
@@ -410,12 +410,28 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		// normalization:
 
-		//		 double mu = W.meanNumber().doubleValue();
-		//		 double std = Math.sqrt(W.varNumber().doubleValue());
-		//		 W = W.subi(mu);
-		//		 W = W.divi(std);
-
 		double[][] zprim = W.toDoubleMatrix();
+		for (int i = 0; i < zprim.length; i++)
+			for (int j = 0; j < zprim[i].length; j++) {
+				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number four prim");
+					
+					for (int i1 = 0; i1 < zprim.length; i1++)
+						for (int j1 = 0; j1 < zprim[i].length; j1++) {
+							System.out.println(zprim[i1][j1]);
+
+						}
+					
+					System.exit(0);
+				}
+				
+			}
+				 double mu = W.meanNumber().doubleValue();
+				 double std = Math.sqrt(W.varNumber().doubleValue());
+				 W = W.subi(mu);
+				 W = W.divi(std);
+
+		  zprim = W.toDoubleMatrix();
 		for (int i = 0; i < zprim.length; i++)
 			for (int j = 0; j < zprim[i].length; j++) {
 				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
