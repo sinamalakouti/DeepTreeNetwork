@@ -113,7 +113,7 @@ public class Conv_Test {
 //    testIter.setPreProcessor(scaler); // same normalization for better results
 
     
-    Constants.numberOfLayers = 2 ;
+    Constants.numberOfLayers = 1 ;
 	Constants.numberOfNeurons = 40;
 	Constants.batchSize = 100;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
@@ -200,10 +200,10 @@ public class Conv_Test {
                 .build())
             .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
                     .nOut(Constants.numberOfNeurons).build())
-            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
-                    .nOut(Constants.numberOfNeurons).build())
+//            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+//                    .nOut(Constants.numberOfNeurons).build())
             
-                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                 		.nOut(outputnum)
                         .activation(Activation.SOFTMAX)
                         .build())
@@ -328,7 +328,7 @@ public class Conv_Test {
 					 Constants.model.score() + "\n" + avglayersTreesDepth);
 					
 					
-//					 out.close();
+					 out.close();
 					 Constants.isEvaluating = false;
 					
 					 }
