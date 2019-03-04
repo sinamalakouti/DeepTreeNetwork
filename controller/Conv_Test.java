@@ -114,8 +114,8 @@ public class Conv_Test {
 
     
     Constants.numberOfLayers = 1 ;
-	Constants.numberOfNeurons = 40;
-	Constants.batchSize = 100;
+	Constants.numberOfNeurons = 20;
+	Constants.batchSize = 150;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
 	double numberTrainExamples = 60000d;
 	Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
@@ -128,7 +128,7 @@ public class Conv_Test {
 	for (int i = 0; i < numInputs; i++)
 		featuresVector.add(i);
 	
-	int max = numInputs / 30;
+	int max = numInputs / 10;
 	HashMap<Integer, Boolean> attInexes = new HashMap<>();
 	for (int j = 0; j < Constants.numberOfNeurons; j++) {
 		Collections.shuffle(featuresVector);
@@ -184,7 +184,7 @@ public class Conv_Test {
     MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
         .seed(seed)
 		.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-        .l2(0.0005)
+        .l2(0.0001)
         .updater(new Sgd(0.01))
         .weightInit(WeightInit.XAVIER)
         .list()
@@ -313,7 +313,7 @@ public class Conv_Test {
 					 mnistTest.reset();
 					
 					 String path =
-					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/4/resultIteration_"+ i;
+					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/5/resultIteration_"+ i;
 //					 String path =
 //					 "resultIteration_"+ i;
 					 File file = new File(path);
