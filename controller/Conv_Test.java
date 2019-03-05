@@ -115,7 +115,7 @@ public class Conv_Test {
     
     Constants.numberOfLayers = 1 ;
 	Constants.numberOfNeurons = 20;
-	Constants.batchSize = 150;
+	Constants.batchSize = 100;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
 	double numberTrainExamples = 60000d;
 	Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
@@ -128,7 +128,7 @@ public class Conv_Test {
 	for (int i = 0; i < numInputs; i++)
 		featuresVector.add(i);
 	
-	int max = numInputs / 10;
+	int max = numInputs / 40;
 	HashMap<Integer, Boolean> attInexes = new HashMap<>();
 	for (int j = 0; j < Constants.numberOfNeurons; j++) {
 		Collections.shuffle(featuresVector);
@@ -200,10 +200,12 @@ public class Conv_Test {
                 .build())
             .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
                     .nOut(Constants.numberOfNeurons).build())
+            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+                    .nOut(Constants.numberOfNeurons).build())
 //            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
 //                    .nOut(Constants.numberOfNeurons).build())
             
-                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(4	, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                 		.nOut(outputnum)
                         .activation(Activation.SOFTMAX)
                         .build())
@@ -313,7 +315,7 @@ public class Conv_Test {
 					 mnistTest.reset();
 					
 					 String path =
-					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/5/resultIteration_"+ i;
+					 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/CNN/6/resultIteration_"+ i;
 //					 String path =
 //					 "resultIteration_"+ i;
 					 File file = new File(path);
