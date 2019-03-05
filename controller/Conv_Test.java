@@ -113,7 +113,7 @@ public class Conv_Test {
 //    testIter.setPreProcessor(scaler); // same normalization for better results
 
     
-    Constants.numberOfLayers = 1 ;
+    Constants.numberOfLayers = 2 ;
 	Constants.numberOfNeurons = 20;
 	Constants.batchSize = 100;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
