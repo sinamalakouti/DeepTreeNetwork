@@ -101,20 +101,21 @@
 			int outputNum = 10;
 			log.info("Build model....");
 			Constants.numberOfLayers = 2;
-			Constants.numberOfNeurons = 40;
+			Constants.numberOfNeurons = 5;
 			Constants.batchSize = 100;
 			Constants.avgHFDepth = new double[Constants.numberOfLayers];
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
 			Constants.maximumDepth = 20;
+			int feature_ratio = 2;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.0001)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -172,7 +173,7 @@
 			 * 
 			 */
 	
-			int max = numInputs / 30;
+			int max = numInputs / Feature_Ratio;
 			HashMap<Integer, Boolean> attInexes = new HashMap<>();
 			for (int j = 0; j < Constants.numberOfNeurons; j++) {
 				Collections.shuffle(featuresVector);
@@ -374,46 +375,46 @@
 				// out.close();
 				// }
 	
-				// if (i % 2 == 0) {
-				// Constants.isEvaluating = true;
-				// log.info("Evaluate model....");
+				 if (i % 2 == 0) {
+				 Constants.isEvaluating = true;
+				 log.info("Evaluate model....");
 				//
-				// Evaluation eval = new Evaluation(outputNum); // create an
+				 Evaluation eval = new Evaluation(outputNum); // create an
 				//
-				// while (mnistTest.hasNext()) {
+				 while (mnistTest.hasNext()) {
+				
+				 DataSet next = mnistTest.next();
+				 System.out.println(Constants.isEvaluating);
+				 _utils.setLabels(next.getLabels(), Constants.isEvaluating,
+				 false);
+				 INDArray output = Constants.model.output(next.getFeatures());
+				
+				 eval.eval(next.getLabels(), output);
+				 }
+				 mnistTest.reset();
 				//
-				// DataSet next = mnistTest.next();
-				// System.out.println(Constants.isEvaluating);
-				// _utils.setLabels(next.getLabels(), Constants.isEvaluating,
-				// false);
-				// INDArray output = Constants.model.output(next.getFeatures());
-				//
-				// eval.eval(next.getLabels(), output);
-				// }
-				// mnistTest.reset();
-				//
-				//// String path =
-				//// "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/1/resultIteration_"+
-				// i;
-				////// String path =
+				 String path =
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/7/resultIteration_"+
+				 i;
+				// String path =
 				////// "resultIteration_"+ i;
-				//// File file = new File(path);
-				//// BufferedWriter out = new BufferedWriter(new
-				//// FileWriter(file));
-				// String avglayersTreesDepth = "";
-				// for ( int l = 0 ; l<Constants.numberOfLayers; l++)
-				// avglayersTreesDepth = avglayersTreesDepth + " " +
-				// Constants.avgHFDepth[l];
-				//// out.write(eval.stats() + "\n" + Constants.model.score() + "\n"
-				// + avglayersTreesDepth);
-				//// System.out.println(eval.stats() + "\n" +
-				// Constants.model.score() + "\n" + avglayersTreesDepth);
+				 File file = new File(path);
+				 BufferedWriter out = new BufferedWriter(new
+				 FileWriter(file));
+				 String avglayersTreesDepth = "";
+				 for ( int l = 0 ; l<Constants.numberOfLayers; l++)
+				 avglayersTreesDepth = avglayersTreesDepth + " " +
+				 Constants.avgHFDepth[l];
+				 out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+//
+				 System.out.println(eval.stats() + "\n" + "errors:  "+
+				 Constants.model.score() + "\n" + avglayersTreesDepth);
+
 				//
+				 out.close();
+				 Constants.isEvaluating = false;
 				//
-				//// out.close();
-				// Constants.isEvaluating = false;
-				//
-				// }
+				 }
 				// if ( i == 10 ){
 				// _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
 				// }

@@ -199,6 +199,7 @@ public class Conv_Test {
                 .stride(2, 2)
                 .build())
             .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+            		.nIn(100)
                     .nOut(Constants.numberOfNeurons).build())
             .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
                     .nOut(Constants.numberOfNeurons).build())

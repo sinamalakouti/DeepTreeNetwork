@@ -46,7 +46,7 @@ public class NormalEstimator extends Estimator implements IncrementalEstimator,
 
 		 	
 		    data = round(data);
-		    double z = ( data - m_Mean ) / (m_StandardDev + 0.01);
+		    double z = ( data - m_Mean ) / (m_StandardDev + 0.001);
 		    if ( m_StandardDev < 0 ){
 		    	System.out.println("in Normal Esitmator get std < 0 ");
 		    	System.exit(0);

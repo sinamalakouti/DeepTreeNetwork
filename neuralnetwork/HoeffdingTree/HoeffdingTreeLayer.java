@@ -90,7 +90,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 	public HoeffdingTreeLayer(NeuralNetConfiguration conf, int layernumber) {
 		super(conf);
-		this.LayerNumber = layernumber - 2	 ;
+		this.LayerNumber = layernumber 	 ;
 
 	}
 	
@@ -408,7 +408,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		applyDropOutIfNecessary(training, workspaceMgr);
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
 
-		// normalization:
+		// 
 
 		double[][] zprim = W.toDoubleMatrix();
 		for (int i = 0; i < zprim.length; i++)
@@ -426,6 +426,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				}
 				
 			}
+//		normalization:
 				 double mu = W.meanNumber().doubleValue();
 				 double std = Math.sqrt(W.varNumber().doubleValue());
 				 W = W.subi(mu);
