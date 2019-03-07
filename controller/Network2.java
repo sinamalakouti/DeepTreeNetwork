@@ -173,7 +173,7 @@
 			 * 
 			 */
 	
-			int max = numInputs / Feature_Ratio;
+			int max = numInputs / feature_ratio;
 			HashMap<Integer, Boolean> attInexes = new HashMap<>();
 			for (int j = 0; j < Constants.numberOfNeurons; j++) {
 				Collections.shuffle(featuresVector);
