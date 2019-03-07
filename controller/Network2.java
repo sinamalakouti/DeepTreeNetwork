@@ -206,7 +206,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 //				
 //				tmp1.add(i);
 //			}
-	
+//	TODO : CHANGE IT BACK. ASAP
 			for (int l = 0; l < Constants.numberOfLayers; l++) {
 	
 				@SuppressWarnings("unchecked")
@@ -225,7 +225,8 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 					int i = rand.nextInt(10);
 					
 					tmp1.add(i);
-//				}				Collections.shuffle(tmp2);
+				}	
+//					Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
 	
