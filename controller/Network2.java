@@ -226,7 +226,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 					
 					tmp1.add(i);
 				}	
-//					Collections.shuffle(tmp2);
+//							Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
 	
