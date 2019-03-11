@@ -102,14 +102,14 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 			int outputNum = 10;
 			log.info("Build model....");
 			Constants.numberOfLayers = 2;
-			Constants.numberOfNeurons = 5;
+			Constants.numberOfNeurons = 10;
 			Constants.batchSize = 100;
 			Constants.avgHFDepth = new double[Constants.numberOfLayers];
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
 			Constants.maximumDepth = 20;
-			int feature_ratio = 2;
+			int feature_ratio = 5;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
@@ -190,42 +190,42 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 	
 			// class configuration for each neuron
 	
-//			ArrayList<Integer> tmp1 = new ArrayList<Integer>();
+			ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 //	
-//			for (int c = 0; c < Constants.numClasses - 1; c++) {
-//				// for 4 classes -> it is set only for mnist dataset ( to be changed
-//				// )
-//				for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
-//					tmp1.add(c);
-//				}
-//			}
+			for (int c = 0; c < Constants.numClasses - 1; c++) {
+				// for 4 classes -> it is set only for mnist dataset ( to be changed
+				// )
+				for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+					tmp1.add(c);
+				}
+			}
 //	
-//			while (tmp1.size() < Constants.numberOfNeurons){
-//				Random rand = new Random();
-//				int i = rand.nextInt(10);
-//				
-//				tmp1.add(i);
-//			}
+			while (tmp1.size() < Constants.numberOfNeurons){
+				Random rand = new Random();
+				int i = rand.nextInt(10);
+				
+				tmp1.add(i);
+			}
 //	TODO : CHANGE IT BACK. ASAP
 			for (int l = 0; l < Constants.numberOfLayers; l++) {
 	
-				@SuppressWarnings("unchecked")
-				ArrayList<Integer> tmp1 = new ArrayList<Integer>();
+//				@SuppressWarnings("unchecked")
+//				ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 				
-				for (int c = 0; c < Constants.numClasses - 1; c++) {
-					// for 4 classes -> it is set only for mnist dataset ( to be changed
-					// )
-					for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
-						tmp1.add(c);
-					}
-				}
-		
-				while (tmp1.size() < Constants.numberOfNeurons){
-					Random rand = new Random();
-					int i = rand.nextInt(10);
-					
-					tmp1.add(i);
-				}	
+//				for (int c = 0; c < Constants.numClasses - 1; c++) {
+//					// for 4 classes -> it is set only for mnist dataset ( to be changed
+//					// )
+//					for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+//						tmp1.add(c);
+//					}
+//				}
+//		
+//				while (tmp1.size() < Constants.numberOfNeurons){
+//					Random rand = new Random();
+//					int i = rand.nextInt(10);
+//					
+//					tmp1.add(i);
+//				}	
 //							Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
@@ -414,7 +414,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/7/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/8/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
