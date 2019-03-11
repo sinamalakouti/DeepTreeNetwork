@@ -109,14 +109,14 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
 			Constants.maximumDepth = 20;
-			int feature_ratio = 5;
+			int feature_ratio = 3;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.0001)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.01)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -201,10 +201,10 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 			}
 //	
 			while (tmp1.size() < Constants.numberOfNeurons){
-				Random rand = new Random();
-				int i = rand.nextInt(10);
-				
-				tmp1.add(i);
+//				Random rand = new Random();
+//				int i = rand.nextInt(10);
+//				
+				tmp1.add(Constants.numClasses -1 );
 			}
 //	TODO : CHANGE IT BACK. ASAP
 			for (int l = 0; l < Constants.numberOfLayers; l++) {
