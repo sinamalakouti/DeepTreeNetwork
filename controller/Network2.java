@@ -209,24 +209,11 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 //	TODO : CHANGE IT BACK. ASAP
 			for (int l = 0; l < Constants.numberOfLayers; l++) {
 	
-//				@SuppressWarnings("unchecked")
-//				ArrayList<Integer> tmp1 = new ArrayList<Integer>();
-				
-//				for (int c = 0; c < Constants.numClasses - 1; c++) {
-//					// for 4 classes -> it is set only for mnist dataset ( to be changed
-//					// )
-//					for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
-//						tmp1.add(c);
-//					}
-//				}
-//		
-//				while (tmp1.size() < Constants.numberOfNeurons){
-//					Random rand = new Random();
-//					int i = rand.nextInt(10);
-//					
-//					tmp1.add(i);
-//				}	
-//							Collections.shuffle(tmp2);
+
+				@SuppressWarnings("unchecked")
+				ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
+				Collections.shuffle(tmp2);
+							Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
 	
