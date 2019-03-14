@@ -401,7 +401,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/8/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/9/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
