@@ -427,10 +427,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				
 			}
 //		normalization:
-				 double mu = W.meanNumber().doubleValue();
-				 double std = Math.sqrt(W.varNumber().doubleValue());
-				 W = W.subi(mu);
-				 W = W.divi(std);
+//				 double mu = W.meanNumber().doubleValue();
+//				 double std = Math.sqrt(W.varNumber().doubleValue());
+//				 W = W.subi(mu);
+//				 W = W.divi(std);
 
 		  zprim = W.toDoubleMatrix();
 		for (int i = 0; i < zprim.length; i++)

@@ -102,14 +102,14 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 			int outputNum = 10;
 			log.info("Build model....");
 			Constants.numberOfLayers = 2;
-			Constants.numberOfNeurons = 10;
+			Constants.numberOfNeurons = 15;
 			Constants.batchSize = 100;
 			Constants.avgHFDepth = new double[Constants.numberOfLayers];
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
 			Constants.maximumDepth = 20;
-			int feature_ratio = 3;
+			int feature_ratio = 5;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
