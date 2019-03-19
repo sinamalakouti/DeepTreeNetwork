@@ -25,7 +25,9 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 	import org.nd4j.linalg.api.ndarray.INDArray;
 	import org.nd4j.linalg.dataset.DataSet;
 	import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-	import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.factory.Nd4j;
 	import org.nd4j.linalg.indexing.NDArrayIndex;
 	import org.nd4j.linalg.learning.config.Sgd;
 	import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -116,7 +118,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.01)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.0001)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -221,7 +223,18 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 	
 			DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
 			DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
-	
+			System.out.println(mnistTrain.next(1).get(0));
+			mnistTrain.reset();
+			System.out.println(mnistTrain.batch());
+			mnistTrain.reset();
+			// normalize data 	set
+			  DataNormalization scaler = new NormalizerStandardize();
+			    scaler.fit(mnistTrain);
+			    mnistTrain.setPreProcessor(scaler);	 
+			    mnistTest.setPreProcessor(scaler); // same normalization for better results
+
+				System.out.println(mnistTrain.next(-1).get(0));
+				mnistTrain.reset();
 			int counter = 0;
 			Instances trainSet2 = null, trainTemp = null;
 			int c = 0;
@@ -401,7 +414,7 @@ import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/9/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/10/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
