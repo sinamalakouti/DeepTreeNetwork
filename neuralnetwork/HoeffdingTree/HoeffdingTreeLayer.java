@@ -432,22 +432,22 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 //				 W = W.subi(mu);
 //				 W = W.divi(std);
 
-		  zprim = W.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number four");
-					
-					for (int i1 = 0; i1 < zprim.length; i1++)
-						for (int j1 = 0; j1 < zprim[i].length; j1++) {
-							System.out.println(zprim[i1][j1]);
-
-						}
-					
-					System.exit(0);
-				}
-				
-			}
+//		  zprim = W.toDoubleMatrix();
+//		for (int i = 0; i < zprim.length; i++)
+//			for (int j = 0; j < zprim[i].length; j++) {
+//				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+//					System.out.println("stop stage number four");
+//					
+//					for (int i1 = 0; i1 < zprim.length; i1++)
+//						for (int j1 = 0; j1 < zprim[i].length; j1++) {
+//							System.out.println(zprim[i1][j1]);
+//
+//						}
+//					
+//					System.exit(0);
+//				}
+//				
+//			}
 
 		// Input validation:
 		if (input.rank() != 2 || input.columns() != W.rows()) {

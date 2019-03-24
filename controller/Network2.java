@@ -104,21 +104,21 @@ import org.nd4j.linalg.factory.Nd4j;
 			int outputNum = 10;
 			log.info("Build model....");
 			Constants.numberOfLayers = 2;
-			Constants.numberOfNeurons = 15;
+			Constants.numberOfNeurons = 40;
 			Constants.batchSize = 100;
 			Constants.avgHFDepth = new double[Constants.numberOfLayers];
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
-			Constants.maximumDepth = 20;
-			int feature_ratio = 5;
+			Constants.maximumDepth = 40;
+			int feature_ratio = 10;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.0001)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.001)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -218,6 +218,7 @@ import org.nd4j.linalg.factory.Nd4j;
 							Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
+		
 	
 			// set-up the project :
 	
@@ -232,8 +233,6 @@ import org.nd4j.linalg.factory.Nd4j;
 			    scaler.fit(mnistTrain);
 			    mnistTrain.setPreProcessor(scaler);	 
 			    mnistTest.setPreProcessor(scaler); // same normalization for better results
-
-				System.out.println(mnistTrain.next(-1).get(0));
 				mnistTrain.reset();
 			int counter = 0;
 			Instances trainSet2 = null, trainTemp = null;
@@ -414,7 +413,7 @@ import org.nd4j.linalg.factory.Nd4j;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/10/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/11/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
