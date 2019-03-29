@@ -115,10 +115,10 @@ import org.nd4j.linalg.factory.Nd4j;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 	
-			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
+			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)	
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.001)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.01)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -413,7 +413,7 @@ import org.nd4j.linalg.factory.Nd4j;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/11/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/12/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
