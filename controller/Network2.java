@@ -49,41 +49,50 @@ import org.nd4j.linalg.factory.Nd4j;
 		private static Logger log = LoggerFactory.getLogger(Network2.class);
 	
 		@SuppressWarnings("unused")
-		private static Instances createProperDataset(INDArray in, boolean training) {
-			Instances instances = null;
-	
-			try {
-				INDArray label = null;
-	
-				if (training == false)
-					label = Constants.testInstancesLabel;
-				else
-					label = Constants.trainInstancesLabel;
-	
-				INDArray dataset = Nd4j.concat(1, in, label);
-	
-				instances = _utils.ndArrayToInstances(dataset);
-				instances.setClassIndex(instances.numAttributes() - 1);
-	
-				if (!instances.classAttribute().isNominal()) {
-					NumericToNominal convert = new NumericToNominal();
-					String[] options = new String[2];
-					options[0] = "-R";
-					options[1] = "" + (instances.classIndex() + 1); // range of
-					// variables to
-					// make numeric
-					convert.setOptions(options);
-					convert.setInputFormat(instances);
-					instances = weka.filters.Filter.useFilter(instances, convert);
-				}
-			} catch (WekaException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return instances;
-	
-		}
+//		private static Instances createProperDataset(INDArray in, boolean training) {
+//			Instances instances = null;
+//	
+//			try {
+//				INDArray label = null;
+//	
+//				if (training == false)
+//					label = Constants.testInstancesLabel;
+//				else
+//					label = Constants.trainInstancesLabel;
+//	
+//				INDArray dataset = Nd4j.concat(1, in, label);
+//	
+//				instances = _utils.ndArrayToInstances(dataset);
+//				instances.setClassIndex(instances.numAttributes() - 1);
+//	
+//				if (!instances.classAttribute().isNominal()) {
+//					NumericToNominal convert = new NumericToNominal();
+//					String[] options = new String[2];
+//					options[0] = "-R";
+//					options[1] = "" + (instances.classIndex() + 1); // range of
+//					// variables to
+//					// make numeric
+//					convert.setOptions(options);
+//					convert.setInputFormat(instances);
+//					instances = weka.filters.Filter.useFilter(instances, convert);
+//					
+//					
+//					
+//					dataset.cleanup();
+//					
+//					
+//				}
+//			} catch (WekaException e) {
+//				e.printStackTrace();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//			
+//			
+//			return instances;
+//	
+//		}
 	
 		public static void main(String[] args) throws Exception {
 	
@@ -110,7 +119,7 @@ import org.nd4j.linalg.factory.Nd4j;
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
-			Constants.maximumDepth = 40;
+			Constants.maximumDepth = 50;
 			int feature_ratio = 10;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
@@ -118,7 +127,7 @@ import org.nd4j.linalg.factory.Nd4j;
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)	
 	
 					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
-					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.01)).l2(1e-4).list()
+					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
 					.layer(0,
@@ -177,18 +186,18 @@ import org.nd4j.linalg.factory.Nd4j;
 			 */
 	
 			int max = numInputs / feature_ratio;
-			HashMap<Integer, Boolean> attInexes = new HashMap<>();
 			for (int j = 0; j < Constants.numberOfNeurons; j++) {
 				Collections.shuffle(featuresVector);
 				int[] temp = new int[max];
 				for (int i = 0; i < max; i++) {
 					temp[i] = featuresVector.get(i);
-					attInexes.put(featuresVector.get(i), true);
 				}
 	
 				Constants.attributesIndexes.put(j, temp);
 	
 			}
+			
+			featuresVector.clear();
 	
 			// class configuration for each neuron
 	
@@ -224,10 +233,8 @@ import org.nd4j.linalg.factory.Nd4j;
 	
 			DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
 			DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
-			System.out.println(mnistTrain.next(1).get(0));
-			mnistTrain.reset();
-			System.out.println(mnistTrain.batch());
-			mnistTrain.reset();
+	
+	
 			// normalize data 	set
 			  DataNormalization scaler = new NormalizerStandardize();
 			    scaler.fit(mnistTrain);
@@ -413,7 +420,7 @@ import org.nd4j.linalg.factory.Nd4j;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/12/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/14/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
@@ -460,6 +467,7 @@ import org.nd4j.linalg.factory.Nd4j;
 	
 		}
 	
+		@SuppressWarnings("null")
 		private static DataSet getBatchTrainSet(int batchNumber, int batchRate, DataSet trainSet, Instances training) {
 	
 			INDArray features = trainSet.getFeatures();
@@ -480,6 +488,14 @@ import org.nd4j.linalg.factory.Nd4j;
 			labels = null;
 			batchTrain_features = null;
 			batchTrain_labels = null;
+			
+			
+			features.cleanup();
+			labels.cleanup();
+			batchTrain_features.cleanup();
+			batchTrain_labels.cleanup();
+			
+			
 			return set;
 	
 		}

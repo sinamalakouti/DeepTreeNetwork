@@ -254,6 +254,9 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			i++;
 
 		}
+		
+		
+		
 
 		// if ( this.layernumber == 0 && neuronNumber ==0){
 		// System.out.println("lets visualize");
@@ -297,7 +300,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			if (training == false) {
 				label = Constants.testInstancesLabel;
 			} else {
-				_utils.setLabels(Constants.model.getLabels(), false, training);
+				_utils.setxLabels(Constants.model.getLabels(), false, training);
 				label = Constants.trainInstancesLabel;
 
 			}
