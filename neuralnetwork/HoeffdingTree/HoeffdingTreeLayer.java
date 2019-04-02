@@ -591,7 +591,9 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				result = ret.transpose().dup();
 				// todo : if we want to pass all the predictions
 				// result = ret.dup();
-
+				ztemp.cleanup();
+				ret.cleanup();
+				
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
@@ -605,9 +607,12 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				// if having random class config
-				result = Nd4j.concat(1, result, ret.transpose());
+				result = Nd4j.concat(1, result, ret.transpose().dup());
 				// if we want pass all the predicitons
 				// result = Nd4j.concat(1, result, ret);
+				
+				ztemp.cleanup();
+				ret.cleanup();
 			}
 
 		}
@@ -626,6 +631,8 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			applyMask(z);
 		}
 
+		z.cleanup();
+		
 		return result;
 	}
 
@@ -633,7 +640,8 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 	public INDArray activate(boolean training, LayerWorkspaceMgr workspaceMgr) {
 		INDArray z = preOutput(training, workspaceMgr);
 		INDArray ret = z.dup();
-
+		z.cleanup();
+		
 		return ret;
 	}
 
@@ -721,6 +729,9 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		if (maskArray != null) {
 			applyMask(z);
 		}
+		
+		
+		z.cleanup();
 
 		return result;
 	}

@@ -420,7 +420,7 @@ import org.nd4j.linalg.factory.Nd4j;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/14/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/13/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
