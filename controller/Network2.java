@@ -476,7 +476,7 @@ import utils.Constants;
 				// class
 				counter++;
 			}
-			System.out.println(counter);
+//			System.out.println(counter);
 			log.info(eval.stats());
 	
 		}
