@@ -3,6 +3,8 @@ package neuralnetwork.HoeffdingTree;
 import java.util.Enumeration;
 import java.util.Iterator;
 
+import org.deeplearning4j.nn.workspace.ArrayType;
+import org.deeplearning4j.nn.workspace.LayerWorkspaceMgr;
 import org.nd4j.linalg.activations.BaseActivationFunction;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -16,6 +18,7 @@ import weka.core.Instances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
+@SuppressWarnings("serial")
 public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 
 	/**
@@ -44,7 +47,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		Instances trainInstaces = createProperDataset(in, true);
 		// if : having random class config:
 		double[] result = new double[trainInstaces.size()];
-
+		
 		
 		// if : want to pass whole predictions
 		// double [][] result = new
@@ -143,15 +146,18 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			//
 			// output = output.sub(min);
 			// output = output.div(max - min);
-
+			trainInstaces.clear();
+			
 			return new Pair<>(output, null);
 		} else {
 			// System.out.println("mage darim ");
 			return new Pair<>(Nd4j.create(outputLayerResult), null);
 		}
+		
+		
 	}
 
-	public INDArray getActivation(INDArray in, boolean training) {
+	public INDArray getActivation(INDArray in,  boolean training) {
 
 		// in = inputData .* weights
 
@@ -288,6 +294,14 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		if (isOutputLayerActivation == true)
 			return Nd4j.create(outputLayerOutput);
 
+		trainInstaces.clear();
+		in.cleanup();
+
+		
+		INDArray arr = Nd4j.create(result);
+//		arr.wo
+		
+		
 		return Nd4j.create(result);
 	}
 
@@ -300,7 +314,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			if (training == false) {
 				label = Constants.testInstancesLabel;
 			} else {
-				_utils.setxLabels(Constants.model.getLabels(), false, training);
+				_utils.setLabels(Constants.model.getLabels(), false, training);
 				label = Constants.trainInstancesLabel;
 
 			}
@@ -320,6 +334,9 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				convert.setInputFormat(instances);
 				instances = weka.filters.Filter.useFilter(instances, convert);
 			}
+			
+			label.cleanup();
+			
 		} catch (WekaException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -336,6 +353,8 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 					ins.setMissing(att);
 			}
 		}
+		
+		
 		
 //		System.out.println(instances.num);
 		return instances;

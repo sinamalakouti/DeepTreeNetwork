@@ -33,9 +33,12 @@ import org.nd4j.linalg.factory.Nd4j;
 	import org.nd4j.linalg.lossfunctions.LossFunctions;
 	import org.slf4j.Logger;
 	import org.slf4j.LoggerFactory;
-	
-	import neuralnetwork.CustomLayer;
-	import utils.Constants;
+
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
+
+import neuralnetwork.CustomLayer;
+import sigmoid.MySigmoidActivationFunction;
+import utils.Constants;
 	import utils._utils;
 	import weka.classifiers.trees.HoeffdingTree;
 	import weka.core.Instance;
@@ -113,7 +116,7 @@ import org.nd4j.linalg.factory.Nd4j;
 			int outputNum = 10;
 			log.info("Build model....");
 			Constants.numberOfLayers = 2;
-			Constants.numberOfNeurons = 40;
+			Constants.numberOfNeurons = 60;
 			Constants.batchSize = 100;
 			Constants.avgHFDepth = new double[Constants.numberOfLayers];
 			double numberTrainExamples = 60000d;
@@ -126,7 +129,7 @@ import org.nd4j.linalg.factory.Nd4j;
 	
 			MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)	
 	
-					.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
+//					.trainingWorkspaceMode(WorkspaceMode.SINGLE).inferenceWorkspaceMode(WorkspaceMode.NONE)
 					.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 					// new BayesTreeActivationFunction(0, false, -1198)
 	
@@ -135,8 +138,15 @@ import org.nd4j.linalg.factory.Nd4j;
 									.activation(Activation.SIGMOID).build())
 					.layer(1,
 							new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-									.activation(Activation.SIGMOID).build())
-					// .layer(2,
+									.activation (Activation.SIGMOID).build())
+					
+//					.layer(0, new DenseLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
+//			                .activation(new MySigmoidActivationFunction(0, false))
+//			                .build())
+//					.layer(1, new DenseLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//			                .activation(new MySigmoidActivationFunction(1, false))
+//			                .build())
+//					// .layer(2,
 					// new
 					// CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 					// .activation(Activation.SIGMOID).build())
@@ -227,6 +237,9 @@ import org.nd4j.linalg.factory.Nd4j;
 							Collections.shuffle(tmp2);
 				Constants.classChosedArray.put(l, tmp1);
 			}
+			
+//			tmp1.clear();
+			
 		
 	
 			// set-up the project :
@@ -270,8 +283,9 @@ import org.nd4j.linalg.factory.Nd4j;
 			DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
 	
 			// System.out.println(mnistTest.getLabels().size());
-			HoeffdingTree batchTree = null;
-			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
+//			HoeffdingTree batchTree = null;
+//			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
+			
 			for (int i = 0; i < 1000; i++) {
 				// in the first iteration do the bagging test and the each batch
 				// test :D
@@ -420,7 +434,7 @@ import org.nd4j.linalg.factory.Nd4j;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/13/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/17/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;
@@ -484,11 +498,6 @@ import org.nd4j.linalg.factory.Nd4j;
 			for (int i = 0; i < list.size(); i++)
 				labels_list[i] = list.get(i).classValue();
 			Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
-			features = null;
-			labels = null;
-			batchTrain_features = null;
-			batchTrain_labels = null;
-			
 			
 			features.cleanup();
 			labels.cleanup();

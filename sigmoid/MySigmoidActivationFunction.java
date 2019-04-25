@@ -59,7 +59,10 @@ public class MySigmoidActivationFunction extends BaseActivationFunction {
         Nd4j.getExecutioner().execAndReturn(new Sigmoid(in));
         
         System.out.println(in.shapeInfoToString());
-		return in;
+        INDArray temp = in.dup();
+        
+        
+		return temp	;
 	}
 
 //	private Instances createProperDataset(INDArray in, boolean training) {}

@@ -184,31 +184,12 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
 				new long[] { W.size(0), delta.size(0) }, 'f');
 
-		zprim = W.toDoubleMatrix();
 
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number seven");
-					System.out.println(zprim[i][j]);
-
-					System.exit(0);
-				}
-			}
 		// TODO : random class config
 		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose();
 		// TODO : pass all predicitons
 		// epsilonNext = W.mmuli(delta2.transpose(), epsilonNext).transpose();
-		zprim = W.toDoubleMatrix();
 
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number eight");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
 
 		weightNoiseParams.clear();
 
@@ -409,23 +390,6 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray W = getParamWithNoise(DefaultParamInitializer.WEIGHT_KEY, training, workspaceMgr);
 
 		// 
-
-		double[][] zprim = W.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number four prim");
-					
-					for (int i1 = 0; i1 < zprim.length; i1++)
-						for (int j1 = 0; j1 < zprim[i].length; j1++) {
-							System.out.println(zprim[i1][j1]);
-
-						}
-					
-					System.exit(0);
-				}
-				
-			}
 //		normalization:
 //				 double mu = W.meanNumber().doubleValue();
 //				 double std = Math.sqrt(W.varNumber().doubleValue());
@@ -587,8 +551,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 					ztemp = z.dup();
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
+				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, ret);
 				// todo : if random class config
 				result = ret.transpose().dup();
+				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 				// todo : if we want to pass all the predictions
 				// result = ret.dup();
 				ztemp.cleanup();
@@ -607,7 +573,9 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				// if having random class config
+				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, ret);
 				result = Nd4j.concat(1, result, ret.transpose().dup());
+				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 				// if we want pass all the predicitons
 				// result = Nd4j.concat(1, result, ret);
 				
@@ -633,6 +601,8 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 		z.cleanup();
 		
+		workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
+		
 		return result;
 	}
 
@@ -641,7 +611,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray z = preOutput(training, workspaceMgr);
 		INDArray ret = z.dup();
 		z.cleanup();
-		
+		ret = workspaceMgr.validateArrayLocation(ArrayType.ACTIVATIONS, ret, true, true);
 		return ret;
 	}
 
