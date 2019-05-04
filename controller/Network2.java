@@ -122,7 +122,7 @@ import utils.Constants;
 			double numberTrainExamples = 60000d;
 			Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 			Constants.numClasses = 10;
-			Constants.maximumDepth = 50;
+			Constants.maximumDepth = 20;
 			int feature_ratio = 10;
 	
 			// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
@@ -434,7 +434,7 @@ import utils.Constants;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/17/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/18/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;

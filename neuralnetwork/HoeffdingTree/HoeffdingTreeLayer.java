@@ -108,46 +108,10 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		// can't be used as
 		// this does a
 
-		double[][] zprim = W.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number zero");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
-		zprim = z.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number one");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
 
-		zprim = epsilon.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number two");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
 		INDArray delta = z.muli(epsilon).dup();
 
-		zprim = delta.toDoubleMatrix();
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number three");
-					System.out.println(zprim[i][j]);
-					System.exit(0);
-				}
-			}
-
+		
 		if (maskArray != null) {
 			applyMask(delta);
 		}
@@ -184,17 +148,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		INDArray epsilonNext = workspaceMgr.createUninitialized(ArrayType.ACTIVATION_GRAD,
 				new long[] { W.size(0), delta.size(0) }, 'f');
 
-		zprim = W.toDoubleMatrix();
 
-		for (int i = 0; i < zprim.length; i++)
-			for (int j = 0; j < zprim[i].length; j++) {
-				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-					System.out.println("stop stage number seven");
-					System.out.println(zprim[i][j]);
-
-					System.exit(0);
-				}
-			}
 		// TODO : random class config
 		epsilonNext = W.mmuli(delta.transpose(), epsilonNext).transpose();
 		// TODO : pass all predicitons
