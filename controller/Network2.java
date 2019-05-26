@@ -432,7 +432,7 @@ public class Network2 {
 				mnistTest.reset();
 				//
 				String path =
-						"/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/19/resultIteration_"+
+						"/home/research/result/phase4/randomClassConfig/19/resultIteration_"+
 								i;
 				// String path =
 				////// "resultIteration_"+ i;
