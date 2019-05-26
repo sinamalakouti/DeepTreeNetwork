@@ -185,7 +185,9 @@
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
-                            <mainClass>controller.Skyserver2</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>src/</classpathPrefix>
+                            <mainClass>controller.Network2</mainClass>
                         </manifest>
                     </archive>
 
@@ -210,7 +212,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>controller.Skyserver2</mainClass>
+                            <mainClass>controller.Network2</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Class-Path>.</Class-Path>
