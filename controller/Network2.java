@@ -102,7 +102,7 @@ public class Network2 {
 
 		String[] options;
 
-		NumericToNominal convert = new NumericToNominal();
+		NumericToNominal convert;
 
 		Constants.weightLayerMin = new double[2];
 		Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
@@ -283,50 +283,50 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 //			HoeffdingTree batchTree = null;
 //			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-
+		System.out.println("NETWORK2.JAVA is running");
 		for (int i = 0; i < 1000; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
-			for (int b = 0; b < Constants.numBatches; b++) {
+				for (int b = 0; b < Constants.numBatches; b++) {
 
-				DataSet set = getBatchTrainSet(b, Constants.batchSize, tempTrainSet, trainSet2);
-				// if (i == 0) {
-				//
-				// Instances batchTrainInstance = _utils.dataset2Instances(set);
-				//
-				// // batch test :
-				//
-				// if (batchTree == null) {
-				// batchTree = new HoeffdingTree();
-				// batchTree.buildClassifier(batchTrainInstance);
-				// } else {
-				// Iterator<Instance> it = batchTrainInstance.iterator();
-				// while (it.hasNext())
-				// batchTree.updateClassifier(it.next());
-				// }
-				//
-				// // bagging test:
-				// for (int t = 0; t < Constants.numberOfNeurons; t++) {
-				// INDArray bag =
-				// _utils.getSubDataset(Constants.attributesIndexes.get(t),
-				// set);
-				// Instances bagInstances = _utils.ndArrayToInstances(bag);
-				// if (baggingTrees[t] == null) {
-				// baggingTrees[t] = new HoeffdingTree();
-				// baggingTrees[t].buildClassifier(bagInstances);
-				// } else {
-				// Iterator<Instance> it = bagInstances.iterator();
-				// while (it.hasNext()) {
-				// baggingTrees[t].updateClassifier(it.next());
-				// }
-				// }
-				//
-				// }
-				//
-				// }
+					DataSet set = getBatchTrainSet(b, Constants.batchSize, tempTrainSet, trainSet2);
+					// if (i == 0) {
+					//
+					// Instances batchTrainInstance = _utils.dataset2Instances(set);
+					//
+					// // batch test :
+					//
+					// if (batchTree == null) {
+					// batchTree = new HoeffdingTree();
+					// batchTree.buildClassifier(batchTrainInstance);
+					// } else {
+					// Iterator<Instance> it = batchTrainInstance.iterator();
+					// while (it.hasNext())
+					// batchTree.updateClassifier(it.next());
+					// }
+					//
+					// // bagging test:
+					// for (int t = 0; t < Constants.numberOfNeurons; t++) {
+					// INDArray bag =
+					// _utils.getSubDataset(Constants.attributesIndexes.get(t),
+					// set);
+					// Instances bagInstances = _utils.ndArrayToInstances(bag);
+					// if (baggingTrees[t] == null) {
+					// baggingTrees[t] = new HoeffdingTree();
+					// baggingTrees[t].buildClassifier(bagInstances);
+					// } else {
+					// Iterator<Instance> it = bagInstances.iterator();
+					// while (it.hasNext()) {
+					// baggingTrees[t].updateClassifier(it.next());
+					// }
+					// }
+					//
+					// }
+					//
+					// }
 
-				Constants.model.fit(set);
-			}
+					Constants.model.fit(set);
+				}
 			// Constants.model.fit(tempTrainSet);
 
 			// if (i == 0) {
