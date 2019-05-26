@@ -1,261 +1,344 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>dl4j-examples</artifactId>
+    <groupId>ComplexNeuronsProject</groupId>
+    <artifactId>ComplexNeuronsProject</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ComplexNeuronsProject</name>
+    <properties>
 
-    <parent>
-        <groupId>org.deeplearning4j</groupId>
-        <artifactId>deeplearning4j-examples-parent</artifactId>
-        <version>1.0.0-beta2</version>
-    </parent>
+        <jdk.version> 1.8.0_71 </jdk.version>
+    </properties>
+    <!-- <dependencies> <dependency> <groupId>ComplexNeuronsProject</groupId>
+        <artifactId>weka</artifactId> <scope>system</scope> <version>1.0</version>
+        <systemPath>${basedir}\lib\weka.jar</systemPath> </dependency> <dependency>
+        <groupId>wekaDeeplearning4j</groupId> <artifactId>wekaDeeplearning4j</artifactId>
+        <scope>system</scope> <version>1.5.3</version>$NO-MVN-MAN-VER$ <systemPath>${basedir}\lib\wekaDeeplearning4j-1.5.3.jar</systemPath>
+        </dependency> <dependency> <groupId>arpack_combined_all</groupId> <artifactId>arpack_combined_all</artifactId>
+        <scope>system</scope> <version>0.1</version> <systemPath>${basedir}\lib\arpack_combined_all-0.1.jar</systemPath>
+        </dependency> <dependency> <groupId>core</groupId> <artifactId>core</artifactId>
+        <scope>system</scope> <version>1.1.2</version> <systemPath>${basedir}\lib\core-1.1.2.jar</systemPath>
+        </dependency> <dependency> <groupId>jniloader</groupId> <artifactId>jniloader</artifactId>
+        <scope>system</scope> <version>1.1</version> <systemPath>${basedir}\lib\jniloader-1.1.jar</systemPath>
+        </dependency> <dependency> <groupId>mtj</groupId> <artifactId>mtj</artifactId>
+        <scope>system</scope> <version>1.0.4</version> <systemPath>${basedir}\lib\mtj-1.0.4.jar</systemPath>
+        </dependency> <dependency> <groupId>native_ref-java</groupId> <artifactId>native_ref-java</artifactId>
+        <scope>system</scope> <version>1.1</version> <systemPath>${basedir}\lib\native_ref-java-1.1.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_ref-osx-x86_64-1.1-natives</groupId>
+        <artifactId>netlib-native_ref-osx-x86_64-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_ref-osx-x86_64-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_ref-win-i686-1.1-natives</groupId>
+        <artifactId>netlib-native_ref-win-i686-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_ref-win-i686-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_ref-win-x86_64-1.1-natives</groupId>
+        <artifactId>netlib-native_ref-win-x86_64-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_ref-win-x86_64-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-linux-armhf-1.1-natives</groupId>
+        <artifactId>netlib-native_system-linux-armhf-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-linux-armhf-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-linux-i686-1.1-natives</groupId>
+        <artifactId>netlib-native_system-linux-i686-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-linux-i686-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-linux-x86_64-1.1-natives</groupId>
+        <artifactId>netlib-native_system-linux-x86_64-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-linux-x86_64-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-osx-x86_64-1.1-natives</groupId>
+        <artifactId>netlib-native_system-osx-x86_64-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-osx-x86_64-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-win-i686-1.1-natives</groupId>
+        <artifactId>netlib-native_system-win-i686-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-win-i686-1.1-natives.JAR</systemPath>
+        </dependency> <dependency> <groupId>netlib-native_system-win-x86_64-1.1-natives</groupId>
+        <artifactId>netlib-native_system-win-x86_64-1.1-natives</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\netlib-native_system-win-x86_64-1.1-natives.jar</systemPath>
+        </dependency> <dependency> <groupId>complexNeuronsProject-1.0.0-beta2-bin</groupId>
+        <artifactId>complexNeuronsProject-1.0.0-beta2-bin</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\complexNeuronsProject-1.0.0-beta2-bin.jar</systemPath>
+        </dependency> <dependency> <groupId>complexNeuronsProject-1.0.0-beta2</groupId>
+        <artifactId>complexNeuronsProject-1.0.0-beta2</artifactId> <scope>system</scope>
+        <version>1.0</version> <systemPath>${basedir}\lib\complexNeuronsProject-1.0.0-beta2.jar</systemPath>
+        </dependency> </dependencies> -->
 
-    <name>DeepLearning4j Examples</name>
 
-    <repositories>
-        <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus snapshot repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.deeplearning4j</groupId>
+                <artifactId>deeplearning4j-core</artifactId>
+                <version>1.0.0-beta2</version><!--$NO-MVN-MAN-VER$-->
+            </dependency>
             <dependency>
                 <groupId>org.nd4j</groupId>
                 <artifactId>nd4j-native-platform</artifactId>
-                <version>${nd4j.version}</version>
+                <version>1.0.0-beta2</version>
+            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>nz.ac.waikato.cms.weka</groupId>-->
+                <!--<artifactId>weka-stable</artifactId>-->
+                <!--<version>3.8.1</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>weka</groupId>-->
+                <!--<artifactId>weka</artifactId>-->
+                <!--<version>1.0</version>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>wekaDeeplearning4j</groupId>
+                <artifactId>wekaDeeplearning4j</artifactId>
+                <version>1.5.3</version>
             </dependency>
             <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-cuda-8.0-platform</artifactId>
-                <version>${nd4j.version}</version>
+                <groupId>mtj</groupId>
+                <artifactId>mtj</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-cuda-9.0-platform</artifactId>
-                <version>${nd4j.version}</version>
+                <groupId>nz.ac.waikato.cms.weka.thirdparty</groupId>
+                <artifactId>bounce</artifactId>
+                <version>0.18</version>
             </dependency>
+
+
             <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-cuda-9.2-platform</artifactId>
-                <version>${nd4j.version}</version>
+                <groupId>com.github.vbmacher</groupId>
+                <artifactId>java-cup</artifactId>
+                <version>11b</version>
             </dependency>
         </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <!-- ND4J backend. You need one in every DL4J project. Normally define artifactId as either "nd4j-native-platform" or "nd4j-cuda-9.2-platform" -->
-        <dependency>
-            <groupId>org.nd4j</groupId>
-            <artifactId>${nd4j.backend}</artifactId>
-            <version>${nd4j.version}</version>
-        </dependency>
-
-        <!-- Core DL4J functionality -->
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-core</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-nlp</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-zoo</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <!-- deeplearning4j-ui is used for visualization: see http://deeplearning4j.org/visualization -->
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-ui_${scala.binary.version}</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <!-- ParallelWrapper & ParallelInference live here -->
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-parallel-wrapper_${scala.binary.version}</artifactId>
-            <version>${dl4j.version}</version>
-        </dependency>
-
-        <!-- Next 2: used for MapFileConversion Example. Note you need *both* together -->
-        <dependency>
-            <groupId>org.datavec</groupId>
-            <artifactId>datavec-hadoop</artifactId>
-            <version>${datavec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
 
-        <!-- Arbiter - used for hyperparameter optimization (grid/random search) -->
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>arbiter-deeplearning4j</artifactId>
-            <version>${arbiter.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>arbiter-ui_${scala.binary.version}</artifactId>
-            <version>${arbiter.version}</version>
-        </dependency>
-
-        <!-- datavec-data-codec: used only in video example for loading video data -->
-        <dependency>
-            <artifactId>datavec-data-codec</artifactId>
-            <groupId>org.datavec</groupId>
-            <version>${datavec.version}</version>
-        </dependency>
-
-        <!-- Used in the feedforward/classification/MLP* and feedforward/regression/RegressionMathFunctions example -->
-        <dependency>
-            <groupId>jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>${jfreechart.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jcommon</artifactId>
-            <version>${jcommon.version}</version>
-        </dependency>
-
-        <!-- Used for downloading data in some of the examples -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-
-    </dependencies>
 
     <build>
+        <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>aspectj-maven-plugin</artifactId>
+                                        <versionRange>[1.0,)</versionRange>
+                                        <goals>
+                                            <goal>test-compile</goal>
+                                            <goal>compile</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.apache.maven.plugins
+                                        </groupId>
+                                        <artifactId>
+                                            maven-install-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.5,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>install-file</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute>
+                                            <runOnIncremental>false</runOnIncremental>
+                                        </execute>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>java</executable>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
                 <configuration>
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedClassifierName>${shadedClassifier}</shadedClassifierName>
-                    <createDependencyReducedPom>true</createDependencyReducedPom>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>org/datanucleus/**</exclude>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
+                    <!-- get all project dependencies -->
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- MainClass in mainfest make a executable jar -->
+                    <archive>
+                        <manifest>
+                            <mainClass>controller.Skyserver2</mainClass>
+                        </manifest>
+                    </archive>
 
                 </configuration>
-
                 <executions>
                     <execution>
+                        <id>make-assembly</id>
+                        <!-- bind to the packaging phase -->
                         <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>reference.conf</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                </transformer>
-                            </transformers>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>controller.Skyserver2</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
+                    </archive>
+
+                </configuration>
+            </plugin>
+
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-install-plugin</artifactId>
+                <version>2.5</version> <executions> <execution> <phase>initialize</phase>
+                <goals> <goal>install-file</goal> </goals> <configuration> <groupId>com.roufid.tutorials</groupId>
+                <artifactId>example-app</artifactId> <version>1.0</version> <packaging>jar</packaging>
+                <file>${basedir}/lib/app.jar</file> </configuration> </execution> </executions>
+                </plugin> -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <!--<dependency>-->
+                <!--<groupId>weka</groupId>-->
+                <!--<artifactId>weka</artifactId>-->
+                <!--<version>1.0</version>-->
+            <!--</dependency>-->
+            <!-- <dependency>
+                <groupId>wekaDeeplearning4j</groupId>
+                <artifactId>wekaDeeplearning4j</artifactId>
+                <version>1.5.3</version>
+            </dependency> -->
+            <dependency>
+                <groupId>arpack_combined_all</groupId>
+                <artifactId>arpack_combined_all</artifactId>
+                <version>0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>core</groupId>
+                <artifactId>core</artifactId>
+                <version>1.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>jniloader</groupId>
+                <artifactId>jniloader</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>mtj</groupId>
+                <artifactId>mtj</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>native_ref-java</groupId>
+                <artifactId>native_ref-java</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>
+                    netlib-native_ref-osx-x86_64-1.1-natives
+                </groupId>
+                <artifactId>
+                    netlib-native_ref-osx-x86_64-1.1-natives
+                </artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>
+                    netlib-native_ref-win-i686-1.1-natives
+                </groupId>
+                <artifactId>
+                    netlib-native_ref-win-i686-1.1-natives
+                </artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>
+                    netlib-native_ref-win-x86_64-1.1-natives
+                </groupId>
+                <artifactId>
+                    netlib-native_ref-win-x86_64-1.1-natives
+                </artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>
+                    netlib-native_system-linux-armhf-1.1-natives
+                </groupId>
+                <artifactId>
+                    netlib-native_system-linux-armhf-1.1-natives
+                </artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>
+                    netlib-native_system-linux-i686-1.1-natives
+                </groupId>
+                <artifactId>
+                    netlib-native_system-linux-i686-1.1-natives
+                </artifactId>
+                <version>1.0</version>
+            </dependency>
 
-    <profiles>
-        <profile>
-            <id>OpenJFX</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>javafx</artifactId>
-                    <version>${javafx.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
+            <!--<dependency>-->
+                <!--<groupId>complexNeuronsProject-1.0.0-beta2-bin</groupId>-->
+                <!--<artifactId>complexNeuronsProject-1.0.0-beta2-bin</artifactId>-->
+                <!--<version>1.0</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>complexNeuronsProject-1.0.0-beta2</groupId>-->
+                <!--<artifactId>complexNeuronsProject-1.0.0-beta2</artifactId>-->
+                <!--<version>1.0</version>-->
+            <!--</dependency>-->
+           <!--  <dependency>
+                <groupId>org.deeplearning4j</groupId>
+                <artifactId>deeplearning4j-core</artifactId>
+                <version>1.0.0-beta2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nd4j</groupId>
+                <artifactId>nd4j-native-platform</artifactId>
+                <version>1.0.0-beta2</version>
+            </dependency> -->
+        </dependencies>
+    </dependencyManagement>
 </project>

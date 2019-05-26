@@ -12,9 +12,9 @@ import java.util.List;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
-import org.deeplearning4j.arbiter.util.ClassPathResource;
+
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
+
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -40,6 +40,7 @@ import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
+//import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;

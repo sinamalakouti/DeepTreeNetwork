@@ -11,9 +11,8 @@
 import java.util.Random;
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
-	
-	import org.deeplearning4j.eval.Evaluation;
-	import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 	import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 	import org.deeplearning4j.nn.conf.WorkspaceMode;
 	import org.deeplearning4j.nn.conf.layers.DenseLayer;
@@ -34,7 +33,6 @@ import org.nd4j.linalg.factory.Nd4j;
 	import org.slf4j.Logger;
 	import org.slf4j.LoggerFactory;
 
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 
 import neuralnetwork.CustomLayer;
 import sigmoid.MySigmoidActivationFunction;
@@ -434,7 +432,7 @@ import utils.Constants;
 				 mnistTest.reset();
 				//
 				 String path =
-				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/18/resultIteration_"+
+				 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/18	/resultIteration_"+
 				 i;
 				// String path =
 				////// "resultIteration_"+ i;

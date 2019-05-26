@@ -25,7 +25,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import no.uib.cipr.matrix.*;
-
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;

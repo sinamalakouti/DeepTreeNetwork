@@ -34,6 +34,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import org.nd4j.linalg.learning.config.IUpdater;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
@@ -89,7 +90,6 @@ public class Skyserver {
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
 		Constants.numClasses = 3;
-
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -194,7 +194,7 @@ public class Skyserver {
 			Collections.shuffle(tmp2);
 			Constants.classChosedArray.put(l, tmp2);
 		}
-
+//IUpdater
 		// set-up the project :
 		//
 		//		DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);

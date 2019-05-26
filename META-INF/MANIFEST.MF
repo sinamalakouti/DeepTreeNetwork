@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Class-Path: complexNeuronsProject-1.00-beta2-bin.jar complexNeuronsPro
+ ject-1.00-beta2.jar core-1.1.2.jar jniloader-1.1.jar mtj-1.0.4.jar na
+ tive_ref-java-1.1.jar native_system-java-1.1.jar weka.jar wekaDeeplea
+ rning4j.jar netlib_system-osx-x86_64-1.1-natives.jar
+Main-Class: controller.Skyserver
+

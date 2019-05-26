@@ -20,7 +20,6 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import utils._utils;
 import weka.core.Instance;
 import weka.core.Instances;

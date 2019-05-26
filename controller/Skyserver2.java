@@ -48,9 +48,9 @@ import weka.core.Instances;
 import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
-public class EMG {
+public class Skyserver2 {
 
-	private static Logger log = LoggerFactory.getLogger(EMG.class);
+	private static Logger log = LoggerFactory.getLogger(Skyserver2.class);
 
 
 
@@ -73,23 +73,22 @@ public class EMG {
 		Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
 		Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
 
-		final int numInputs = 3000;
-		int outputNum = 6;
+		final int numInputs = 9;
+		int outputNum = 3;
 		log.info("Build model....");
-		Constants.numberOfLayers = 3;
-		Constants.numberOfNeurons = 40;
+		Constants.numberOfLayers = 2;
+		Constants.numberOfNeurons = 5;
 		Constants.maximumDepth =20;
-		int neuron_feature_ratio = 5;
-		Constants.batchSize = 126;
+		int neuron_feature_ratio = 2;
+		Constants.batchSize = 100;
 		Constants.isSerialzing = false;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
-		double numberTrainExamples = 1260d;
-		double numberTestExamples = 540d;
+		double numberOfExamples = 10000d;
+		double numberTrainExamples = 7000d;
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 6;
-
+		Constants.numClasses = 3;
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -98,16 +97,33 @@ public class EMG {
 				.weightInit(WeightInit.XAVIER).updater(new Sgd(0.1)).l2(1e-4).list()
 				// new BayesTreeActivationFunction(0, false, -1198)
 
-				 .layer(0,
+				  	
+				  .layer(0,
 						new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
 				.layer(1,
 						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 						.activation(Activation.SIGMOID).build())
+//				.layer(2,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
+//
+//				.layer(3,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
+//				.layer(4,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
+//				.layer(5,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
+//				.layer(6,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
+//				.layer(7,
+//						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//						.activation(Activation.SIGMOID).build())
 				.layer(2,
-						new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-						.activation(Activation.SIGMOID).build())
-				.layer(3,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
 				.backprop(true).pretrain(false).build();
@@ -177,7 +193,7 @@ public class EMG {
 			Collections.shuffle(tmp2);
 			Constants.classChosedArray.put(l, tmp2);
 		}
-
+//IUpdater
 		// set-up the project :
 		//
 		//		DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
@@ -186,23 +202,17 @@ public class EMG {
 		char delimiter = ',';
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
 
-		//Xtrain
-		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/train.csv")));
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTrainExamples,3000,Constants.numClasses);
-		DataSet trainingData = iterator.next();
-			
+		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/skyserverTest.csv")));
 		
-		//Xtest
-		recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
-		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/test.csv")));
-		 iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTestExamples,3000,Constants.numClasses);
-		DataSet testData = iterator.next();
-		
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,9,Constants.numClasses);
+		DataSet allData = iterator.next();
+		allData.shuffle();
+		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.7);  //Use 70% of data for training
+
+
+		DataSet trainingData = testAndTrain.getTrain();
+		DataSet testData = testAndTrain.getTest();
 		//        TODO:
-		System.out.println("*******"); 
-		System.out.println("BEFORE");
-	
-		System.out.println(trainingData.getFeatures());
 		DataNormalization normalizer = new NormalizerStandardize();
 		normalizer.fit(trainingData);           //Collect the statistics (mean/stdev) from the training data. This does not modify the input data
 		normalizer.transform(trainingData);     //Apply normalization to the training data
@@ -210,9 +220,8 @@ public class EMG {
 		int counter = 0;
 		Instances trainSet2 = null;
 		int c = 0;
-		System.out.println("AFTER");
-		System.out.println(trainingData.getFeatures());
-		System.out.println("*******");
+
+
 		trainSet2 =_utils.dataset2Instances(trainingData);
 
 		convert = new NumericToNominal();
@@ -224,8 +233,6 @@ public class EMG {
 		trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
 		trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
 		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
-		
-		
 		HoeffdingTree batchTree = null;
 		HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
 		for (int i = 0; i < 150; i++) {
@@ -391,9 +398,11 @@ public class EMG {
 				//				}
 				//				mnistTest.reset();
 
-								 String path ="/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/EMG/2/resultIteration_"+ i;
+//								 String path =
+//								 "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/"
+//										+ "phase_3/without_depth_limit/without_normalization/3/resultIteration_"+ i;
 //								 
-//								 	String path ="resultIteration_"+ i;
+								 String path ="resultIteration_"+ i;
 
 								 File file = new File(path);
 								 BufferedWriter out = new BufferedWriter(new

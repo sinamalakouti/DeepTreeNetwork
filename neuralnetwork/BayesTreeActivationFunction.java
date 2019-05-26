@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.jfree.data.general.Dataset;
 import org.nd4j.linalg.activations.BaseActivationFunction;
 import org.nd4j.linalg.api.buffer.DataBuffer.Type;
 import org.nd4j.linalg.api.ndarray.INDArray;
