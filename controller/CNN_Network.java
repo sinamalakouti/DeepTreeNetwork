@@ -3,12 +3,7 @@ package controller;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Randocdm;
+import java.util.*;
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
@@ -74,7 +69,7 @@ public class CNN_Network {
     
 
     int seed = 1234;
-    Random randNumGen = new Random(seed);
+//    Random randNumGen = new Random(seed);
 
     log.info("Data load and vectorization...");
 //    String localFilePath = basePath + "/mnist_png.tar.gz";
