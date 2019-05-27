@@ -60,50 +60,55 @@
         </dependency> </dependencies> -->
 
 
-        <dependencies>
-            <dependency>
-                <groupId>org.deeplearning4j</groupId>
-                <artifactId>deeplearning4j-core</artifactId>
-                <version>1.0.0-beta2</version><!--$NO-MVN-MAN-VER$-->
-            </dependency>
-            <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-native-platform</artifactId>
-                <version>1.0.0-beta2</version>
-            </dependency>
-            <!--<dependency>-->
-                <!--<groupId>nz.ac.waikato.cms.weka</groupId>-->
-                <!--<artifactId>weka-stable</artifactId>-->
-                <!--<version>3.8.1</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>weka</groupId>-->
-                <!--<artifactId>weka</artifactId>-->
-                <!--<version>1.0</version>-->
-            <!--</dependency>-->
-            <dependency>
-                <groupId>wekaDeeplearning4j</groupId>
-                <artifactId>wekaDeeplearning4j</artifactId>
-                <version>1.5.3</version>
-            </dependency>
-            <dependency>
-                <groupId>mtj</groupId>
-                <artifactId>mtj</artifactId>
-                <version>1.0.4</version>
-            </dependency>
-            <dependency>
-                <groupId>nz.ac.waikato.cms.weka.thirdparty</groupId>
-                <artifactId>bounce</artifactId>
-                <version>0.18</version>
-            </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>1.0.0-beta2</version><!--$NO-MVN-MAN-VER$-->
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-native-platform</artifactId>
+            <version>1.0.0-beta2</version>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>nz.ac.waikato.cms.weka</groupId>-->
+        <!--<artifactId>weka-stable</artifactId>-->
+        <!--<version>3.8.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>weka</groupId>-->
+        <!--<artifactId>weka</artifactId>-->
+        <!--<version>1.0</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>wekaDeeplearning4j</groupId>
+            <artifactId>wekaDeeplearning4j</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>mtj</groupId>
+            <artifactId>mtj</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka.thirdparty</groupId>
+            <artifactId>bounce</artifactId>
+            <version>0.18</version>
+        </dependency>
 
 
-            <dependency>
-                <groupId>com.github.vbmacher</groupId>
-                <artifactId>java-cup</artifactId>
-                <version>11b</version>
-            </dependency>
-        </dependencies>
+        <dependency>
+            <groupId>com.github.vbmacher</groupId>
+            <artifactId>java-cup</artifactId>
+            <version>11b</version>
+        </dependency>
+    </dependencies>
 
 
 
@@ -241,9 +246,9 @@
     <dependencyManagement>
         <dependencies>
             <!--<dependency>-->
-                <!--<groupId>weka</groupId>-->
-                <!--<artifactId>weka</artifactId>-->
-                <!--<version>1.0</version>-->
+            <!--<groupId>weka</groupId>-->
+            <!--<artifactId>weka</artifactId>-->
+            <!--<version>1.0</version>-->
             <!--</dependency>-->
             <!-- <dependency>
                 <groupId>wekaDeeplearning4j</groupId>
@@ -322,25 +327,25 @@
             </dependency>
 
             <!--<dependency>-->
-                <!--<groupId>complexNeuronsProject-1.0.0-beta2-bin</groupId>-->
-                <!--<artifactId>complexNeuronsProject-1.0.0-beta2-bin</artifactId>-->
-                <!--<version>1.0</version>-->
+            <!--<groupId>complexNeuronsProject-1.0.0-beta2-bin</groupId>-->
+            <!--<artifactId>complexNeuronsProject-1.0.0-beta2-bin</artifactId>-->
+            <!--<version>1.0</version>-->
             <!--</dependency>-->
             <!--<dependency>-->
-                <!--<groupId>complexNeuronsProject-1.0.0-beta2</groupId>-->
-                <!--<artifactId>complexNeuronsProject-1.0.0-beta2</artifactId>-->
-                <!--<version>1.0</version>-->
+            <!--<groupId>complexNeuronsProject-1.0.0-beta2</groupId>-->
+            <!--<artifactId>complexNeuronsProject-1.0.0-beta2</artifactId>-->
+            <!--<version>1.0</version>-->
             <!--</dependency>-->
-           <!--  <dependency>
-                <groupId>org.deeplearning4j</groupId>
-                <artifactId>deeplearning4j-core</artifactId>
-                <version>1.0.0-beta2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.nd4j</groupId>
-                <artifactId>nd4j-native-platform</artifactId>
-                <version>1.0.0-beta2</version>
-            </dependency> -->
+            <!--  <dependency>
+                 <groupId>org.deeplearning4j</groupId>
+                 <artifactId>deeplearning4j-core</artifactId>
+                 <version>1.0.0-beta2</version>
+             </dependency>
+             <dependency>
+                 <groupId>org.nd4j</groupId>
+                 <artifactId>nd4j-native-platform</artifactId>
+                 <version>1.0.0-beta2</version>
+             </dependency> -->
         </dependencies>
     </dependencyManagement>
 </project>
