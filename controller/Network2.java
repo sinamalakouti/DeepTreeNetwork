@@ -31,11 +31,12 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 
 import neuralnetwork.CustomLayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sigmoid.MySigmoidActivationFunction;
 import utils.Constants;
 import utils._utils;
@@ -115,14 +116,14 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 60;
+		Constants.numberOfNeurons = 20;
 		Constants.batchSize = 100;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
 		Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 		Constants.numClasses = 10;
-		Constants.maximumDepth = 10;
-		int feature_ratio = 10;
+		Constants.maximumDepth = 20;
+		int feature_ratio = 20;
 
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -290,40 +291,7 @@ public class Network2 {
 				for (int b = 0; b < Constants.numBatches; b++) {
 
 					DataSet set = getBatchTrainSet(b, Constants.batchSize, tempTrainSet, trainSet2);
-					// if (i == 0) {
-					//
-					// Instances batchTrainInstance = _utils.dataset2Instances(set);
-					//
-					// // batch test :
-					//
-					// if (batchTree == null) {
-					// batchTree = new HoeffdingTree();
-					// batchTree.buildClassifier(batchTrainInstance);
-					// } else {
-					// Iterator<Instance> it = batchTrainInstance.iterator();
-					// while (it.hasNext())
-					// batchTree.updateClassifier(it.next());
-					// }
-					//
-					// // bagging test:
-					// for (int t = 0; t < Constants.numberOfNeurons; t++) {
-					// INDArray bag =
-					// _utils.getSubDataset(Constants.attributesIndexes.get(t),
-					// set);
-					// Instances bagInstances = _utils.ndArrayToInstances(bag);
-					// if (baggingTrees[t] == null) {
-					// baggingTrees[t] = new HoeffdingTree();
-					// baggingTrees[t].buildClassifier(bagInstances);
-					// } else {
-					// Iterator<Instance> it = bagInstances.iterator();
-					// while (it.hasNext()) {
-					// baggingTrees[t].updateClassifier(it.next());
-					// }
-					// }
-					//
-					// }
-					//
-					// }
+
 
 					Constants.model.fit(set);
 				}
@@ -419,20 +387,20 @@ public class Network2 {
 				//
 				Evaluation eval = new Evaluation(outputNum); // create an
 				//
-				while (mnistTest.hasNext()) {
+					while (mnistTest.hasNext()) {
 
-					DataSet next = mnistTest.next();
-					System.out.println(Constants.isEvaluating);
-					_utils.setLabels(next.getLabels(), Constants.isEvaluating,
-							false);
-					INDArray output = Constants.model.output(next.getFeatures());
+						DataSet next = mnistTest.next();
+						System.out.println(Constants.isEvaluating);
+						_utils.setLabels(next.getLabels(), Constants.isEvaluating,
+								false);
+						INDArray output = Constants.model.output(next.getFeatures());
 
-					eval.eval(next.getLabels(), output);
-				}
+						eval.eval(next.getLabels(), output);
+					}
 				mnistTest.reset();
 				//
 				String path =
-						"/home/research/result/phase4/randomClassConfig/19/resultIteration_"+
+						"/home/research/result/phase4/randomClassConfig/20/resultIteration_"+
 								i;
 				// String path =
 				////// "resultIteration_"+ i;
@@ -479,7 +447,7 @@ public class Network2 {
 
 	}
 
-	@SuppressWarnings("null")
+
 	private static DataSet getBatchTrainSet(int batchNumber, int batchRate, DataSet trainSet, Instances training) {
 
 		INDArray features = trainSet.getFeatures();
