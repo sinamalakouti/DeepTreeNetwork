@@ -273,7 +273,7 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 //			HoeffdingTree batchTree = null;
 //			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		System.out.println("NETWORK2.JAVA is running   784 / 4 and 40 neurons");
+		System.out.println("NETWORK2.JAVA is running   784 / 5 and 10 neurons");
 		for (int i = 0; i < 150; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
