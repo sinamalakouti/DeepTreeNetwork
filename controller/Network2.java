@@ -1,22 +1,10 @@
 package controller;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
+import neuralnetwork.CustomLayer;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
-
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -31,21 +19,20 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-
-
-
-import neuralnetwork.CustomLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sigmoid.MySigmoidActivationFunction;
 import utils.Constants;
 import utils._utils;
-import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.TestInstances;
-import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Network2 {
 
@@ -116,7 +103,7 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 50;
+		Constants.numberOfNeurons = 40;
 		Constants.batchSize = 100;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
@@ -125,7 +112,7 @@ public class Network2 {
 		Constants.maximumDepth = 20;
 		Constants.maximumDepth --;
 
-		int feature_ratio = 20;
+		int feature_ratio = 5;
 
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -286,8 +273,8 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 //			HoeffdingTree batchTree = null;
 //			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		System.out.println("NETWORK2.JAVA is running");
-		for (int i = 0; i < 1000; i++) {
+		System.out.println("NETWORK2.JAVA is running   784 / 4 and 40 neurons");
+		for (int i = 0; i < 150; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
 				for (int b = 0; b < Constants.numBatches; b++) {
@@ -402,8 +389,7 @@ public class Network2 {
 				mnistTest.reset();
 				//
 				String path =
-						"/root/research/result/phase4/randomClassConfig/21/resultIteration_"+
-								i;
+						"/home/research/result/phase4/randomClassConfig/21/resultIteration_"+ i;
 
 				// String path =
 				////// "resultIteration_"+ i;
