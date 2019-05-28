@@ -108,6 +108,7 @@ public class CNN_Network {
 	Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 	Constants.numClasses = 10;
 	Constants.maximumDepth = 20;
+
 	int outputnum =10;
 	
 	int numInputs =2880;

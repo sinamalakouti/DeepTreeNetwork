@@ -116,13 +116,15 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 20;
+		Constants.numberOfNeurons = 40;
 		Constants.batchSize = 100;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
 		Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 		Constants.numClasses = 10;
 		Constants.maximumDepth = 20;
+		Constants.maximumDepth --;
+
 		int feature_ratio = 20;
 
 
