@@ -112,7 +112,7 @@ public class Network2 {
 		Constants.maximumDepth = 20;
 		Constants.maximumDepth --;
 
-		int feature_ratio = 5;
+		int feature_ratio = 20;
 
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -389,7 +389,7 @@ public class Network2 {
 				mnistTest.reset();
 				//
 				String path =
-						"/home/research/result/phase4/randomClassConfig/22/resultIteration_"+ i;
+						"/home/sepehr/sina/results/1/resultIteration_"+ i;
 
 				// String path =
 				////// "resultIteration_"+ i;
