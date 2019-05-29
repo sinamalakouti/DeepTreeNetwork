@@ -112,7 +112,7 @@ public class Network2 {
 		Constants.maximumDepth = 20;
 		Constants.maximumDepth --;
 
-		int feature_ratio = 20;
+		int feature_ratio = 10;
 
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -273,7 +273,7 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 //			HoeffdingTree batchTree = null;
 //			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		System.out.println("NETWORK2.JAVA is running   784 / 5 and 10 neurons");
+		System.out.println("NETWORK2.JAVA is running   784 / 10 and 10 neurons");
 		for (int i = 0; i < 150; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
@@ -389,7 +389,7 @@ public class Network2 {
 				mnistTest.reset();
 				//
 				String path =
-						"/home/sepehr/sina/results/1/resultIteration_"+ i;
+						"/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/20_"+ i;
 
 				// String path =
 				////// "resultIteration_"+ i;
