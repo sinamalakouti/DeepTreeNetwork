@@ -103,7 +103,7 @@ public class Network2 {
 		int outputNum = 10;
 		log.info("Build model....");
 		Constants.numberOfLayers = 2;
-		Constants.numberOfNeurons = 10;
+		Constants.numberOfNeurons = 20;
 		Constants.batchSize = 100;
 		Constants.avgHFDepth = new double[Constants.numberOfLayers];
 		double numberTrainExamples = 60000d;
@@ -112,7 +112,7 @@ public class Network2 {
 		Constants.maximumDepth = 20;
 		Constants.maximumDepth --;
 
-		int feature_ratio = 10;
+		int feature_ratio = 2;
 
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -273,7 +273,7 @@ public class Network2 {
 		// System.out.println(mnistTest.getLabels().size());
 //			HoeffdingTree batchTree = null;
 //			HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
-		System.out.println("NETWORK2.JAVA is running   784 / 10 and 10 neurons");
+		System.out.println("NETWORK2.JAVA is running   784 / 2 and 20 neurons");
 		for (int i = 0; i < 150; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
@@ -389,7 +389,7 @@ public class Network2 {
 				mnistTest.reset();
 				//
 				String path =
-						"/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/20_"+ i;
+						"/root/research/result/phase4/randomClassConfig/23/resultIteration_"+ i;
 
 				// String path =
 				////// "resultIteration_"+ i;
