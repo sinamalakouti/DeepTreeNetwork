@@ -278,29 +278,34 @@ public class Skyserver2 {
 
 
 				Constants.model.fit(set);
-//				if ( Constants.isCompare == true && Constants.isSerialzing == true){
-//					System.exit(0);
-//				}else if ( Constants.isCompare== true)
+				if ( Constants.isCompare == true && Constants.isSerialzing == true){
+					System.exit(0);
+				}else if ( Constants.isCompare== true)
 				{
-//					System.err.println("shittt wrong comparing akhe chera!!");
-//					System.exit(0);
+					System.err.println("shittt wrong comparing akhe chera!!");
+					System.exit(0);
 				}
-//				if ( Constants.isSerialzing == true)
-//					Constants.isSerialzing = false;
+				if ( Constants.isSerialzing == true)
+					Constants.isSerialzing = false;
 
 			}
+			MultiLayerNetwork previous_model = Constants.model;
+						if ( Constants.isSerialzing == false){
+							_utils.serializing();
+							Constants.isDeSerializing = false;
 
-			//			if ( Constants.isSerialzing == false){
-			//				_utils.serializing();
-			//				Constants.isDeSerializing = false;
-			//			}
-			//			else
-			//			{
-			//				Constants.isSerialzing = false;
-			//				_utils.deserializing();
-			//				
-			//			}
+						}
+						else
+						{
+							Constants.isSerialzing = false;
+							_utils.deserializing();
 
+						}
+
+
+			System.out.println();
+			System.out.println("Original and restored networks: configs are equal: " + Constants.model.getLayerWiseConfigurations().equals(previous_model.getLayerWiseConfigurations()));
+			System.out.println("Original and restored networks: parameters are equal: " + Constants.model.params().equals(previous_model.params()));
 
 
 			//			if (i == 0) {
@@ -416,12 +421,12 @@ public class Skyserver2 {
 				if ( i == 0 )
 					maxAccuracy = eval.accuracy();
 				else if ( maxAccuracy > eval.accuracy() &&  maxAccuracy - eval.accuracy() > 0.05){
-//					Constants.isSerialzing = false;
-//					Constants.isDeSerializing = true;
+					Constants.isSerialzing = false;
+					Constants.isDeSerializing = true;
 
-//						Constants.trees2 = new ArrayList<>(); 
+//						Constants.trees2 = new ArrayList<>();
 //					for (int l =0 ; l < Constants.numberOfLayers ; l++){
-//						HashMap<Integer, HoeffdingTree> hfs2 =new HashMap<>();	
+//						HashMap<Integer, HoeffdingTree> hfs2 =new HashMap<>();
 //						for ( int jj =0 ; jj < Constants.numberOfNeurons ;jj ++){
 //
 //							FileInputStream file = null;

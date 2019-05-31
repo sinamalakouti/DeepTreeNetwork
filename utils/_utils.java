@@ -48,8 +48,7 @@ public class _utils {
 			Constants.trainInstancesLabel = idxOfMaxInEachColumn.dup();
 		else if (evaluating)
 			Constants.testInstancesLabel = idxOfMaxInEachColumn.dup();
-		
-		idxOfMaxInEachColumn.cleanup();
+
 
 	}
 
@@ -57,13 +56,13 @@ public class _utils {
 
 		INDArray features = ds.getFeatures();
 		INDArray labels = ds.getLabels();
-		
-		
+
+
 		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
-		
+
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
 		Instances instances = _utils.ndArrayToInstances(features_labels);
-		NumericToNominal convert = new NumericToNominal();
+		NumericToNominal convert ;
 		convert = new NumericToNominal();
 		String[] options = new String[2];
 		options[0] = "-R";
@@ -72,25 +71,27 @@ public class _utils {
 		convert.setInputFormat(instances);
 		instances = weka.filters.Filter.useFilter(instances, convert);
 		instances.setClassIndex(instances.numAttributes()-1);
-	
-		idx_labels.cleanup();
-		features.cleanup();
-		labels.cleanup();
+//
+//		idx_labels.cleanup();
+//		features.cleanup();
+//		labels.cleanup();
+
+
 		return instances;
 	}
-	
+
 	public static INDArray getSubDataset(int[] featursIndx , DataSet ds){
 		INDArray features = ds.getFeatures().getColumns(featursIndx);
 		INDArray labels = ds.getLabels();
 		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
-		
+
 		features.cleanup();
 		idx_labels.cleanup();
 		labels.cleanup();
-		
+
 		return features_labels;
-		
+
 	}
 
 	public static INDArray convertActivtionOutput(INDArray arg0, double[][] prediction) throws Exception {
@@ -110,17 +111,17 @@ public class _utils {
 		instances = weka.filters.Filter.useFilter(instances, convert);
 
 		DataSet lables = weka.classifiers.functions.dl4j.Utils.instancesToDataSet(instances);
-		
+
 		dataset.cleanup();
 		instances.clear();
 		arr.cleanup();
-		
+
 		return lables.getLabels();
 	}
 
 	public static int getSplittingFeature(HNode node) throws Exception {
 
-		int attribute = -1;
+		int attribute ;
 		String att = ((SplitNode) node).getSplitAtt();
 		int attNumeric = Integer.parseInt("" + att.charAt(att.length() - 1));
 		attribute = attNumeric;
@@ -291,7 +292,7 @@ public class _utils {
 			instances.add(inst);
 		}
 
-		
+
 		NumericToNominal convert = new NumericToNominal();
 		convert = new NumericToNominal();
 		String[] options = new String[2];
@@ -301,7 +302,7 @@ public class _utils {
 		convert.setInputFormat(instances);
 		instances = weka.filters.Filter.useFilter(instances, convert);
 		instances.setClassIndex(instances.numAttributes()-1);
-		
+
 		return instances;
 	}
 
@@ -315,21 +316,10 @@ public class _utils {
 		double temp = (n1 - 1) * Math.pow(std1, 2) + (n2 - 1) * Math.pow(std2, 2);
 		temp /= (n1 + n2 - 2);
 		temp = Math.sqrt(temp);
-		if (Double.isInfinite(Math.pow(std2, 2))) {
-			System.out.println("in utils");
-			System.out.println("ehe he");
-			System.exit(0);
-		}
-
-		if (Double.isInfinite(temp)) {
-			System.out.println("in utils");
-			System.out.println("haaaa?");
-			System.exit(0);
-		}
 		return Math.max(0.00001, temp);
 	}
-	
-	
+
+
 	public static void createGNUPLOT_ds ( String  name, String path, int first, int last) throws IOException{
 //		  JavaPlot p = new JavaPlot();
 //	      JavaPlot.getDebugger().setLevel(Debug.VERBOSE);
@@ -344,25 +334,26 @@ public class _utils {
 		double [][] score = new double[n] [2];
 		int counter = 0;
 			for ( int i = 0 ; i < n ; i ++ ){
-				
+
 				counter = (i * 2);
 				x[i] = counter + 1;
-				
+
 				File file = new File(path +"resultIteration_" + ( i *2) );
 				Scanner scan = new Scanner(file);
 				String line = null;
+
 				while (scan.hasNextLine()){
 				    line = scan.nextLine();
-				    			
+
 	//		        String delim = "[^a-zA-Z1-9.]+";
-				    
+
 					String delim = "\\s+";
 					String [] tokens = line.split(delim);
-					
+
 					if ( tokens.length < 2)
 						continue;
 					if ( tokens[1].toLowerCase().compareTo("accuracy:") == 0){
-						accuracy[i][0] = counter+1;	
+						accuracy[i][0] = counter+1;
 					 accuracy[i][1] = Double.parseDouble(tokens[2]);
 					}else if ( tokens[1].toLowerCase().compareTo("f1") == 0){
 						fscore[i][0] = counter +1;
@@ -371,16 +362,20 @@ public class _utils {
 					else if ( tokens[0].toLowerCase().compareTo("errors") == 0){
 						score[i][0] = counter +1;
 						score[i][1]= Double.parseDouble(tokens[1]);
-				
+
 					}
-					else 
+					else
 						continue;
-					
-							
+
+
 				}
-				
+				scan.close();
+
+
+
 			}
-			
+
+
 			File file = new File("gnu_result.csv");
 		    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		    String str = "";
@@ -389,32 +384,46 @@ public class _utils {
 		    		System.out.println("chera saram jigh mizani????");
 		    		System.exit(0);
 		    	}
-				str += fscore[i][0]+", "+ fscore[i][1] +", " + score[i][1] +"\n"; 
+				str += fscore[i][0]+", "+ fscore[i][1] +", " + score[i][1] +"\n";
 			}
 		    writer.write(str);
-		    writer.close();			
+		    writer.close();
 
 	}
 //	public static void draw_accuracy_fscore(String name, String path, int first, int last) throws FileNotFoundException{sa}
-	
-	
+
+
+    /**
+     *
+     * steps for serializing the model :
+     * 1) save the whole model and parameters
+     * 2) train the model and save activation functions based on the model it self
+     * 3) also save the itaration number
+     *
+     *
+     * @throws IOException
+     */
+
 	public static void serializing() throws IOException{
-		Constants.isSerialzing = true;
-		ModelSerializer.writeModel(Constants.model, new File("NetowrkModel"), true);
-			
-//		MultiLayerNetwork net = ModelSerializer.restoreMultiLayerNetwork(new File("CustomLayerModel.zip"));
-		
-		
-//        System.out.println("Original and restored networks: configs are equal: " + Constants.model.getLayerWiseConfigurations().equals(net.getLayerWiseConfigurations()));
-//        System.out.println("Original and restored networks: parameters are equal: " + net.params().equals(net.params()));
+
+		ModelSerializer.writeModel(Constants.model, new File("model/NetowrkModel"), true);
+
+
 	}
-	
+
+    /**
+     * steps for desrializing the model :
+     *  1) load the whole model
+     *  2)
+     * @throws IOException
+     */
+
 	public static void deserializing() throws IOException{
 		Constants.isDeSerializing = true;
-		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File("NetowrkModel"));
-		
+		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File("model/NetowrkModel"));
+
 	}
-	
-	
+
+
 
 }

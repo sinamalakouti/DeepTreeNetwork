@@ -278,26 +278,26 @@ public class ADNode implements Serializable, TechnicalInformationHandler,
    * 
    * @param argv the commandline options
    */
-  public static void main(String[] argv) {
-    try {
-      Instances instances = new Instances(new FileReader("\\iris.2.arff"));
-      ADNode ADTree = ADNode.makeADTree(instances);
-      int[] nCounts = new int[12];
-      int[] nNodes = new int[3];
-      int[] nOffsets = new int[3];
-      nNodes[0] = 0;
-      nNodes[1] = 3;
-      nNodes[2] = 4;
-      nOffsets[0] = 2;
-      nOffsets[1] = 1;
-      nOffsets[2] = 4;
-      ADTree.print();
-      ADTree.getCounts(nCounts, nNodes, nOffsets, 0, 0, false);
-
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-  } // main
+//  public static void main(String[] argv) {
+//    try {
+//      Instances instances = new Instances(new FileReader("\\iris.2.arff"));
+//      ADNode ADTree = ADNode.makeADTree(instances);
+//      int[] nCounts = new int[12];
+//      int[] nNodes = new int[3];
+//      int[] nOffsets = new int[3];
+//      nNodes[0] = 0;
+//      nNodes[1] = 3;
+//      nNodes[2] = 4;
+//      nOffsets[0] = 2;
+//      nOffsets[1] = 1;
+//      nOffsets[2] = 4;
+//      ADTree.print();
+//      ADTree.getCounts(nCounts, nNodes, nOffsets, 0, 0, false);
+//
+//    } catch (Throwable t) {
+//      t.printStackTrace();
+//    }
+//  } // main
 
   /**
    * Returns the revision string.

@@ -1,14 +1,13 @@
 package controller;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
@@ -234,49 +233,13 @@ public class Skyserver {
 		trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
 		trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
 		DataSet tempTrainSet = _utils.instancesToDataSet(trainSet2);
-		HoeffdingTree batchTree = null;
-		HoeffdingTree[] baggingTrees = new HoeffdingTree[Constants.numberOfNeurons];
+
 		for (int i = 0; i < 150; i++) {
 			// in the first iteration do the bagging test and the each batch
 			// test :D
 			for (int b = 0; b < Constants.numBatches; b++) {
 
 				DataSet set = getBatchTrainSet(b, Constants.batchSize, tempTrainSet, trainSet2);
-				//				if (i == 0) {
-				//					Instances batchTrainInstance = _utils.dataset2Instances(set);					
-				//					// batch test :
-				//
-				//					if (batchTree == null) {
-				//						batchTree = new HoeffdingTree();
-				//						batchTree.buildClassifier(batchTrainInstance);
-				//					} else {
-				//						Iterator<Instance> it = batchTrainInstance.iterator();
-				//						while (it.hasNext())
-				//							batchTree.updateClassifier(it.next());
-				//					}
-				//
-				//					// bagging test:
-				//					for (int t = 0; t < Constants.numberOfNeurons; t++) {
-				//						INDArray bag = _utils.getSubDataset(Constants.attributesIndexes.get(t), set);
-				//						Instances bagInstances = _utils.ndArrayToInstances(bag);
-				//						if (baggingTrees[t] == null) {
-				//							baggingTrees[t] = new HoeffdingTree();
-				//							baggingTrees[t].buildClassifier(bagInstances);
-				//						} else {
-				//							Iterator<Instance> it = bagInstances.iterator();
-				//							while (it.hasNext()) {
-				//								baggingTrees[t].updateClassifier(it.next());
-				//							}
-				//						}
-				//
-				//					}
-				//
-				//				}
-
-				//				System.out.println(b);
-				//				System.out.println("shoot");
-				//				System.out.println(i);
-
 
 				Constants.model.fit(set);
 //				if ( Constants.isCompare == true && Constants.isSerialzing == true){
@@ -291,16 +254,7 @@ public class Skyserver {
 
 			}
 
-			//			if ( Constants.isSerialzing == false){
-			//				_utils.serializing();
-			//				Constants.isDeSerializing = false;
-			//			}
-			//			else
-			//			{
-			//				Constants.isSerialzing = false;
-			//				_utils.deserializing();
-			//				
-			//			}
+
 
 
 
@@ -417,12 +371,12 @@ public class Skyserver {
 				if ( i == 0 )
 					maxAccuracy = eval.accuracy();
 				else if ( maxAccuracy > eval.accuracy() &&  maxAccuracy - eval.accuracy() > 0.05){
-//					Constants.isSerialzing = false;
-//					Constants.isDeSerializing = true;
+					Constants.isSerialzing = false;
+					Constants.isDeSerializing = true;
 
-//						Constants.trees2 = new ArrayList<>(); 
+						Constants.trees2 = new ArrayList<>();
 //					for (int l =0 ; l < Constants.numberOfLayers ; l++){
-//						HashMap<Integer, HoeffdingTree> hfs2 =new HashMap<>();	
+//						HashMap<Integer, HoeffdingTree> hfs2 =new HashMap<>();
 //						for ( int jj =0 ; jj < Constants.numberOfNeurons ;jj ++){
 //
 //							FileInputStream file = null;
@@ -432,21 +386,21 @@ public class Skyserver {
 //							} catch (FileNotFoundException e1) {
 //								// TODO Auto-generated catch block
 //								e1.printStackTrace();
-//							} 
+//							}
 //							try {
 //								in = new ObjectInputStream(file);
 //							} catch (IOException e1) {
 //								// TODO Auto-generated catch block
 //								e1.printStackTrace();
-//							} 
+//							}
 //							HoeffdingTreeActivationFunction object1 = null;
-//							// Method for deserialization of object 
+//							// Method for deserialization of object
 //							try {
-//								object1 = (HoeffdingTreeActivationFunction)in.readObject();
+//								object1 = (HoeffdingTreeActivationFunction) in.readObject();
 //							} catch (ClassNotFoundException | IOException e) {
-//								
+//
 //								e.printStackTrace();
-//							} 
+//							}
 //
 //							hfs2.put(jj, object1.getActivationModel());
 //
@@ -561,11 +515,7 @@ public class Skyserver {
 
 				}else if ( Constants.isSerialzing == false){
 
-//					_utils.serializing();
-//					if ( maxAccuracy < eval.accuracy())
-//						maxAccuracy = eval.accuracy();
-//					Constants.isDeSerializing = false;
-					//				}
+					_utils.serializing();
 
 
 				}
