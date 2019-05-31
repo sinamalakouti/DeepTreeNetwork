@@ -404,7 +404,7 @@ public class _utils {
 
 	public static void serializing() throws IOException{
 
-		ModelSerializer.writeModel(Constants.model, new File("model/NetowrkModel"), true);
+		ModelSerializer.writeModel(Constants.model, new File("../model/NetowrkModel"), true);
 
 
 	}
@@ -418,7 +418,7 @@ public class _utils {
 
 	public static void deserializing() throws IOException{
 		Constants.isDeSerializing = true;
-		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File("model/NetowrkModel"));
+		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File("../model/NetowrkModel"));
 
 	}
 

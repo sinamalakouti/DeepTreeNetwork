@@ -63,7 +63,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 10;
+        Constants.numberOfNeurons = 40;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -72,7 +72,7 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio = 60;
+        int feature_ratio =5;
 
 
         Network2 net2 = new Network2();
@@ -159,7 +159,7 @@ public class Network2 {
                 if (i % 50 == 0 && serializing)  {
                     Constants.isSerialzing = true;
                     _utils.serializing();
-                    File file = new File("problem/problem_configuration");
+                    File file = new File("../problem/problem_configuration");
                     FileWriter fr = new FileWriter(file);
                     BufferedWriter out = new BufferedWriter(fr);
                     String str = new String();
@@ -347,7 +347,7 @@ public class Network2 {
     private void save_problem_configuration(int numInputs, int feature_ratio) throws IOException {
 
         System.out.println("SAVING THE PROBLEM");
-        File file = new File("problem/problem_configuration");
+        File file = new File("../problem/problem_configuration");
         String str1 = file.getAbsolutePath();
         System.out.println("str1");
         str1 = file.getCanonicalPath();
@@ -359,24 +359,24 @@ public class Network2 {
         out.write(str);
 
         FileOutputStream attributesIndexes_file =
-                new FileOutputStream("problem/attributesIndexes.ser");
+                new FileOutputStream("../problem/attributesIndexes.ser");
         ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
         attIndex_out.writeObject(Constants.attributesIndexes);
 
 
         FileOutputStream class_file =
-                new FileOutputStream("problem/class_file.ser");
+                new FileOutputStream("../problem/class_file.ser");
         ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
         class_file_out.writeObject(Constants.classChosedArray);
 
         FileOutputStream mnistTrain_file =
-                new FileOutputStream("problem/mnistTrain_file.ser");
+                new FileOutputStream("../problem/mnistTrain_file.ser");
         ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
         mnistTrain_file_out.writeObject(mnistTrain);
 
 
         FileOutputStream mnistTest_file =
-                new FileOutputStream("problem/mnistTest_file.ser");
+                new FileOutputStream("../problem/mnistTest_file.ser");
         ObjectOutputStream mnistTest_file_out = new ObjectOutputStream(mnistTest_file);
         mnistTest_file_out.writeObject(mnistTest);
 
@@ -399,7 +399,7 @@ public class Network2 {
     private void load_problem_configuration(int numInputs, int feature_ratio) throws IOException, ClassNotFoundException {
 
         System.out.println("LOADING THE PROBLEM");
-        File file = new File("problem/problem_configuration");
+        File file = new File("../problem/problem_configuration");
 
         Scanner in = new Scanner(file);
 
@@ -408,25 +408,25 @@ public class Network2 {
         this.iteration_based = Integer.parseInt(arr[1]);
 
         FileInputStream attributesIndexes_file =
-                new FileInputStream("problem/attributesIndexes.ser");
+                new FileInputStream("../problem/attributesIndexes.ser");
         ObjectInputStream attIndex_in = new ObjectInputStream(attributesIndexes_file);
 
         Constants.attributesIndexes = (HashMap<Integer, int[]>) attIndex_in.readObject();
 
 
         FileInputStream class_file =
-                new FileInputStream("problem/class_file.ser");
+                new FileInputStream("../problem/class_file.ser");
         ObjectInputStream class_file_in = new ObjectInputStream(class_file);
         Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
 
         FileInputStream mnistTrain_file =
-                new FileInputStream("problem/mnistTrain_file.ser");
+                new FileInputStream("../problem/mnistTrain_file.ser");
         ObjectInputStream mnistTrain_file_in = new ObjectInputStream(mnistTrain_file);
         mnistTrain = (DataSetIterator) mnistTrain_file_in.readObject();
 
 
         FileInputStream mnistTest_file =
-                new FileInputStream("problem/mnistTest_file.ser");
+                new FileInputStream("../problem/mnistTest_file.ser");
         ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
         mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
 
