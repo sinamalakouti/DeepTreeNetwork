@@ -399,7 +399,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				FileOutputStream file = null;
 				try {
-					file = new FileOutputStream("model/hf_Activation_" + LayerNumber + "_" + neuron);
+					file = new FileOutputStream("/model/hf_Activation_" + LayerNumber + "_" + neuron);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

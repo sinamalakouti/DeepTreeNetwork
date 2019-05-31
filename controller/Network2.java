@@ -63,7 +63,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 40;
+        Constants.numberOfNeurons = 10;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -72,7 +72,7 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio = 5;
+        int feature_ratio = 60;
 
 
         Network2 net2 = new Network2();
@@ -348,6 +348,10 @@ public class Network2 {
 
         System.out.println("SAVING THE PROBLEM");
         File file = new File("problem/problem_configuration");
+        String str1 = file.getAbsolutePath();
+        System.out.println("str1");
+        str1 = file.getCanonicalPath();
+        System.out.println(str1);
         FileWriter fr = new FileWriter(file);
         BufferedWriter out = new BufferedWriter(fr);
         String str = new String();
