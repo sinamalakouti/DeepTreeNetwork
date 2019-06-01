@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 40;
+        Constants.numberOfNeurons = 50;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
