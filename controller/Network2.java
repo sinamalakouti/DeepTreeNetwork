@@ -72,7 +72,7 @@ public class Network2 {
 
         int feature_ratio =40;
         DataSetIterator  mnistTrain = null;
-        DataSetIterator  mnistTest = null;
+        DataSet  mnistTest = null;
      //
         Instances trainSet2 = null;
 
@@ -90,10 +90,11 @@ public class Network2 {
 
 
 
+
         FileInputStream mnistTest_file =
                 new FileInputStream("../problem/mnistTest_file.ser");
         ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
-        mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
+        mnistTest.load(mnistTest_file);
 
 
         mnistTest_file.close();
@@ -182,17 +183,17 @@ public class Network2 {
                 //
                 Evaluation eval = new Evaluation(outputNum); // create an
                 //
-                while (mnistTest.hasNext()) {
+//                while (mnistTest.hasNext()) {
 
-                    DataSet next = mnistTest.next();
+//                    DataSet next = mnistTest.next();
                     System.out.println(Constants.isEvaluating);
-                    _utils.setLabels(next.getLabels(), Constants.isEvaluating,
+                    _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating,
                             false);
-                    INDArray output = Constants.model.output(next.getFeatures());
+                    INDArray output = Constants.model.output(mnistTest.getFeatures());
 
-                    eval.eval(next.getLabels(), output);
-                }
-                mnistTest.reset();
+                    eval.eval(mnistTest.getLabels(), output);
+//                }
+//                mnistTest.reset();
                 //
                 String path =
                         "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/21/resultIteration_" + i;
@@ -370,8 +371,9 @@ public class Network2 {
 
         FileOutputStream mnistTrain_file =
                 new FileOutputStream("../problem/mnistTrain_file.ser");
-        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
-        mnistTrain_file_out.writeObject(mnistTrain);
+//        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
+//        mnistTrain_file_out.writeObject(mnistTrain);
+        mnistTest.next().save(mnistTrain_file);
 
 
         FileOutputStream mnistTest_file =
@@ -418,9 +420,9 @@ public class Network2 {
         class_file.close();
         class_file_out.close();
         mnistTrain_file.close();
-        mnistTrain_file_out.close();
+//        mnistTrain_file_out.close();
         mnistTrain_file.close();
-        mnistTrain_file_out.close();
+//        mnistTrain_file_out.close();
         mnistTest_file.close();
         mnistTest_file_out.close();
         trainSet_file_out.close();
