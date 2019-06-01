@@ -397,41 +397,41 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 
 
-			if (Constants.isDeSerializing && !activationModels.containsKey(neuron)) {
+				if (Constants.isDeSerializing && !activationModels.containsKey(neuron)) {
 
-				FileInputStream file = null;
-				ObjectInputStream in = null;
-				try {
-					file = new FileInputStream("../model/hf_Activation_" + LayerNumber + "_" + neuron);
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				try {
-					in = new ObjectInputStream(file);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				HoeffdingTreeActivationFunction object1 = null;
-				// Method for deserialization of object
-				try {
-					object1 = (HoeffdingTreeActivationFunction) in.readObject();
-				} catch (ClassNotFoundException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				this.activationModels.put(neuron, object1);
+					FileInputStream file = null;
+					ObjectInputStream in = null;
+					try {
+						file = new FileInputStream("../model/hf_Activation_" + LayerNumber + "_" + neuron);
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						in = new ObjectInputStream(file);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					HoeffdingTreeActivationFunction object1 = null;
+					// Method for deserialization of object
+					try {
+						object1 = (HoeffdingTreeActivationFunction) in.readObject();
+					} catch (ClassNotFoundException | IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					this.activationModels.put(neuron, object1);
 
-				try {
-					in.close();
-					file.close();
+					try {
+						in.close();
+						file.close();
 
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			}
 
 			if (!activationModels.containsKey(neuron))
 				activationModels.put(neuron, new HoeffdingTreeActivationFunction(this.LayerNumber, false, neuron));

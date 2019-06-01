@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 50;
+        Constants.numberOfNeurons = 40;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -70,7 +70,7 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio =5;
+        int feature_ratio =40;
         DataSetIterator  mnistTrain = null;
         DataSetIterator  mnistTest = null;
      //
@@ -78,7 +78,7 @@ public class Network2 {
 
 
         Network2 net2 = new Network2();
-        if (deSerializing == false ) {
+        if (deSerializing == false) {
             net2.init_problem_configuration(numInputs, feature_ratio);
             trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
             DataSet tempTrainSet;
@@ -138,7 +138,7 @@ public class Network2 {
 
 
 
-        System.out.println("NETWORK2.JAVA is running   784 / 5 and 40 neurons at 23");
+        System.out.println("NETWORK2.JAVA is running   784 / 40 and 40 neurons at 21");
         for (int i = 0 + net2.iteration_based; i < 156; i++) {
             // in the first iteration do the bagging test and the each batch
             // test :D
@@ -195,7 +195,7 @@ public class Network2 {
                 mnistTest.reset();
                 //
                 String path =
-                        "/root/research/result/phase4/randomClassConfig/22/resultIteration_" + i;
+                        "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/21/resultIteration_" + i;
                 File file = new File(path);
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
