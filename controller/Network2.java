@@ -225,16 +225,16 @@ public class Network2 {
         // object with 10
         // possible classes
         int counter = 0;
-        while (mnistTest.hasNext()) {
+//        while (mnistTest.hasNext()) {
 
-            DataSet next = mnistTest.next();
-            _utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
-            INDArray output = Constants.model.output(next.getFeatures());
-            eval.eval(next.getLabels(), output); // check the prediction
+//            DataSet next = mnistTest.next();
+            _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating, false);
+            INDArray output = Constants.model.output(mnistTest.getFeatures());
+            eval.eval(mnistTest.getLabels(), output); // check the prediction
             // against the true
             // class
             counter++;
-        }
+//        }
 //			System.out.println(counter);
         log.info(eval.stats());
 
