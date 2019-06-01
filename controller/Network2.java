@@ -195,7 +195,7 @@ public class Network2 {
                 mnistTest.reset();
                 //
                 String path =
-                        "/home/research/result/phase4/randomClassConfig/23/resultIteration_" + i;
+                        "/root/research/result/phase4/randomClassConfig/22/resultIteration_" + i;
                 File file = new File(path);
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
