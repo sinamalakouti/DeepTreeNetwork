@@ -373,7 +373,7 @@ public class Network2 {
                 new FileOutputStream("../problem/mnistTrain_file.ser");
 //        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
 //        mnistTrain_file_out.writeObject(mnistTrain);
-        mnistTest.next().save(mnistTrain_file);
+        mnistTest.next().save(mnistTest);
 
 
         FileOutputStream mnistTest_file =
