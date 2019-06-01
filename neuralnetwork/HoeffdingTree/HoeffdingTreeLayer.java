@@ -397,7 +397,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 
 
-				if (Constants.isDeSerializing && !activationModels.containsKey(neuron)) {
+				if (Constants.isDeSerializing ) {
 
 					FileInputStream file = null;
 					ObjectInputStream in = null;
