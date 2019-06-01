@@ -126,7 +126,7 @@ public class Skyserver {
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 						.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
-				.backprop(true).pretrain(false).build();
+				.build();
 
 		// run the model
 		String configAsJson = conf.toJson();

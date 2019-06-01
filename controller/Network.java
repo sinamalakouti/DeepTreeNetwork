@@ -143,7 +143,7 @@ public class Network {
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 								.activation(Activation.SOFTMAX).nIn(40).nOut(outputNum).build())
-				.backprop(true).pretrain(false).build();
+				.build();
 
 		// run the model
 		Constants.model = new MultiLayerNetwork(conf);

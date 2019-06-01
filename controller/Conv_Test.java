@@ -206,7 +206,7 @@ public class Conv_Test {
                         .activation(Activation.SOFTMAX)
                         .build())
         .setInputType(InputType.convolutionalFlat(28, 28, 1)) // InputType.convolutional for normal image
-        .backprop(true).pretrain(false).build();
+        .build();
 
      Constants.model = new MultiLayerNetwork(conf);
      Constants.model.init();

@@ -40,7 +40,7 @@ public class _utils {
 
 	public static void setLabels(INDArray labels, boolean evaluating, boolean training) {
 
-		INDArray idxOfMaxInEachColumn = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
+		INDArray idxOfMaxInEachColumn = Nd4j.getExecutioner().exec(new IAMax(labels),1);
 
 		if (training)
 			Constants.trainInstancesLabel = idxOfMaxInEachColumn.dup();
@@ -56,7 +56,7 @@ public class _utils {
 		INDArray labels = ds.getLabels();
 
 
-		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
+		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels),1);
 
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
 		Instances instances = _utils.ndArrayToInstances(features_labels);
@@ -69,7 +69,7 @@ public class _utils {
 		convert.setInputFormat(instances);
 		instances = weka.filters.Filter.useFilter(instances, convert);
 		instances.setClassIndex(instances.numAttributes()-1);
-//
+
 //		idx_labels.cleanup();
 //		features.cleanup();
 //		labels.cleanup();
@@ -81,12 +81,10 @@ public class _utils {
 	public static INDArray getSubDataset(int[] featursIndx , DataSet ds){
 		INDArray features = ds.getFeatures().getColumns(featursIndx);
 		INDArray labels = ds.getLabels();
-		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels), 1);
+		INDArray idx_labels = Nd4j.getExecutioner().exec(new IAMax(labels),1);
 		INDArray features_labels = Nd4j.concat(1, features, idx_labels).dup();
 
-		features.cleanup();
-		idx_labels.cleanup();
-		labels.cleanup();
+		
 
 		return features_labels;
 
@@ -110,9 +108,9 @@ public class _utils {
 
 		DataSet lables = weka.classifiers.functions.dl4j.Utils.instancesToDataSet(instances);
 
-		dataset.cleanup();
+
 		instances.clear();
-		arr.cleanup();
+		
 
 		return lables.getLabels();
 	}

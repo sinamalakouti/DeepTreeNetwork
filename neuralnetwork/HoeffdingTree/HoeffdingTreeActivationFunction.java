@@ -162,7 +162,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		// in = inputData .* weights
 
 
-		Instances trainInstaces = createProperDataset(in.dup(), training);
+		Instances trainInstaces = createProperDataset(in, training);
 
 		// having random class config:
 		double[] result = new double[trainInstaces.size()];
@@ -295,7 +295,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 			return Nd4j.create(outputLayerOutput);
 
 		trainInstaces.clear();
-		in.cleanup();
+//		in.cleanup();
 
 		
 		INDArray arr = Nd4j.create(result);
@@ -335,7 +335,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 				instances = weka.filters.Filter.useFilter(instances, convert);
 			}
 			
-			label.cleanup();
+//			label.cleanup();
 			
 		} catch (WekaException e) {
 			e.printStackTrace();

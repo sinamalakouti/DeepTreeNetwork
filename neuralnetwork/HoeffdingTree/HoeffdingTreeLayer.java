@@ -105,7 +105,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		// this does a
 
 
-		INDArray delta = z.muli(epsilon).dup();
+		INDArray delta = z.muli(epsilon)	;
 
 		
 		if (maskArray != null) {
@@ -395,44 +395,6 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		}
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 
-			if (Constants.isSerialzing == true) {
-
-				FileOutputStream file = null;
-				try {
-					file = new FileOutputStream("../model/hf_Activation_" + LayerNumber + "_" + neuron);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				ObjectOutputStream out = null;
-				try {
-					out = new ObjectOutputStream(file);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					out.writeObject(activationModels.get(neuron));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				try {
-					out.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					file.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			}
-			
 
 
 			if (Constants.isDeSerializing && !activationModels.containsKey(neuron)) {
@@ -509,7 +471,8 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				// z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
 				else
 					ztemp = z.dup();
-
+				//System.out.println(activationModels);
+				//System.out.println(activationModels.get(neuron));
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, ret);
 				// todo : if random class config
@@ -539,9 +502,48 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				// if we want pass all the predicitons
 				// result = Nd4j.concat(1, result, ret);
 				
-				ztemp.cleanup();
-				ret.cleanup();
+//				ztemp.cleanup();
+//				ret.cleanup();
 			}
+
+			if (Constants.isSerialzing == true) {
+
+				FileOutputStream file = null;
+				try {
+					file = new FileOutputStream("../model/hf_Activation_" + LayerNumber + "_" + neuron);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ObjectOutputStream out = null;
+				try {
+					out = new ObjectOutputStream(file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					out.writeObject(activationModels.get(neuron));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					file.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
 
 		}
 		double avgDepth = 0d;

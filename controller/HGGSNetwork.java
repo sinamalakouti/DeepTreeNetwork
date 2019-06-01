@@ -103,7 +103,7 @@ public class HGGSNetwork {
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 								.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(Constants.numClasses).build())
-				.backprop(true).pretrain(false).build();
+.build();
 
 		// run the model
 		Constants.model = new MultiLayerNetwork(conf);

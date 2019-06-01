@@ -28,6 +28,7 @@ import org.deeplearning4j.nn.workspace.ArrayType;
 import org.deeplearning4j.nn.workspace.LayerWorkspaceMgr;
 import org.deeplearning4j.optimize.Solver;
 import org.deeplearning4j.optimize.api.ConvexOptimizer;
+//import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.memory.MemoryWorkspace;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
@@ -345,10 +346,10 @@ public  class TreeLayer extends BaseLayer<CustomLayer> {
         }
 
 
-        INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+        INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS ,input.size(0), W.size(0));
         
 //        TODO : is the weighted input
-        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(1));
+        INDArray ret = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS,  input.size(0), W.size(1));
         for(int neuron  = 0 ; neuron < W.columns() ; neuron ++ ) {
         	
         	if ( ! activationModels.containsKey(neuron))

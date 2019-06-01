@@ -26,7 +26,6 @@ import utils.Constants;
 import utils._utils;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.pmml.Constant;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
@@ -37,10 +36,9 @@ public class Network2 {
     private static Logger log = LoggerFactory.getLogger(Network2.class);
 
 
-    DataSetIterator mnistTrain;
-    DataSetIterator mnistTest;
-    DataSet tempTrainSet;
-    Instances trainSet2 = null;
+//    DataSetIterator mnistTrain;
+//
+
 
     int iteration_based;
 
@@ -73,51 +71,41 @@ public class Network2 {
         Constants.maximumDepth--;
 
         int feature_ratio =5;
+        DataSetIterator  mnistTrain = null;
+        DataSetIterator  mnistTest = null;
+     //
+        Instances trainSet2 = null;
 
 
         Network2 net2 = new Network2();
-        if (deSerializing == false) {
+        if (deSerializing == false && false) {
             net2.init_problem_configuration(numInputs, feature_ratio);
-            net2.save_problem_configuration(numInputs, feature_ratio);
+            trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
+            DataSet tempTrainSet;
+            tempTrainSet = _utils.instancesToDataSet(trainSet2);
+            saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
         }
         else
-            net2.load_problem_configuration(numInputs, feature_ratio);
+            trainSet2 = net2.load_problem_configuration(numInputs, feature_ratio);
 
 
-        DataNormalization scaler = new NormalizerStandardize();
-        scaler.fit(net2.mnistTrain);
-        net2.mnistTrain.setPreProcessor(scaler);
-        net2.mnistTest.setPreProcessor(scaler); // same normalization for better results
-        net2.mnistTrain.reset();
+
+        FileInputStream mnistTest_file =
+                new FileInputStream("../problem/mnistTest_file.ser");
+        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
+        mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
 
 
-        int counter = 0;
-        Instances trainTemp = null;
-        int c = 0;
+        mnistTest_file.close();
+        mnistTest_file_in.close();
 
-        while (net2.mnistTrain.hasNext()) {
-            DataSet set = net2.mnistTrain.next();
-            if (c == 0) {
-                net2.trainSet2 = _utils.dataset2Instances(set);
-            } else {
-                trainTemp = _utils.dataset2Instances(set);
-                for (int i = 0; i < trainTemp.size(); i++)
-                    net2.trainSet2.add(trainTemp.get(i));
-            }
 
-            c++;
-        }
-        net2.mnistTrain.reset();
+        mnistTrain = null;
 
-        NumericToNominal convert = new NumericToNominal();
-        String[] options = new String[2];
-        options[0] = "-R";
-        options[1] = "" + (net2.trainSet2.numAttributes()); // range of variables to
-        convert.setOptions(options);
-        convert.setInputFormat(net2.trainSet2);
-        net2.trainSet2 = weka.filters.Filter.useFilter(net2.trainSet2, convert);
-        net2.trainSet2.setClassIndex(net2.trainSet2.numAttributes() - 1);
-        net2.tempTrainSet = _utils.instancesToDataSet(net2.trainSet2);
+
+
+
+
 
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -135,7 +123,7 @@ public class Network2 {
                 .layer(2,
                         new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                                 .activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
-                .backprop(true).pretrain(false).build();
+                .build();
 
         // run the model
         Constants.model = new MultiLayerNetwork(conf);
@@ -148,22 +136,24 @@ public class Network2 {
 //			tmp1.clear();
 
 
+
+
         System.out.println("NETWORK2.JAVA is running   784 / 5 and 40 neurons at 23");
         for (int i = 0 + net2.iteration_based; i < 156; i++) {
             // in the first iteration do the bagging test and the each batch
             // test :D
             for (int b = 0; b < Constants.numBatches; b++) {
 
-                DataSet set = getBatchTrainSet(b, Constants.batchSize, net2.tempTrainSet, net2.trainSet2);
+                DataSet set = getBatchTrainSet(b, Constants.batchSize,trainSet2 );
 
-                if (i % 50 == 0 && serializing)  {
+                if (i % 10  == 0 && serializing && b == Constants.numBatches - 1)  {
                     Constants.isSerialzing = true;
                     _utils.serializing();
                     File file = new File("../problem/problem_configuration");
                     FileWriter fr = new FileWriter(file);
                     BufferedWriter out = new BufferedWriter(fr);
                     String str = new String();
-                    str += "iteration_based " + net2.iteration_based + "\n";
+                    str += "iteration_based " + i + "\n";
                     out.write(str);
                     out.close();
                     fr.close();
@@ -192,9 +182,9 @@ public class Network2 {
                 //
                 Evaluation eval = new Evaluation(outputNum); // create an
                 //
-                while (net2.mnistTest.hasNext()) {
+                while (mnistTest.hasNext()) {
 
-                    DataSet next = net2.mnistTest.next();
+                    DataSet next = mnistTest.next();
                     System.out.println(Constants.isEvaluating);
                     _utils.setLabels(next.getLabels(), Constants.isEvaluating,
                             false);
@@ -202,7 +192,7 @@ public class Network2 {
 
                     eval.eval(next.getLabels(), output);
                 }
-                net2.mnistTest.reset();
+                mnistTest.reset();
                 //
                 String path =
                         "/home/research/result/phase4/randomClassConfig/23/resultIteration_" + i;
@@ -233,10 +223,10 @@ public class Network2 {
         Evaluation eval = new Evaluation(outputNum); // create an evaluation
         // object with 10
         // possible classes
-        counter = 0;
-        while (net2.mnistTest.hasNext()) {
+        int counter = 0;
+        while (mnistTest.hasNext()) {
 
-            DataSet next = net2.mnistTest.next();
+            DataSet next = mnistTest.next();
             _utils.setLabels(next.getLabels(), Constants.isEvaluating, false);
             INDArray output = Constants.model.output(next.getFeatures());
             eval.eval(next.getLabels(), output); // check the prediction
@@ -250,27 +240,30 @@ public class Network2 {
     }
 
 
-    private static DataSet getBatchTrainSet(int batchNumber, int batchRate, DataSet trainSet, Instances training) {
+    private static DataSet getBatchTrainSet(int batchNumber, int batchRate , Instances training) {
 
-        INDArray features = trainSet.getFeatures();
-        INDArray labels = trainSet.getLabels();
+//
+        DataSet set = null;
+        try {
+            set = readBatch_dataset(batchNumber);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         int start = batchNumber * batchRate;
         int end = (batchNumber + 1) * batchRate;
-
-        INDArray batchTrain_features = features.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
-        INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
-
-        DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
         List<Instance> list = training.subList(start, end);
+
         double[] labels_list = new double[list.size()];
         for (int i = 0; i < list.size(); i++)
             labels_list[i] = list.get(i).classValue();
         Constants.trainInstancesLabel = Nd4j.create(labels_list).transpose();
 
-        features.cleanup();
-        labels.cleanup();
-        batchTrain_features.cleanup();
-        batchTrain_labels.cleanup();
+//        features.cleanup();
+//        labels.cleanup();
+//        batchTrain_features.cleanup();
+//        batchTrain_labels.cleanup();
 
 
         return set;
@@ -335,16 +328,13 @@ public class Network2 {
 
         // set-up the project :
 
-        mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-        mnistTest = new MnistDataSetIterator(10000, false, 6);
-
 
         iteration_based = 0;
 
     }
 
 
-    private void save_problem_configuration(int numInputs, int feature_ratio) throws IOException {
+    private Instances save_problem_configuration(int numInputs, int feature_ratio , Instances trainSet2) throws Exception {
 
         System.out.println("SAVING THE PROBLEM");
         File file = new File("../problem/problem_configuration");
@@ -369,6 +359,15 @@ public class Network2 {
         ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
         class_file_out.writeObject(Constants.classChosedArray);
 
+        DataSetIterator  mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
+        DataSetIterator  mnistTest = new MnistDataSetIterator(10000, false, 6);
+        DataNormalization scaler = new NormalizerStandardize();
+        scaler.fit(mnistTrain);
+        mnistTrain.setPreProcessor(scaler);
+        mnistTest.setPreProcessor(scaler); // same normalization for better results
+        mnistTrain.reset();
+
+
         FileOutputStream mnistTrain_file =
                 new FileOutputStream("../problem/mnistTrain_file.ser");
         ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
@@ -379,6 +378,38 @@ public class Network2 {
                 new FileOutputStream("../problem/mnistTest_file.ser");
         ObjectOutputStream mnistTest_file_out = new ObjectOutputStream(mnistTest_file);
         mnistTest_file_out.writeObject(mnistTest);
+
+        int counter = 0;
+        Instances trainTemp = null;
+        int c = 0;
+        while (mnistTrain.hasNext()) {
+            DataSet set = mnistTrain.next();
+            if (c == 0) {
+                trainSet2 = _utils.dataset2Instances(set);
+            } else {
+                trainTemp = _utils.dataset2Instances(set);
+                for (int i = 0; i < trainTemp.size(); i++)
+                    trainSet2.add(trainTemp.get(i));
+            }
+
+            c++;
+        }
+        NumericToNominal convert = new NumericToNominal();
+        String[] options = new String[2];
+        options[0] = "-R";
+        options[1] = "" + (trainSet2.numAttributes()); // range of variables to
+        convert.setOptions(options);
+        convert.setInputFormat(trainSet2);
+        trainSet2 = weka.filters.Filter.useFilter(trainSet2, convert);
+        trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
+
+
+
+        FileOutputStream trainSet_file =
+                new FileOutputStream("../problem/trainSet_file.ser");
+        ObjectOutputStream trainSet_file_out = new ObjectOutputStream(trainSet_file);
+        trainSet_file_out.writeObject(trainSet2);
+
 
 
         out.close();
@@ -392,11 +423,13 @@ public class Network2 {
         mnistTrain_file_out.close();
         mnistTest_file.close();
         mnistTest_file_out.close();
-
+        trainSet_file_out.close();
+        trainSet_file.close();
+        return  trainSet2;
     }
 
 
-    private void load_problem_configuration(int numInputs, int feature_ratio) throws IOException, ClassNotFoundException {
+    private Instances load_problem_configuration(int numInputs, int feature_ratio) throws IOException, ClassNotFoundException {
 
         System.out.println("LOADING THE PROBLEM");
         File file = new File("../problem/problem_configuration");
@@ -417,29 +450,100 @@ public class Network2 {
         FileInputStream class_file =
                 new FileInputStream("../problem/class_file.ser");
         ObjectInputStream class_file_in = new ObjectInputStream(class_file);
+
         Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
 
-        FileInputStream mnistTrain_file =
-                new FileInputStream("../problem/mnistTrain_file.ser");
-        ObjectInputStream mnistTrain_file_in = new ObjectInputStream(mnistTrain_file);
-        mnistTrain = (DataSetIterator) mnistTrain_file_in.readObject();
+
+        FileInputStream trainSet_file =
+                new FileInputStream("../problem/trainSet_file.ser");
+        ObjectInputStream trainSet_file_in = new ObjectInputStream(trainSet_file);
+        Instances trainTest2 = (Instances) trainSet_file_in.readObject();
 
 
-        FileInputStream mnistTest_file =
-                new FileInputStream("../problem/mnistTest_file.ser");
-        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
-        mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
+//        FileInputStream mnistTrain_file =
+//                new FileInputStream("../problem/mnistTrain_file.ser");
+//        ObjectInputStream mnistTrain_file_in = new ObjectInputStream(mnistTrain_file);
+//        mnistTrain = (DataSetIterator) mnistTrain_file_in.readObject();
+//
+//
+//        FileInputStream mnistTest_file =
+//                new FileInputStream("../problem/mnistTest_file.ser");
+//        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
+//        mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
 
 
-        mnistTest_file.close();
-        mnistTest_file_in.close();
-        mnistTrain_file.close();
-        mnistTrain_file_in.close();
+//        mnistTest_file.close();
+//        mnistTest_file_in.close();
+//        mnistTrain_file.close();
+//        mnistTrain_file_in.close();
         class_file.close();
         class_file_in.close();
         attributesIndexes_file.close();
         attIndex_in.close();
+        in.close();
+        trainSet_file.close();
+        trainSet_file_in.close();
+        return  trainTest2;
+
 
 
     }
+
+
+    private static void saveBatches ( int totalBatches, int batchRate, DataSet trainSet, Instances training) throws IOException {
+
+        for (int batchNumber  = 0 ; batchNumber < totalBatches ; batchNumber ++){
+
+
+            INDArray features = trainSet.getFeatures();
+            INDArray labels = trainSet.getLabels();
+            int start = batchNumber * batchRate;
+            int end = (batchNumber + 1) * batchRate;
+
+            INDArray batchTrain_features = features.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
+            INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
+
+            DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
+
+            FileOutputStream batch_file =
+                    new FileOutputStream("../data/batch" +batchNumber + ".ser");
+            ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
+            batch_file_out.writeObject(set);
+
+
+
+            batch_file.close();
+            batch_file_out.close();
+//            instanc_b_file.close();
+//            instanc_b_file_out.close();
+        }
+    }
+
+
+    private  static DataSet readBatch_dataset( int batchNumber) throws IOException, ClassNotFoundException {
+
+
+        FileInputStream batch_file =
+                new FileInputStream("../data/batch" +batchNumber + ".ser");
+        ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
+        DataSet set =  (DataSet) batch_file_in.readObject();
+
+        batch_file.close();
+        batch_file_in.close();
+        return set;
+    }
+//    private  static Instances readBatch_instance( int batchNumber) throws IOException, ClassNotFoundException {
+//
+//
+//        FileInputStream batch_file =
+//                new FileInputStream("../data/instanceb_" +batchNumber + ".ser");
+//        ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
+//        Instances set =  (Instances) batch_file_in.readObject();
+//
+//        batch_file.close();
+//        batch_file_in.close();
+//        return set;
+//    }
 }
+
+

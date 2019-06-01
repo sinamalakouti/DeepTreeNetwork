@@ -151,7 +151,7 @@ public class Main {
                     .nIn(100)
                     .nOut(outputNum)
                     .build())
-            .pretrain(false).backprop(true) //use backpropagation to adjust weights
+            
             .build();
 
         Constants.model = new MultiLayerNetwork(conf);
