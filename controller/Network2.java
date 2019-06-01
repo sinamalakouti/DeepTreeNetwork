@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 50;
+        Constants.numberOfNeurons = 40;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -196,7 +196,7 @@ public class Network2 {
 //                mnistTest.reset();
                 //
                 String path =
-                        "/root/research/result/phase4/randomClassConfig/22/resultIteration_" + i;
+                        "/home/research/result/phase4/randomClassConfig/24/resultIteration_" + i;
                 File file = new File(path);
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
