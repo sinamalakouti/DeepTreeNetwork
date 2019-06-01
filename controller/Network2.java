@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 40;
+        Constants.numberOfNeurons = 50;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -70,9 +70,9 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio =40;
+        int feature_ratio =5;
         DataSetIterator  mnistTrain = null;
-        DataSet  mnistTest = null;
+        DataSet  mnistTest = new DataSet();
      //
         Instances trainSet2 = null;
 
@@ -139,7 +139,7 @@ public class Network2 {
 
 
 
-        System.out.println("NETWORK2.JAVA is running   784 / 40 and 40 neurons at 21");
+        System.out.println("NETWORK2.JAVA is running   784 / 5 and 50 neurons at 21");
         for (int i = 0 + net2.iteration_based; i < 156; i++) {
             // in the first iteration do the bagging test and the each batch
             // test :D
