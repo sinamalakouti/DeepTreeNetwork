@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 50;
+        Constants.numberOfNeurons = 40;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -70,7 +70,7 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio =5;
+        int feature_ratio =40;
         DataSetIterator  mnistTrain = null;
         DataSet  mnistTest = null;
      //
