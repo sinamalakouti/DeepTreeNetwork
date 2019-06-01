@@ -373,13 +373,13 @@ public class Network2 {
                 new FileOutputStream("../problem/mnistTrain_file.ser");
 //        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
 //        mnistTrain_file_out.writeObject(mnistTrain);
-        mnistTest.next().save(mnistTest);
 
 
         FileOutputStream mnistTest_file =
                 new FileOutputStream("../problem/mnistTest_file.ser");
         ObjectOutputStream mnistTest_file_out = new ObjectOutputStream(mnistTest_file);
-        mnistTest_file_out.writeObject(mnistTest);
+//        mnistTest_file_out.writeObject(mnistTest);
+        mnistTest.next().save(mnistTest_file);
 
         int counter = 0;
         Instances trainTemp = null;
