@@ -78,7 +78,7 @@ public class Network2 {
 
 
         Network2 net2 = new Network2();
-        if (deSerializing == false && false) {
+        if (deSerializing == false ) {
             net2.init_problem_configuration(numInputs, feature_ratio);
             trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
             DataSet tempTrainSet;
