@@ -196,7 +196,7 @@ public class Network2 {
 //                mnistTest.reset();
                 //
                 String path =
-                        "/home/research/result/phase4/randomClassConfig/24/resultIteration_" + i;
+                        "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/22/resultIteration_" + i;
 //                File file = new File(path);
 //                BufferedWriter out = new BufferedWriter(new
 //                        FileWriter(file));
