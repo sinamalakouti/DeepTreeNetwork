@@ -197,20 +197,20 @@ public class Network2 {
                 //
                 String path =
                         "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/22/resultIteration_" + i;
-//                File file = new File(path);
-//                BufferedWriter out = new BufferedWriter(new
-//                        FileWriter(file));
+                File file = new File(path);
+                BufferedWriter out = new BufferedWriter(new
+                        FileWriter(file));
                 String avglayersTreesDepth = "";
                 for (int l = 0; l < Constants.numberOfLayers; l++)
                     avglayersTreesDepth = avglayersTreesDepth + " " +
                             Constants.avgHFDepth[l];
-//                out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+                out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
 //
                 System.out.println(eval.stats() + "\n" + "errors:  " +
                         Constants.model.score() + "\n" + avglayersTreesDepth);
 
                 //
-//                out.close();
+                out.close();
                 Constants.isEvaluating = false;
                 //
             }
