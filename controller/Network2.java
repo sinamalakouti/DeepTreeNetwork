@@ -61,7 +61,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 40;
+        Constants.numberOfNeurons = 20;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -177,7 +177,7 @@ public class Network2 {
 
             }
 
-            if (i % 2 == 0) {
+                if (i % 2 == 0) {
                 Constants.isEvaluating = true;
                 log.info("Evaluate model....");
                 //
@@ -197,20 +197,20 @@ public class Network2 {
                 //
                 String path =
                         "/home/research/result/phase4/randomClassConfig/24/resultIteration_" + i;
-                File file = new File(path);
-                BufferedWriter out = new BufferedWriter(new
-                        FileWriter(file));
+//                File file = new File(path);
+//                BufferedWriter out = new BufferedWriter(new
+//                        FileWriter(file));
                 String avglayersTreesDepth = "";
                 for (int l = 0; l < Constants.numberOfLayers; l++)
                     avglayersTreesDepth = avglayersTreesDepth + " " +
                             Constants.avgHFDepth[l];
-                out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+//                out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
 //
                 System.out.println(eval.stats() + "\n" + "errors:  " +
                         Constants.model.score() + "\n" + avglayersTreesDepth);
 
                 //
-                out.close();
+//                out.close();
                 Constants.isEvaluating = false;
                 //
             }

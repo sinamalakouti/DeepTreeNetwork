@@ -207,59 +207,59 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		double[][] outputLayerOutput = null;
 		if (this.isOutputLayerActivation == true)
 			outputLayerOutput = new double[trainInstaces.size()][trainInstaces.numClasses()];
-		while (it.hasNext()) {
+			while (it.hasNext()) {
 
-			double[] prediction;
-			// double[] prediction2;
+				double[] prediction;
+				// double[] prediction2;
 
-			try {
-				Instance next = it.next();
+				try {
+					Instance next = it.next();
 
-				prediction = activationModel.predicate(next);
-				// prediciton2 = activationModel.predicate(next ,
-				// isOutputLayerActivation);
+					prediction = activationModel.predicate(next);
+					// prediciton2 = activationModel.predicate(next ,
+					// isOutputLayerActivation);
 
-				// if we have only random class config then uncumment the
-				// following
-				double res;
+					// if we have only random class config then uncumment the
+					// following
+					double res;
 
-				// we want to pass predictions
-				// double [] res = null;
+					// we want to pass predictions
+					// double [] res = null;
 
-				if (isOutputLayerActivation == false) {
+					if (isOutputLayerActivation == false) {
 
-					if (prediction.length != Constants.numClasses
-							&& Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length) {
-						System.err.println("in doostemoon bayad bezoodi hal beshe :))");
-						System.out.println("prediction \t"  +prediction.length);
-						System.out.println("num classes \t " +  Constants.numClasses);
-						res = 0;
-					} else
-						// having random class config:
-						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+						if (prediction.length != Constants.numClasses
+								&& Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length) {
+							System.err.println("in doostemoon bayad bezoodi hal beshe :))");
+							System.out.println("prediction \t"  +prediction.length);
+							System.out.println("num classes \t " +  Constants.numClasses);
+							res = 0;
+						} else
+							// having random class config:
+							res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
 
-					// passing whole predicitions:
-					// res = prediction.clone();
-					result[i] = res;
+						// passing whole predicitions:
+						// res = prediction.clone();
+						result[i] = res;
 
-					if (res < 0 || res - 1 > 0.01) {
-						System.out.println("ya khode khoda probablity not valid");
-						System.out.println(res);
+						if (res < 0 || res - 1 > 0.01) {
+							System.out.println("ya khode khoda probablity not valid");
+							System.out.println(res);
+							System.exit(0);
+						}
+					} else {
+						System.out.println("WHY HERE IN  Loss FUNCTION -> output layer");
 						System.exit(0);
+						outputLayerOutput[i] = prediction;
 					}
-				} else {
-					System.out.println("WHY HERE IN  Loss FUNCTION -> output layer");
-					System.exit(0);
-					outputLayerOutput[i] = prediction;
+
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 
-			} catch (Exception e) {
-				e.printStackTrace();
+				i++;
+
 			}
-
-			i++;
-
-		}
 		
 		
 		
@@ -298,7 +298,7 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 //		in.cleanup();
 
 		
-		INDArray arr = Nd4j.create(result);
+//		INDArray arr = Nd4j.create(result);
 //		arr.wo
 		
 		
