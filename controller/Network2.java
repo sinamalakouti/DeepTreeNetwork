@@ -70,7 +70,7 @@ public class Network2 {
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
 
-        int feature_ratio =5;
+        int feature_ratio = 5;
         DataSetIterator  mnistTrain = null;
         DataSet  mnistTest = new DataSet();
      //
