@@ -10,7 +10,7 @@ import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
 import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instances;
 
-public class Constants {
+public class 	Constants {
 
 //	TODO  : these are unique for each  neuron
 //	public static ArrayList<Integer> attCardinality = new ArrayList<>();

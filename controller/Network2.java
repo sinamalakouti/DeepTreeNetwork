@@ -339,7 +339,7 @@ public class Network2 {
     private Instances save_problem_configuration(int numInputs, int feature_ratio , Instances trainSet2) throws Exception {
 
         System.out.println("SAVING THE PROBLEM");
-        File file = new File(Constants.output_file_prefix  + "/25problem/problem_configuration");
+        File file = new File(Constants.output_file_prefix  + "/25/problem/problem_configuration");
         String str1 = file.getAbsolutePath();
         System.out.println("str1");
         str1 = file.getCanonicalPath();
