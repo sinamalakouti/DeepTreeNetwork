@@ -47,6 +47,7 @@ public class Constants {
 	public static HashMap<Integer, ArrayList<Integer>> dropout = new HashMap<>();
 	public static double dropoutRate;
 	public static boolean isDropoutEnable  = false;
+	public static String output_file_prefix = "";
 	
 	
 }
