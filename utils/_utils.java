@@ -372,7 +372,7 @@ public class _utils {
 			}
 
 
-			File file = new File("gnu_result.csv");
+			File file = new File(path + name  +".csv");
 		    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		    String str = "";
 		    for ( int i = 0 ; i< n ; i ++){
@@ -402,7 +402,7 @@ public class _utils {
 
 	public static void serializing() throws IOException{
 
-		ModelSerializer.writeModel(Constants.model, new File(Constants.output_file_prefix  + "/25/model/NetowrkModel"), true);
+		ModelSerializer.writeModel(Constants.model, new File(Constants.output_file_prefix  + "/26/model/NetowrkModel"), true);
 
 
 	}
@@ -416,7 +416,7 @@ public class _utils {
 
 	public static void deserializing() throws IOException{
 		Constants.isDeSerializing = true;
-		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File(Constants.output_file_prefix  + "/25/model/NetowrkModel"));
+		Constants.model = ModelSerializer.restoreMultiLayerNetwork(new File(Constants.output_file_prefix  + "/26/model/NetowrkModel"));
 
 	}
 
