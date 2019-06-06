@@ -527,7 +527,7 @@ public class Network2 {
 
 
         FileInputStream batch_file =
-                new FileInputStream(Constants.output_file_prefix  + " /26/data/batch" +batchNumber + ".ser");
+                new FileInputStream(Constants.output_file_prefix  + "/26/data/batch" +batchNumber + ".ser");
         ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
         DataSet set =  (DataSet) batch_file_in.readObject();
 
