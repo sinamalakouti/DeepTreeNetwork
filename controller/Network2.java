@@ -93,7 +93,7 @@ public class Network2 {
 
 
         FileInputStream mnistTest_file =
-                new FileInputStream(Constants.output_file_prefix + "/25/problem/mnistTest_file.ser");
+                new FileInputStream(Constants.output_file_prefix + "/26/problem/mnistTest_file.ser");
         ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
         mnistTest.load(mnistTest_file);
 
@@ -151,7 +151,7 @@ public class Network2 {
                 if (i % 10  == 0 && serializing && b == Constants.numBatches - 1)  {
                     Constants.isSerialzing = true;
                     _utils.serializing();
-                    File file = new File(Constants.output_file_prefix + "/25/problem/problem_configuration");
+                    File file = new File(Constants.output_file_prefix + "/26/problem/problem_configuration");
                     FileWriter fr = new FileWriter(file);
                     BufferedWriter out = new BufferedWriter(fr);
                     String str = new String();
@@ -197,7 +197,7 @@ public class Network2 {
 //                }
 //                mnistTest.reset();
                 //
-                String path = Constants.output_file_prefix + "/25/resultIteration_" + i;
+                String path = Constants.output_file_prefix + "/26/resultIteration_" + i;
                 File file = new File(path);
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
@@ -339,7 +339,7 @@ public class Network2 {
     private Instances save_problem_configuration(int numInputs, int feature_ratio , Instances trainSet2) throws Exception {
 
         System.out.println("SAVING THE PROBLEM");
-        File file = new File(Constants.output_file_prefix  + "/25/  problem/problem_configuration");
+        File file = new File(Constants.output_file_prefix  + "/26/problem/problem_configuration");
         String str1 = file.getAbsolutePath();
         System.out.println("str1");
         str1 = file.getCanonicalPath();
