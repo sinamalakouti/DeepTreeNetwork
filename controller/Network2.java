@@ -62,7 +62,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 40;
+        Constants.numberOfNeurons = 50;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -70,10 +70,10 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/root/research/result/phase4/randomClassConfig/27";
+        Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/25";
 
         double learning_rate = 0.1;
-        int feature_ratio = 2;
+        int feature_ratio = 10;
         DataSetIterator  mnistTrain = null;
         DataSet  mnistTest = new DataSet();
      //
