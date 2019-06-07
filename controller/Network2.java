@@ -512,7 +512,7 @@ public class Network2 {
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
 
             FileOutputStream batch_file =
-                    new FileOutputStream(Constants.output_file_prefix  + "/26/data/batch" +batchNumber + ".ser");
+                    new FileOutputStream(Constants.output_file_prefix  + "/data/batch" +batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
