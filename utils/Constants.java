@@ -48,6 +48,7 @@ public class 	Constants {
 	public static double dropoutRate;
 	public static boolean isDropoutEnable  = false;
 	public static String output_file_prefix = "";
+
 	
 	
 }

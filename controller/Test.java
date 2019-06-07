@@ -142,7 +142,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		try{
-			_utils.createGNUPLOT_ds("net_50n_40fr", "/Users/sina/Documents/JGU_Research/ComplexNeuronsProject/Experiments/DeCoDeML Workshop/16/", 0, 150);
+			_utils.createGNUPLOT_ds("net_60n_10dp", "/Users/sina/Documents/JGU_Research/ComplexNeuronsProject/Experiments/DeCoDeML Workshop/19/", 0, 110);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
