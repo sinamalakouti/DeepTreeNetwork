@@ -62,7 +62,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 20;
+        Constants.numberOfNeurons = 50;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
         double numberTrainExamples = 60000d;
@@ -70,10 +70,10 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/26";
+        Constants.output_file_prefix = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/23";
 
         double learning_rate = 0.1;
-        int feature_ratio = 2;
+        int feature_ratio = 5;
         DataSetIterator  mnistTrain = null;
         DataSet  mnistTest = new DataSet();
      //
@@ -200,7 +200,7 @@ public class Network2 {
 //                }
 //                mnistTest.reset();
                 //
-                String path = Constants.output_file_prefix + "/resultIteration_" + i;
+                String path = Constants.output_file_prefix + "/result/resultIteration_" + i;
                 File file = new File(path);
                 BufferedWriter out = new BufferedWriter(new
                         FileWriter(file));
