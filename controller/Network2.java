@@ -73,7 +73,7 @@ public class Network2 {
         Constants.output_file_prefix = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/23";
 
         double learning_rate = 0.1;
-        int feature_ratio = 5;
+        int feature_ratio = 2;
         DataSetIterator  mnistTrain = null;
         DataSet  mnistTest = new DataSet();
      //
