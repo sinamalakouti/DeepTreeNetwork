@@ -48,7 +48,7 @@ public class Network2 {
         // TODO Nd4j.setDataType(Type.DOUBLE);
 
 
-        boolean deSerializing= false;
+        boolean deSerializing= true;
         boolean serializing = true;
 
         Constants.weightLayerMin = new double[2];
@@ -70,7 +70,7 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/home/sina/eclipse-workspace/ComplexNeuronsProject/result/phase4/randomClassConfig/23";
+        Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/23_pc/23";
 
         double learning_rate = 0.1;
         int feature_ratio = 2;
