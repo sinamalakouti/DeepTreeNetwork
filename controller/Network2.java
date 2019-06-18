@@ -149,6 +149,8 @@ public class Network2 {
             // test :D
             for (int b = 0; b < Constants.numBatches; b++) {
 
+                System.out.println("iteration  " + i + "  batch   " + b );
+
                 DataSet set = getBatchTrainSet(b, Constants.batchSize,trainSet2 );
 
                 if (i % 10  == 0 && serializing && b == Constants.numBatches - 1)  {
