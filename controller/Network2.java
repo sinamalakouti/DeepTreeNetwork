@@ -14,6 +14,7 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.KFoldIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
@@ -41,14 +42,19 @@ public class Network2 {
 //
 
 
+    KFoldIterator fivefoldIterator = null;
     int iteration_based;
+    int fold_iteration;
 
     public static void main(String[] args) throws Exception {
 
-        // TODO Nd4j.setDataType(Type.DOUBLE);
+    }
 
 
-        boolean deSerializing= true;
+    private static void kfold_experiment(int k) throws Exception {
+
+
+        boolean deSerializing = true;
         boolean serializing = true;
 
         Constants.weightLayerMin = new double[2];
@@ -62,54 +68,37 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
-        Constants.numberOfNeurons = 50;
+        Constants.numberOfNeurons = 10;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
-        double numberTrainExamples = 60000d;
+        double numberTrainExamples = 60000d / k;
+        Constants.allData_size = 70000;
         Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/23_pc/23";
+        Constants.output_file_prefix = "/research/result/phase5/Barchart_Experiments/1";
 
         double learning_rate = 0.1;
-        int feature_ratio = 2;
-        DataSetIterator  mnistTrain = null;
-        DataSet  mnistTest = new DataSet();
-     //
+        int feature_ratio = 5;
+        DataSet mnistTrain ;
+        DataSet mnistTest ;
+        //
         Instances trainSet2 = null;
 
 
         Network2 net2 = new Network2();
+
+
         if (deSerializing == false) {
             net2.init_problem_configuration(numInputs, feature_ratio);
-            trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
-            DataSet tempTrainSet;
-            tempTrainSet = _utils.instancesToDataSet(trainSet2);
-            saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
-        }
-        else
-            trainSet2 = net2.load_problem_configuration(numInputs, feature_ratio);
+            net2.save_kfold(numInputs, feature_ratio, trainSet2, k);
 
-
-
-
-        FileInputStream mnistTest_file =
-                new FileInputStream(Constants.output_file_prefix + "/problem/mnistTest_file.ser");
-        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
-        mnistTest.load(mnistTest_file);
-
-
-        mnistTest_file.close();
-        mnistTest_file_in.close();
-
-
-        mnistTrain = null;
-
-
-
-
-
+//            DataSet tempTrainSet;
+//            tempTrainSet = _utils.instancesToDataSet(trainSet2);
+//            saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
+        } else
+            net2.load_kfold_configuration();
 
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -140,56 +129,76 @@ public class Network2 {
 //			tmp1.clear();
 
 
+        System.out.println("NETWORK2.JAVA is running" + " 784 / " + feature_ratio + "  and " +
+                Constants.numberOfNeurons + "  neurons at  " + Constants.output_file_prefix);
 
 
-        System.out.println("NETWORK2.JAVA is running" +   " 784 / " + feature_ratio +  "  and " +
-                Constants.numberOfNeurons +   "  neurons at  "  + Constants.output_file_prefix);
-        for (int i = 0 + net2.iteration_based; i < 156; i++) {
-            // in the first iteration do the bagging test and the each batch
-            // test :D
-            for (int b = 0; b < Constants.numBatches; b++) {
+        int j = 0;
 
-                System.out.println("iteration  " + i + "  batch   " + b );
+        while (j != net2.fold_iteration) {
+            net2.fivefoldIterator.next();
+        }
 
-                DataSet set = getBatchTrainSet(b, Constants.batchSize,trainSet2 );
+        mnistTrain = net2.fivefoldIterator.next();
+        mnistTest = net2.fivefoldIterator.testFold();
 
-                if (i % 10  == 0 && serializing && b == Constants.numBatches - 1)  {
-                    Constants.isSerialzing = true;
-                    _utils.serializing();
-                    File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
-                    FileWriter fr = new FileWriter(file);
-                    BufferedWriter out = new BufferedWriter(fr);
-                    String str = new String();
-                    str += "iteration_based " + i + "\n";
-                    out.write(str);
-                    out.close();
-                    fr.close();
+
+        for (; net2.fold_iteration < 5; net2.fold_iteration++) {
+
+            if (deSerializing == false) {
+                trainSet2 = _utils.dataset2Instances(mnistTrain);
+                saveBatches(Constants.numBatches, Constants.batchSize, mnistTrain, trainSet2);
+            } else
+                trainSet2 = _utils.dataset2Instances(mnistTrain);
+
+
+            for (int i = 0 + net2.iteration_based; i < 156; i++) {
+                // in the first iteration do the bagging test and the each batch
+                // test :D
+                for (int b = 0; b < Constants.numBatches; b++) {
+
+                    System.out.println("at fold iteration " + net2.fold_iteration + "   iteration  " + i + "  batch   " + b);
+
+                    DataSet set = getBatchTrainSet(b, Constants.batchSize, trainSet2);
+
+                    if (i % 10 == 0 && serializing && b == Constants.numBatches - 1) {
+                        Constants.isSerialzing = true;
+                        _utils.serializing();
+                        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
+                        FileWriter fr = new FileWriter(file);
+                        BufferedWriter out = new BufferedWriter(fr);
+                        String str = new String();
+                        str += "iteration_based " + i + "\n";
+                        str += "fold " + net2.fold_iteration + "\n";
+                        out.write(str);
+                        out.close();
+                        fr.close();
+                    }
+                    if (deSerializing == true) {
+                        Constants.isDeSerializing = true;
+                        _utils.deserializing();
+                    }
+
+
+                    Constants.model.fit(set);
+
+                    if (Constants.isSerialzing == true)
+                        Constants.isSerialzing = false;
+                    if (Constants.isDeSerializing == true) {
+                        Constants.isDeSerializing = false;
+                        deSerializing = false;
+                    }
+
+
                 }
-                if ( deSerializing == true){
-                    Constants.isDeSerializing = true;
-                    _utils.deserializing();
-                }
-
-
-                Constants.model.fit(set);
-
-                if (Constants.isSerialzing == true)
-                    Constants.isSerialzing = false;
-                if (Constants.isDeSerializing == true) {
-                    Constants.isDeSerializing = false;
-                    deSerializing = false;
-                }
-
-
-            }
 
                 if (i % 2 == 0) {
                     System.out.println("EVALUATING AT ITERATION  " + i);
-                Constants.isEvaluating = true;
-                log.info("Evaluate model....");
-                //
-                Evaluation eval = new Evaluation(outputNum); // create an
-                //
+                    Constants.isEvaluating = true;
+                    log.info("Evaluate model....");
+                    //
+                    Evaluation eval = new Evaluation(outputNum); // create an
+                    //
 //                while (mnistTest.hasNext()) {
 
 //                    DataSet next = mnistTest.next();
@@ -201,36 +210,220 @@ public class Network2 {
                     eval.eval(mnistTest.getLabels(), output);
 //                }
 //                mnistTest.reset();
-                //
-                String path = Constants.output_file_prefix + "/result/resultIteration_" + i;
-                File file = new File(path);
-                BufferedWriter out = new BufferedWriter(new
-                        FileWriter(file));
-                String avglayersTreesDepth = "";
-                for (int l = 0; l < Constants.numberOfLayers; l++)
-                    avglayersTreesDepth = avglayersTreesDepth + " " +
-                            Constants.avgHFDepth[l];
-                out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+                    //
+                    String path = Constants.output_file_prefix + "/" + (net2.fold_iteration + 1) + "/resultIteration_" + i;
+                    File file = new File(path);
+                    BufferedWriter out = new BufferedWriter(new
+                            FileWriter(file));
+                    String avglayersTreesDepth = "";
+                    for (int l = 0; l < Constants.numberOfLayers; l++)
+                        avglayersTreesDepth = avglayersTreesDepth + " " +
+                                Constants.avgHFDepth[l];
+                    out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
 //
-                System.out.println(eval.stats() + "\n" + "errors:  " +
-                        Constants.model.score() + "\n" + avglayersTreesDepth);
+                    System.out.println(eval.stats() + "\n" + "errors:  " +
+                            Constants.model.score() + "\n" + avglayersTreesDepth);
 
-                //
-                out.close();
-                Constants.isEvaluating = false;
-                //
+                    //
+                    out.close();
+                    Constants.isEvaluating = false;
+                    //
+                }
+                // if ( i == 10 ){
+                // _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
+                // }
+
             }
-            // if ( i == 10 ){
-            // _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
-            // }
+
 
         }
 
-        Constants.isEvaluating = true;
-        Evaluation eval = new Evaluation(outputNum); // create an evaluation
-        // object with 10
-        // possible classes
-        int counter = 0;
+
+    }
+
+
+    private static void regular_experiment() throws Exception {
+        {
+
+            // TODO Nd4j.setDataType(Type.DOUBLE);
+
+
+            boolean deSerializing = true;
+            boolean serializing = true;
+
+            Constants.weightLayerMin = new double[2];
+            Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
+            Constants.weightLayerMin[1] = Double.POSITIVE_INFINITY;
+            Constants.weightLayerMax = new double[2];
+            Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
+            Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
+
+            final int numInputs = 784;
+            int outputNum = 10;
+            log.info("Build model....");
+            Constants.numberOfLayers = 2;
+            Constants.numberOfNeurons = 50;
+            Constants.batchSize = 100;
+            Constants.avgHFDepth = new double[Constants.numberOfLayers];
+            double numberTrainExamples = 60000d;
+            Constants.allData_size = 70000;
+            Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
+            Constants.numClasses = 10;
+            Constants.maximumDepth = 20;
+            Constants.maximumDepth--;
+            Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/23_pc/23";
+
+            double learning_rate = 0.1;
+            int feature_ratio = 2;
+            DataSetIterator mnistTrain = null;
+            DataSet mnistTest = new DataSet();
+            //
+            Instances trainSet2 = null;
+
+
+            Network2 net2 = new Network2();
+
+
+            if (deSerializing == false) {
+                net2.init_problem_configuration(numInputs, feature_ratio);
+                trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
+                DataSet tempTrainSet;
+                tempTrainSet = _utils.instancesToDataSet(trainSet2);
+                saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
+            } else
+                trainSet2 = net2.load_problem_configuration(numInputs, feature_ratio);
+
+
+            FileInputStream mnistTest_file =
+                    new FileInputStream(Constants.output_file_prefix + "/problem/mnistTest_file.ser");
+            ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
+            mnistTest.load(mnistTest_file);
+
+
+            mnistTest_file.close();
+            mnistTest_file_in.close();
+
+
+            mnistTrain = null;
+
+
+            MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
+
+                    .trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
+                    .weightInit(WeightInit.XAVIER).updater(new Sgd(learning_rate)).l2(1e-4).list()
+                    // new BayesTreeActivationFunction(0, false, -1198)
+
+                    .layer(0,
+                            new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
+                                    .activation(Activation.SIGMOID).build())
+                    .layer(1,
+                            new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+                                    .activation(Activation.SIGMOID).build())
+                    .layer(2,
+                            new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                                    .activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(outputNum).build())
+                    .build();
+
+            // run the model
+            Constants.model = new MultiLayerNetwork(conf);
+
+            Constants.model.init();
+            Constants.model.setListeners(new ScoreIterationListener(5));
+            System.out.println("start");
+
+
+//			tmp1.clear();
+
+
+            System.out.println("NETWORK2.JAVA is running" + " 784 / " + feature_ratio + "  and " +
+                    Constants.numberOfNeurons + "  neurons at  " + Constants.output_file_prefix);
+            for (int i = 0 + net2.iteration_based; i < 156; i++) {
+                // in the first iteration do the bagging test and the each batch
+                // test :D
+                for (int b = 0; b < Constants.numBatches; b++) {
+
+                    System.out.println("iteration  " + i + "  batch   " + b);
+
+                    DataSet set = getBatchTrainSet(b, Constants.batchSize, trainSet2);
+
+                    if (i % 10 == 0 && serializing && b == Constants.numBatches - 1) {
+                        Constants.isSerialzing = true;
+                        _utils.serializing();
+                        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
+                        FileWriter fr = new FileWriter(file);
+                        BufferedWriter out = new BufferedWriter(fr);
+                        String str = new String();
+                        str += "iteration_based " + i + "\n";
+                        out.write(str);
+                        out.close();
+                        fr.close();
+                    }
+                    if (deSerializing == true) {
+                        Constants.isDeSerializing = true;
+                        _utils.deserializing();
+                    }
+
+
+                    Constants.model.fit(set);
+
+                    if (Constants.isSerialzing == true)
+                        Constants.isSerialzing = false;
+                    if (Constants.isDeSerializing == true) {
+                        Constants.isDeSerializing = false;
+                        deSerializing = false;
+                    }
+
+
+                }
+
+                if (i % 2 == 0) {
+                    System.out.println("EVALUATING AT ITERATION  " + i);
+                    Constants.isEvaluating = true;
+                    log.info("Evaluate model....");
+                    //
+                    Evaluation eval = new Evaluation(outputNum); // create an
+                    //
+//                while (mnistTest.hasNext()) {
+
+//                    DataSet next = mnistTest.next();
+                    System.out.println(Constants.isEvaluating);
+                    _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating,
+                            false);
+                    INDArray output = Constants.model.output(mnistTest.getFeatures());
+
+                    eval.eval(mnistTest.getLabels(), output);
+//                }
+//                mnistTest.reset();
+                    //
+                    String path = Constants.output_file_prefix + "/result/resultIteration_" + i;
+                    File file = new File(path);
+                    BufferedWriter out = new BufferedWriter(new
+                            FileWriter(file));
+                    String avglayersTreesDepth = "";
+                    for (int l = 0; l < Constants.numberOfLayers; l++)
+                        avglayersTreesDepth = avglayersTreesDepth + " " +
+                                Constants.avgHFDepth[l];
+                    out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+//
+                    System.out.println(eval.stats() + "\n" + "errors:  " +
+                            Constants.model.score() + "\n" + avglayersTreesDepth);
+
+                    //
+                    out.close();
+                    Constants.isEvaluating = false;
+                    //
+                }
+                // if ( i == 10 ){
+                // _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
+                // }
+
+            }
+
+            Constants.isEvaluating = true;
+            Evaluation eval = new Evaluation(outputNum); // create an evaluation
+            // object with 10
+            // possible classes
+            int counter = 0;
 //        while (mnistTest.hasNext()) {
 
 //            DataSet next = mnistTest.next();
@@ -242,12 +435,12 @@ public class Network2 {
             counter++;
 //        }
 //			System.out.println(counter);
-        log.info(eval.stats());
+            log.info(eval.stats());
 
+        }
     }
 
-
-    private static DataSet getBatchTrainSet(int batchNumber, int batchRate , Instances training) {
+    private static DataSet getBatchTrainSet(int batchNumber, int batchRate, Instances training) {
 
 //
         DataSet set = null;
@@ -276,6 +469,7 @@ public class Network2 {
         return set;
 
     }
+
 
     private void init_problem_configuration(int numInputs, int feature_ratio) throws Exception {
         System.out.println("INITING THE PROBLEM");
@@ -338,17 +532,55 @@ public class Network2 {
 
         iteration_based = 0;
 
+        fold_iteration = 0;
     }
 
 
-    private Instances save_problem_configuration(int numInputs, int feature_ratio , Instances trainSet2) throws Exception {
+    private void save_kfold(int numInputs, int feature_ratio, Instances trainSet2, int k) throws Exception {
+
 
         System.out.println("SAVING THE PROBLEM");
-        File file = new File(Constants.output_file_prefix  + "/problem/problem_configuration");
-        String str1 = file.getAbsolutePath();
-        System.out.println("str1");
-        str1 = file.getCanonicalPath();
-        System.out.println(str1);
+        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
+        FileWriter fr = new FileWriter(file);
+        BufferedWriter out = new BufferedWriter(fr);
+        String str = new String();
+        str += "iteration_based " + iteration_based + "\n";
+        str += "fold " + fold_iteration + "\n";
+        out.write(str);
+
+        FileOutputStream attributesIndexes_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
+        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
+        attIndex_out.writeObject(Constants.attributesIndexes);
+
+        FileOutputStream class_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
+        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
+        class_file_out.writeObject(Constants.classChosedArray);
+
+        DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
+        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+
+
+        Instances AllInstances = _utils.dataset2Instances(mnistTrain.next());
+        Instances temp = _utils.dataset2Instances(mnistTest.next());
+        for (int i = 0; i < temp.size(); i++)
+            AllInstances.add(temp.get(i));
+
+        DataSet allData = _utils.instancesToDataSet(AllInstances);
+        this.fivefoldIterator = new KFoldIterator(5, allData);
+        FileOutputStream mnist_kfold =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
+        ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
+        mnist_kfold_out.writeObject(this.fivefoldIterator);
+
+
+    }
+
+    private Instances save_problem_configuration(int numInputs, int feature_ratio, Instances trainSet2) throws Exception {
+
+        System.out.println("SAVING THE PROBLEM");
+        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
         FileWriter fr = new FileWriter(file);
         BufferedWriter out = new BufferedWriter(fr);
         String str = new String();
@@ -356,18 +588,18 @@ public class Network2 {
         out.write(str);
 
         FileOutputStream attributesIndexes_file =
-                new FileOutputStream(Constants.output_file_prefix  + "/problem/attributesIndexes.ser");
+                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
         ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
         attIndex_out.writeObject(Constants.attributesIndexes);
 
 
         FileOutputStream class_file =
-                new FileOutputStream(Constants.output_file_prefix  + "/problem/class_file.ser");
+                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
         ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
         class_file_out.writeObject(Constants.classChosedArray);
 
-        DataSetIterator  mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-        DataSetIterator  mnistTest = new MnistDataSetIterator(10000, false, 6);
+        DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
+        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
         DataNormalization scaler = new NormalizerStandardize();
         scaler.fit(mnistTrain);
         mnistTrain.setPreProcessor(scaler);
@@ -376,7 +608,7 @@ public class Network2 {
 
 
         FileOutputStream mnistTrain_file =
-                new FileOutputStream(Constants.output_file_prefix  + "/problem/mnistTrain_file.ser");
+                new FileOutputStream(Constants.output_file_prefix + "/problem/mnistTrain_file.ser");
 //        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
 //        mnistTrain_file_out.writeObject(mnistTrain);
 
@@ -412,12 +644,10 @@ public class Network2 {
         trainSet2.setClassIndex(trainSet2.numAttributes() - 1);
 
 
-
         FileOutputStream trainSet_file =
-                new FileOutputStream(Constants.output_file_prefix  + "/problem/trainSet_file.ser");
+                new FileOutputStream(Constants.output_file_prefix + "/problem/trainSet_file.ser");
         ObjectOutputStream trainSet_file_out = new ObjectOutputStream(trainSet_file);
         trainSet_file_out.writeObject(trainSet2);
-
 
 
         out.close();
@@ -433,14 +663,74 @@ public class Network2 {
         mnistTest_file_out.close();
         trainSet_file_out.close();
         trainSet_file.close();
-        return  trainSet2;
+        return trainSet2;
     }
 
+    private void load_kfold_configuration() throws IOException, ClassNotFoundException {
+
+        System.out.println("LOADING THE PROBLEM");
+        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
+
+        Scanner in = new Scanner(file);
+
+        String str = in.nextLine();
+        String[] arr = str.split(" ");
+        this.iteration_based = Integer.parseInt(arr[1]);
+
+        str = in.nextLine();
+        arr = str.split(" ");
+        this.fold_iteration = Integer.parseInt(arr[1]);
+
+
+        FileInputStream attributesIndexes_file =
+                new FileInputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
+        ObjectInputStream attIndex_in = new ObjectInputStream(attributesIndexes_file);
+
+        Constants.attributesIndexes = (HashMap<Integer, int[]>) attIndex_in.readObject();
+
+
+        FileInputStream class_file =
+                new FileInputStream(Constants.output_file_prefix + "/problem/class_file.ser");
+        ObjectInputStream class_file_in = new ObjectInputStream(class_file);
+
+        Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
+
+
+        FileInputStream trainSet_file =
+                new FileInputStream(Constants.output_file_prefix + "/problem/trainSet_file.ser");
+        ObjectInputStream trainSet_file_in = new ObjectInputStream(trainSet_file);
+        Instances trainTest2 = (Instances) trainSet_file_in.readObject();
+
+
+//        FileInputStream mnistTrain_file =
+//                new FileInputStream("../problem/mnistTrain_file.ser");
+//        ObjectInputStream mnistTrain_file_in = new ObjectInputStream(mnistTrain_file);
+//        mnistTrain = (DataSetIterator) mnistTrain_file_in.readObject();
+//
+//
+//        FileInputStream mnistTest_file =
+//                new FileInputStream("../problem/mnistTest_file.ser");
+//        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
+//        mnistTest = (DataSetIterator) mnistTest_file_in.readObject();
+
+
+//        mnistTest_file.close();
+//        mnistTest_file_in.close();
+//        mnistTrain_file.close();
+//        mnistTrain_file_in.close();
+        class_file.close();
+        class_file_in.close();
+        attributesIndexes_file.close();
+        attIndex_in.close();
+        in.close();
+
+
+    }
 
     private Instances load_problem_configuration(int numInputs, int feature_ratio) throws IOException, ClassNotFoundException {
 
         System.out.println("LOADING THE PROBLEM");
-        File file = new File(Constants.output_file_prefix  + "/problem/problem_configuration");
+        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
 
         Scanner in = new Scanner(file);
 
@@ -449,21 +739,21 @@ public class Network2 {
         this.iteration_based = Integer.parseInt(arr[1]);
 
         FileInputStream attributesIndexes_file =
-                new FileInputStream(Constants.output_file_prefix  + "/problem/attributesIndexes.ser");
+                new FileInputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
         ObjectInputStream attIndex_in = new ObjectInputStream(attributesIndexes_file);
 
         Constants.attributesIndexes = (HashMap<Integer, int[]>) attIndex_in.readObject();
 
 
         FileInputStream class_file =
-                new FileInputStream(Constants.output_file_prefix  + "/problem/class_file.ser");
+                new FileInputStream(Constants.output_file_prefix + "/problem/class_file.ser");
         ObjectInputStream class_file_in = new ObjectInputStream(class_file);
 
         Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
 
 
         FileInputStream trainSet_file =
-                new FileInputStream(Constants.output_file_prefix  + "/problem/trainSet_file.ser");
+                new FileInputStream(Constants.output_file_prefix + "/problem/trainSet_file.ser");
         ObjectInputStream trainSet_file_in = new ObjectInputStream(trainSet_file);
         Instances trainTest2 = (Instances) trainSet_file_in.readObject();
 
@@ -491,16 +781,15 @@ public class Network2 {
         in.close();
         trainSet_file.close();
         trainSet_file_in.close();
-        return  trainTest2;
-
+        return trainTest2;
 
 
     }
 
 
-    private static void saveBatches ( int totalBatches, int batchRate, DataSet trainSet, Instances training) throws IOException {
+    private static void saveBatches(int totalBatches, int batchRate, DataSet trainSet, Instances training) throws IOException {
 
-        for (int batchNumber  = 0 ; batchNumber < totalBatches ; batchNumber ++){
+        for (int batchNumber = 0; batchNumber < totalBatches; batchNumber++) {
 
 
             INDArray features = trainSet.getFeatures();
@@ -514,10 +803,9 @@ public class Network2 {
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
 
             FileOutputStream batch_file =
-                    new FileOutputStream(Constants.output_file_prefix  + "/data/batch" +batchNumber + ".ser");
+                    new FileOutputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
-
 
 
             batch_file.close();
@@ -528,30 +816,18 @@ public class Network2 {
     }
 
 
-    private  static DataSet readBatch_dataset( int batchNumber) throws IOException, ClassNotFoundException {
+    private static DataSet readBatch_dataset(int batchNumber) throws IOException, ClassNotFoundException {
 
 
         FileInputStream batch_file =
-                new FileInputStream(Constants.output_file_prefix  + "/data/batch" +batchNumber + ".ser");
+                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
         ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
-        DataSet set =  (DataSet) batch_file_in.readObject();
+        DataSet set = (DataSet) batch_file_in.readObject();
 
         batch_file.close();
         batch_file_in.close();
         return set;
     }
-//    private  static Instances readBatch_instance( int batchNumber) throws IOException, ClassNotFoundException {
-//
-//
-//        FileInputStream batch_file =
-//                new FileInputStream("../data/instanceb_" +batchNumber + ".ser");
-//        ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
-//        Instances set =  (Instances) batch_file_in.readObject();
-//
-//        batch_file.close();
-//        batch_file_in.close();
-//        return set;
-//    }
 }
 
 

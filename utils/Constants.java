@@ -28,7 +28,8 @@ public class 	Constants {
 	public static int numberOfLayers;
 	public static int numberOfNeurons;
 	public static int batchSize;
-	public static int numBatches; 
+	public static int numBatches;
+	public static int allData_size;
 	public static HashMap<Integer,ArrayList<Integer>> classChosedArray = new HashMap<>();
 	public static HashMap<Integer,int[]> attributesIndexes = new HashMap<>();
 	public static ArrayList<HashMap<Integer,int[]>> attributesIndexes2 = new ArrayList<>();
