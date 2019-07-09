@@ -698,10 +698,12 @@ public class Network2 {
         Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
 
 
-        FileInputStream trainSet_file =
-                new FileInputStream(Constants.output_file_prefix + "/problem/trainSet_file.ser");
-        ObjectInputStream trainSet_file_in = new ObjectInputStream(trainSet_file);
-        Instances trainTest2 = (Instances) trainSet_file_in.readObject();
+
+        FileInputStream mnist_kfold =
+                new FileInputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
+        ObjectInputStream mnist_kfold_in = new ObjectInputStream(mnist_kfold);
+
+        this.fivefoldIterator =  (KFoldIterator) mnist_kfold_in.readObject();
 
 
 //        FileInputStream mnistTrain_file =
