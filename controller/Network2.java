@@ -237,6 +237,13 @@ public class Network2 {
 
             }
 
+            // run the model
+            Constants.model = new MultiLayerNetwork(conf);
+
+            Constants.model.init();
+            Constants.model.setListeners(new ScoreIterationListener(5));
+
+
 
         }
 

@@ -19,18 +19,19 @@ import weka.core.WekaException;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 @SuppressWarnings("serial")
-public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
+public class HoeffdingTreeActivationFunction extends BaseActivationFunction implements Runnable {
 
 	/**
 	 * 
 	 */
-	// private static final long serialVersionUID = -6622285329198225782L;
+	 private static final long serialVersionUID = -6622285329198225782L;
 	private HoeffdingTree activationModel;
 	int layernumber = 0;
 	boolean isTraind = false;
 	Boolean isOutputLayerActivation = false;
 	int neuronNumber = 0;
-
+	boolean resultIsReady=false;
+	int typeOfJob = 0; // 0 : forward pass ( get activation ) 1 : backprop
 	public HoeffdingTreeActivationFunction(int layerNUmber, boolean isOutpuLayerActivation, int neuronNumber) {
 		this.layernumber = layerNUmber;
 		this.isOutputLayerActivation = isOutpuLayerActivation;
@@ -364,9 +365,38 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction {
 		return activationModel;
 	}
 
-	// @Override
-	// public INDArray getActivation(INDArray in, boolean training) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+
+
+	/**
+	 * When an object implementing interface <code>Runnable</code> is used
+	 * to create a thread, starting the thread causes the object's
+	 * <code>run</code> method to be called in that separately executing
+	 * thread.
+	 * <p>
+	 * The general contract of the method <code>run</code> is that it may
+	 * take any action whatsoever.
+	 *
+	 * @see Thread#run()
+	 */
+	@Override
+	public void run() {
+		resultIsReady = false;
+
+
+
+
+
+
+		resultIsReady = true;
+
+	}
+
+	public void setActivationModel(HoeffdingTree activationModel) {
+		this.activationModel = activationModel;
+	}
+
+	public boolean isResultIsReady() {
+
+		return resultIsReady;
+	}
 }
