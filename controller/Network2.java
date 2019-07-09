@@ -56,7 +56,7 @@ public class Network2 {
     private static void kfold_experiment(int k) throws Exception {
 
 
-        boolean deSerializing = true;
+        boolean deSerializing = false;
         boolean serializing = true;
 
         Constants.weightLayerMin = new double[2];
@@ -79,7 +79,7 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/research/result/phase5/Barchart_Experiments/1";
+        Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/1";
 
         double learning_rate = 0.1;
         int feature_ratio = 5;
@@ -250,7 +250,7 @@ public class Network2 {
             // TODO Nd4j.setDataType(Type.DOUBLE);
 
 
-            boolean deSerializing = true;
+            boolean deSerializing = false;
             boolean serializing = true;
 
             Constants.weightLayerMin = new double[2];
