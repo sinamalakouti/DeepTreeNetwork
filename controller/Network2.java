@@ -73,16 +73,16 @@ public class Network2 {
         Constants.numberOfNeurons = 10;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
-        double numberTrainExamples = 60000d / k;
+        double numberTrainExamples = 60000d / k * 4;
         Constants.allData_size = 70000;
         Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/1";
+        Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/13";
 
         double learning_rate = 0.1;
-        int feature_ratio = 5;
+        int feature_ratio = 40;
         DataSet mnistTrain ;
         DataSet mnistTest ;
         //
@@ -139,15 +139,20 @@ public class Network2 {
 
         while (j != net2.fold_iteration) {
             net2.fivefoldIterator.next();
+            j++;
         }
-
-        mnistTrain = net2.fivefoldIterator.next();
-        mnistTest = net2.fivefoldIterator.testFold();
 
 
         for (; net2.fold_iteration < 5; net2.fold_iteration++) {
 
+
+            mnistTrain = net2.fivefoldIterator.next();
+            mnistTest = net2.fivefoldIterator.testFold();
+
+
             if (deSerializing == false) {
+                net2.init_problem_configuration(numInputs, feature_ratio);
+                net2.save_kfold(numInputs, feature_ratio, trainSet2, k);
                 trainSet2 = _utils.dataset2Instances(mnistTrain);
                 saveBatches(Constants.numBatches, Constants.batchSize, mnistTrain, trainSet2);
             } else
@@ -237,7 +242,7 @@ public class Network2 {
 
             }
 
-            // run the model
+                // run the model
             Constants.model = new MultiLayerNetwork(conf);
 
             Constants.model.init();
@@ -566,22 +571,25 @@ public class Network2 {
                 new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
         ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
         class_file_out.writeObject(Constants.classChosedArray);
-
+//
         DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
         DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
+//
 
-        Instances AllInstances = _utils.dataset2Instances(mnistTrain.next());
-        Instances temp = _utils.dataset2Instances(mnistTest.next());
-        for (int i = 0; i < temp.size(); i++)
-            AllInstances.add(temp.get(i));
+        if (this.fivefoldIterator == null ) {
+            Instances AllInstances = _utils.dataset2Instances(mnistTrain.next());
+            Instances temp = _utils.dataset2Instances(mnistTest.next());
+            for (int i = 0; i < temp.size(); i++)
+                AllInstances.add(temp.get(i));
 
-        DataSet allData = _utils.instancesToDataSet(AllInstances);
-        this.fivefoldIterator = new KFoldIterator(5, allData);
-        FileOutputStream mnist_kfold =
-                new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
-        ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
-        mnist_kfold_out.writeObject(this.fivefoldIterator);
+            DataSet allData = _utils.instancesToDataSet(AllInstances);
+            this.fivefoldIterator = new KFoldIterator(5, allData);
+            FileOutputStream mnist_kfold =
+                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
+            ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
+            mnist_kfold_out.writeObject(this.fivefoldIterator);
+        }
 
 
     }
