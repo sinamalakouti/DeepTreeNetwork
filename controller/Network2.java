@@ -73,7 +73,7 @@ public class Network2 {
         Constants.numberOfNeurons = 10;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];
-        double numberTrainExamples = 60000d / k * 4;
+        double numberTrainExamples = 70000d / k * 4;
         Constants.allData_size = 70000;
         Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
         Constants.numClasses = 10;
