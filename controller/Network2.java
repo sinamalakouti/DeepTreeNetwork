@@ -94,6 +94,7 @@ public class Network2 {
 
         if (deSerializing == false) {
             net2.init_problem_configuration(numInputs, feature_ratio);
+            net2.fold_iteration = 0;
             net2.save_kfold(numInputs, feature_ratio, trainSet2, k);
 
 //            DataSet tempTrainSet;
@@ -546,7 +547,7 @@ public class Network2 {
 
         iteration_based = 0;
 
-        fold_iteration = 0;
+
     }
 
 
@@ -572,12 +573,13 @@ public class Network2 {
         ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
         class_file_out.writeObject(Constants.classChosedArray);
 //
-        DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
-        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+
 
 //
 
         if (this.fivefoldIterator == null ) {
+            DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
+            DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
             Instances AllInstances = _utils.dataset2Instances(mnistTrain.next());
             Instances temp = _utils.dataset2Instances(mnistTest.next());
             for (int i = 0; i < temp.size(); i++)
