@@ -243,7 +243,7 @@ public class CNN_Network {
                 .layer(4, new DenseLayer.Builder()
                         .name("ffn1")
                         .activation(Activation.RELU)
-                        .nOut(500)
+                        .nOut(Constants.numberOfNeurons)
                         .build())
                 .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(10)
@@ -349,7 +349,7 @@ public class CNN_Network {
                         .build())
 
                 .layer(4,
-                        new CustomLayer.Builder().nIn(numInputs).nOut(Constants.numberOfNeurons)
+                        new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
                                 .activation(Activation.SIGMOID).build())
                 .layer(5,
                         new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
@@ -533,7 +533,7 @@ public class CNN_Network {
             int outputNum = 10;
             log.info("Build model....");
             Constants.numberOfLayers = 2;
-            Constants.numberOfNeurons = 50;
+            Constants.numberOfNeurons = 20;
             Constants.batchSize = 100;
             Constants.avgHFDepth = new double[Constants.numberOfLayers];
             double numberTrainExamples = 60000d;
