@@ -207,7 +207,9 @@ public class CNN_Network {
         }
 
 
+        //lets run the other one
 
+        regular_experiment(trained_weights);
     }
 
 
@@ -738,11 +740,11 @@ public class CNN_Network {
     private static DataSet readBatch_dataset(int batchNumber) throws IOException, ClassNotFoundException {
 
 //
-//        FileInputStream batch_file =
-//                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
-
         FileInputStream batch_file =
-                new FileInputStream("batch" + batchNumber + ".ser");
+                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
+
+//        FileInputStream batch_file =
+//                new FileInputStream("batch" + batchNumber + ".ser");
         ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
         DataSet set = (DataSet) batch_file_in.readObject();
 
@@ -767,7 +769,7 @@ public class CNN_Network {
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
 //b/batch" + batchNumber + ".ser");
             FileOutputStream batch_file =
-                    new FileOutputStream("batch" + batchNumber + ".ser");
+                    new FileOutputStream("/batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
