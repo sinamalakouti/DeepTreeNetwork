@@ -659,9 +659,9 @@ public class CNN_Network {
             System.out.println("start");
 
             Constants.model.getLayer(0).setParam("W", init_weights.get(0));
-            Constants.model.getLayer(1).setParam("W", init_weights.get(1));
+//            Constants.model.getLayer(1).setParam("W", init_weights.get(1));
             Constants.model.getLayer(2).setParam("W", init_weights.get(2));
-            Constants.model.getLayer(3).setParam("W", init_weights.get(3));
+//            Constants.model.getLayer(3).setParam("W", init_weights.get(3));
             Constants.model.getLayer(4).setParam("W", init_weights.get(4));
 //            nothing for 5
             Constants.model.getLayer(6).setParam("W", init_weights.get(5));
@@ -834,7 +834,7 @@ public class CNN_Network {
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
 //b/batch" + batchNumber + ".ser");
             FileOutputStream batch_file =
-                    new FileOutputStream("/data/batch" + batchNumber + ".ser");
+                    new FileOutputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
