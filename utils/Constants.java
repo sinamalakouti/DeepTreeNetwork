@@ -26,6 +26,7 @@ public class 	Constants {
 	public static boolean isEvaluating = false;
 	public static int maximumDepth ;
 	public static int numberOfLayers;
+	public static int base_hf_layerNumber;
 	public static int numberOfNeurons;
 	public static int batchSize;
 	public static int numBatches;
@@ -60,7 +61,7 @@ public class 	Constants {
 	}
 
 	public static HashMap<Integer, ArrayList<Integer>> getClassChosedArray() {
-		return classChosedArray;
+		return Constants.classChosedArray;
 	}
 
 	public static void setClassChosedArray(HashMap<Integer, ArrayList<Integer>> classChosedArray) {

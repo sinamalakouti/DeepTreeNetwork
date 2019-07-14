@@ -309,7 +309,7 @@ public class CNN_Network {
             @SuppressWarnings("unchecked")
             ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
             Collections.shuffle(tmp2);
-            Constants.classChosedArray.put(l, tmp2);
+            Constants.classChosedArray.put(l + Constants.base_hf_layerNumber, tmp2);
         }
 
         // set-up the project :
@@ -543,7 +543,7 @@ public class CNN_Network {
             Constants.maximumDepth = 20;
             Constants.maximumDepth--;
             Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/CNN";
-
+            Constants.base_hf_layerNumber = 4;
             double learning_rate = 0.1;
             int feature_ratio = 2;
             DataSetIterator mnistTrain = null;
