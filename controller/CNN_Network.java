@@ -540,7 +540,7 @@ public class CNN_Network {
             Constants.numClasses = 10;
             Constants.maximumDepth = 20;
             Constants.maximumDepth--;
-            Constants.output_file_prefix = "/home/research/result/phase4/randomClassConfig/23_pc/23";
+            Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/CNN";
 
             double learning_rate = 0.1;
             int feature_ratio = 2;

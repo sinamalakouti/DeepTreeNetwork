@@ -563,15 +563,15 @@ public class Network2 {
         str += "fold " + fold_iteration + "\n";
 //        out.write(str);
 
-//        FileOutputStream attributesIndexes_file =
-//                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
-//        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
-//        attIndex_out.writeObject(Constants.attributesIndexes);
+        FileOutputStream attributesIndexes_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
+        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
+        attIndex_out.writeObject(Constants.attributesIndexes);
 //
-//        FileOutputStream class_file =
-//                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
-//        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
-//        class_file_out.writeObject(Constants.classChosedArray);
+        FileOutputStream class_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
+        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
+        class_file_out.writeObject(Constants.classChosedArray);
 //
 
 
