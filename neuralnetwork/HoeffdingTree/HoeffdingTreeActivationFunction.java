@@ -3,8 +3,6 @@ package neuralnetwork.HoeffdingTree;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.deeplearning4j.nn.workspace.ArrayType;
-import org.deeplearning4j.nn.workspace.LayerWorkspaceMgr;
 import org.nd4j.linalg.activations.BaseActivationFunction;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -74,16 +72,16 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction impl
 				// for mapping : result [i] = predictionDerivative[0]; should
 				// changed true -> false in the line above
 				// Nesterovs
-				if (predictionDerivative.length != Constants.numClasses && Constants.classChosedArray.get(layernumber)
+				if (predictionDerivative.length != Constants.getNumClasses() && Constants.getClassChosedArray().get(layernumber)
 						.get(neuronNumber) >= predictionDerivative.length) {
 					
 					System.err.println("inja ham bayad doros shavad dar moshtagh e gerami");
 					System.out.println("prediction lenghth\t" + predictionDerivative.length);
-					System.out.println(Constants.numClasses);
+					System.out.println(Constants.getNumClasses());
 					result[i] = 0;
 				} else {
 					// if : having random class config
-					result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+					result[i] = predictionDerivative[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 					//// if want to pass whole prediction :
 					// for ( int c = 0 ; c < predictionDerivative.length ; c++)
 					// avg += predictionDerivative[c];
@@ -229,15 +227,15 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction impl
 
 					if (isOutputLayerActivation == false) {
 
-						if (prediction.length != Constants.numClasses
-								&& Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length) {
+						if (prediction.length != Constants.getNumClasses()
+								&& Constants.getClassChosedArray().get(layernumber).get(neuronNumber) >= prediction.length) {
 							System.err.println("in doostemoon bayad bezoodi hal beshe :))");
 							System.out.println("prediction \t"  +prediction.length);
-							System.out.println("num classes \t " +  Constants.numClasses);
+							System.out.println("num classes \t " + Constants.getNumClasses());
 							res = 0;
 						} else
 							// having random class config:
-							res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+							res = prediction[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 
 						// passing whole predicitions:
 						// res = prediction.clone();

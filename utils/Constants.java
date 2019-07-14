@@ -50,6 +50,20 @@ public class 	Constants {
 	public static boolean isDropoutEnable  = false;
 	public static String output_file_prefix = "";
 
-	
-	
+
+	public static int getNumClasses() {
+		return numClasses;
+	}
+
+	public static void setNumClasses(int numClasses) {
+		Constants.numClasses = numClasses;
+	}
+
+	public static HashMap<Integer, ArrayList<Integer>> getClassChosedArray() {
+		return classChosedArray;
+	}
+
+	public static void setClassChosedArray(HashMap<Integer, ArrayList<Integer>> classChosedArray) {
+		Constants.classChosedArray = classChosedArray;
+	}
 }

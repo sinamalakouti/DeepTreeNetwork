@@ -196,8 +196,8 @@ public class Network {
 		Collections.shuffle(tmp1);
 		Collections.shuffle(tmp2);
 
-		Constants.classChosedArray.put(0, tmp1);
-		Constants.classChosedArray.put(1, tmp2);
+		Constants.getClassChosedArray().put(0, tmp1);
+		Constants.getClassChosedArray().put(1, tmp2);
 		//
 		Constants.testInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(test)).transpose();
 		Constants.trainInstancesLabel = NDArrayUtil.toNDArray(_utils.getLabels(training)).transpose();

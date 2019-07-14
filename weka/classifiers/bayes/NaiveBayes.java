@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.apache.commons.math3.analysis.function.Constant;
-
 import utils.Constants;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Aggregateable;
@@ -126,14 +124,14 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 	public double[] getGaussianPDF_log(Instance data, double[] classProb, double[][] sampleMeans,
 			double[][] sampleStDevs) {
 
-		double[] pdf = new double[Constants.numClasses];
+		double[] pdf = new double[Constants.getNumClasses()];
 		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
 			System.out.println("ERRRROOOOORRRR !!");
 			System.exit(0);
 		}
 
 		int n_attributes = sampleMeans.length;
-		int n_classes = Constants.numClasses;
+		int n_classes = Constants.getNumClasses();
 
 		Instance x = data;
 		for (int c = 0; c < n_classes; c++) {
@@ -597,8 +595,8 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 //		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][m_Instances.numClasses()];
 //		m_ClassDistribution = new DiscreteEstimator(m_Instances.numClasses(), true);
 		
-		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][Constants.numClasses];
-		m_ClassDistribution = new DiscreteEstimator(Constants.numClasses, true);
+		m_Distributions = new Estimator[m_Instances.numAttributes() - 1][Constants.getNumClasses()];
+		m_ClassDistribution = new DiscreteEstimator(Constants.getNumClasses(), true);
 		int attIndex = 0;
 		Enumeration<Attribute> enu = m_Instances.enumerateAttributes();
 		while (enu.hasMoreElements()) {
@@ -631,7 +629,7 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 				}
 			}
 
-			for (int j = 0; j < Constants.numClasses; j++) {
+			for (int j = 0; j < Constants.getNumClasses(); j++) {
 				switch (attribute.type()) {
 				case Attribute.NUMERIC:
 					if (m_UseKernelEstimator) {
@@ -706,9 +704,9 @@ public class NaiveBayes extends AbstractClassifier implements OptionHandler, Wei
 			instance = m_Disc.output();
 		}
 		double[] probs = new double[m_NumClasses];
-		if ( m_NumClasses != Constants.numClasses){
+		if ( m_NumClasses != Constants.getNumClasses()){
 			System.err.println("in NaiveBayes we don't have same number of classes -> error");
-			System.err.println("correct number of classes\t"+ Constants.numClasses);
+			System.err.println("correct number of classes\t"+ Constants.getNumClasses());
 			System.err.println("number of classes in naive bayes\t"+ m_NumClasses);
 			System.err.println("in distribution number of classes\t" + m_Distributions[0].length);
 			

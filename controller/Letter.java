@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.datavec.api.records.reader.RecordReader;
@@ -19,7 +18,6 @@ import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -88,7 +86,7 @@ public class Letter {
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 26;
+		Constants.setNumClasses(26);
 
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
@@ -157,23 +155,23 @@ public class Letter {
 
 		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-		for (int c = 0; c < Constants.numClasses - 1; c++) {
+		for (int c = 0; c < Constants.getNumClasses() - 1; c++) {
 			// for 4 classes -> it is set only for mnist dataset ( to be changed
 			// )
-			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.getNumClasses()); i++) {
 				tmp1.add(c);
 			}
 		}
 
 		while (tmp1.size() < Constants.numberOfNeurons)
-			tmp1.add(Constants.numClasses - 1);
+			tmp1.add(Constants.getNumClasses() - 1);
 
 		for (int l = 0; l < Constants.numberOfLayers; l++) {
 
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.classChosedArray.put(l, tmp2);
+			Constants.getClassChosedArray().put(l, tmp2);
 		}
 
 		// set-up the project :
@@ -189,7 +187,7 @@ public class Letter {
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
 
 		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/Letter.csv")));
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,16,Constants.numClasses);
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,16, Constants.getNumClasses());
 		
 		DataSet allData = iterator.next();
 		allData.shuffle();

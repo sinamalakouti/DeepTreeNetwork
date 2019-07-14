@@ -380,14 +380,14 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 	public double[] getGaussianPDF_log(Instance data, double[] classProb, double[][] sampleMeans,
 			double[][] sampleStDevs, Instances dataset) {
 
-		double[] pdf = new double[Constants.numClasses];
+		double[] pdf = new double[Constants.getNumClasses()];
 		if (sampleMeans.length != sampleStDevs.length || sampleMeans[0].length != sampleStDevs[0].length) {
 			System.out.println("ERRRROOOOORRRR !!");
 			System.exit(0);
 		}				
 
 		int n_attributes = sampleMeans.length;
-		int n_classes = Constants.numClasses;
+		int n_classes = Constants.getNumClasses();
 
 		Instance x = data;
 		for (int c = 0; c < n_classes; c++) {
@@ -474,12 +474,12 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
 		  this.setParameters(data);
 	  }
 	protected void setParameters(Instances data) throws Exception {
-		double[][] mu2 = new double[data.numAttributes() - 1][Constants.numClasses];
-		double[][] sd2 = new double[data.numAttributes() - 1][Constants.numClasses];
+		double[][] mu2 = new double[data.numAttributes() - 1][Constants.getNumClasses()];
+		double[][] sd2 = new double[data.numAttributes() - 1][Constants.getNumClasses()];
 		int numInstances2 = data.size();
-		double[] classProb2 = new double[Constants.numClasses];
+		double[] classProb2 = new double[Constants.getNumClasses()];
 
-		Instances[] tempInstances = new Instances[Constants.numClasses];
+		Instances[] tempInstances = new Instances[Constants.getNumClasses()];
 		double s = 0d;
 		for (int j = 0; j < data.classAttribute().numValues(); j++) {
 			

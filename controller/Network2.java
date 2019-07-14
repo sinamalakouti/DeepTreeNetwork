@@ -27,7 +27,6 @@ import utils.Constants;
 import utils._utils;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.pmml.Constant;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
@@ -83,8 +82,8 @@ public class Network2 {
 
         double learning_rate = 0.1;
         int feature_ratio = 40;
-        DataSet mnistTrain ;
-        DataSet mnistTest ;
+        DataSet mnistTrain;
+        DataSet mnistTest;
         //
         Instances trainSet2 = null;
 
@@ -126,6 +125,8 @@ public class Network2 {
 
         Constants.model.init();
         Constants.model.setListeners(new ScoreIterationListener(5));
+        INDArray a = Constants.model.getLayer(0).getParam("W");
+
         System.out.println("start");
 
 
@@ -243,12 +244,11 @@ public class Network2 {
 
             }
 
-                // run the model
+            // run the model
             Constants.model = new MultiLayerNetwork(conf);
 
             Constants.model.init();
             Constants.model.setListeners(new ScoreIterationListener(5));
-
 
 
         }
@@ -556,28 +556,28 @@ public class Network2 {
 
         System.out.println("SAVING THE PROBLEM");
         File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
-        FileWriter fr = new FileWriter(file);
-        BufferedWriter out = new BufferedWriter(fr);
+//        FileWriter fr = new FileWriter(file);
+//        BufferedWriter out = new BufferedWriter(fr);
         String str = new String();
         str += "iteration_based " + iteration_based + "\n";
         str += "fold " + fold_iteration + "\n";
-        out.write(str);
+//        out.write(str);
 
-        FileOutputStream attributesIndexes_file =
-                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
-        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
-        attIndex_out.writeObject(Constants.attributesIndexes);
-
-        FileOutputStream class_file =
-                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
-        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
-        class_file_out.writeObject(Constants.classChosedArray);
+//        FileOutputStream attributesIndexes_file =
+//                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
+//        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
+//        attIndex_out.writeObject(Constants.attributesIndexes);
+//
+//        FileOutputStream class_file =
+//                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
+//        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
+//        class_file_out.writeObject(Constants.classChosedArray);
 //
 
 
 //
 
-        if (this.fivefoldIterator == null ) {
+        if (this.fivefoldIterator == null) {
             DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
             DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
             Instances AllInstances = _utils.dataset2Instances(mnistTrain.next());
@@ -587,10 +587,10 @@ public class Network2 {
 
             DataSet allData = _utils.instancesToDataSet(AllInstances);
             this.fivefoldIterator = new KFoldIterator(5, allData);
-            FileOutputStream mnist_kfold =
-                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
-            ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
-            mnist_kfold_out.writeObject(this.fivefoldIterator);
+//            FileOutputStream mnist_kfold =
+//                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
+//            ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
+//            mnist_kfold_out.writeObject(this.fivefoldIterator);
         }
 
 
@@ -712,15 +712,14 @@ public class Network2 {
                 new FileInputStream(Constants.output_file_prefix + "/problem/class_file.ser");
         ObjectInputStream class_file_in = new ObjectInputStream(class_file);
 
-        Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
-
+        Constants.setClassChosedArray((HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject());
 
 
         FileInputStream mnist_kfold =
                 new FileInputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
         ObjectInputStream mnist_kfold_in = new ObjectInputStream(mnist_kfold);
 
-        this.fivefoldIterator =  (KFoldIterator) mnist_kfold_in.readObject();
+        this.fivefoldIterator = (KFoldIterator) mnist_kfold_in.readObject();
 
 
 //        FileInputStream mnistTrain_file =
@@ -770,7 +769,7 @@ public class Network2 {
                 new FileInputStream(Constants.output_file_prefix + "/problem/class_file.ser");
         ObjectInputStream class_file_in = new ObjectInputStream(class_file);
 
-        Constants.classChosedArray = (HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject();
+        Constants.setClassChosedArray((HashMap<Integer, ArrayList<Integer>>) class_file_in.readObject());
 
 
         FileInputStream trainSet_file =
@@ -822,9 +821,9 @@ public class Network2 {
             INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
 
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
-
+//b/batch" + batchNumber + ".ser");
             FileOutputStream batch_file =
-                    new FileOutputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
+                    new FileOutputStream("batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
@@ -840,8 +839,10 @@ public class Network2 {
     private static DataSet readBatch_dataset(int batchNumber) throws IOException, ClassNotFoundException {
 
 
+//        FileInputStream batch_file =
+//                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
         FileInputStream batch_file =
-                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
+                new FileInputStream("batch" + batchNumber + ".ser");
         ObjectInputStream batch_file_in = new ObjectInputStream(batch_file);
         DataSet set = (DataSet) batch_file_in.readObject();
 

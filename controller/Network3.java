@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
@@ -26,18 +25,15 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.nd4j.linalg.util.NDArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
-import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
-import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 public class Network3 {
@@ -179,29 +175,29 @@ public class Network3 {
 			
 		}
 
-		Constants.numClasses= 10;
+		Constants.setNumClasses(10);
 		Constants.numberOfLayers =2;
 		Constants.numberOfNeurons =40;
 		// class configuration for each neuron
 		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 //
-		for (int c = 0; c < Constants.numClasses - 1; c++) {
+		for (int c = 0; c < Constants.getNumClasses() - 1; c++) {
 			// for 4 classes -> it is set only for mnist dataset ( to be changed
 			// )
-			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.getNumClasses()); i++) {
 				tmp1.add(c);
 			}
 		}
 
 		while (tmp1.size() < Constants.numberOfNeurons)
-			tmp1.add(Constants.numClasses - 1);
+			tmp1.add(Constants.getNumClasses() - 1);
 
 		for (int l = 0; l < Constants.numberOfLayers; l++) {
 
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.classChosedArray.put(l, tmp2);
+			Constants.getClassChosedArray().put(l, tmp2);
 		}
 
 

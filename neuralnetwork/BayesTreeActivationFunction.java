@@ -74,7 +74,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
 //			for mapping : 	result [i] = predictionDerivative[0]; should changed true -> false in the line above
 
 
-                result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+                result[i] = predictionDerivative[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 
 
 //				if (isOutputLayerActivation == false) {
@@ -248,7 +248,7 @@ public class BayesTreeActivationFunction extends BaseActivationFunction {
                 double res;
                 if (isOutputLayerActivation == false) {
 
-                    res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+                    res = prediction[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 
 //					TODO adding the mapping again
 //					INDArray pred = Nd4j.create(prediciton2);

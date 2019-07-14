@@ -6,29 +6,23 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.SplitTestAndTrain;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
@@ -88,7 +82,7 @@ public class EMG {
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 6;
+		Constants.setNumClasses(6);
 
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
@@ -159,23 +153,23 @@ public class EMG {
 
 		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-		for (int c = 0; c < Constants.numClasses - 1; c++) {
+		for (int c = 0; c < Constants.getNumClasses() - 1; c++) {
 			// for 4 classes -> it is set only for mnist dataset ( to be changed
 			// )
-			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.getNumClasses()); i++) {
 				tmp1.add(c);
 			}
 		}
 
 		while (tmp1.size() < Constants.numberOfNeurons)
-			tmp1.add(Constants.numClasses - 1);
+			tmp1.add(Constants.getNumClasses() - 1);
 
 		for (int l = 0; l < Constants.numberOfLayers; l++) {
 
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.classChosedArray.put(l, tmp2);
+			Constants.getClassChosedArray().put(l, tmp2);
 		}
 
 		// set-up the project :
@@ -188,14 +182,14 @@ public class EMG {
 
 		//Xtrain
 		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/train.csv")));
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTrainExamples,3000,Constants.numClasses);
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTrainExamples,3000, Constants.getNumClasses());
 		DataSet trainingData = iterator.next();
 			
 		
 		//Xtest
 		recordReader = new CSVRecordReader(numLinesToSkip,delimiter);
 		recordReader.initialize(new FileSplit(new File("/home/sina/eclipse-workspace/ComplexNeuronsProject/Dataset/test.csv")));
-		 iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTestExamples,3000,Constants.numClasses);
+		 iterator = new RecordReaderDataSetIterator(recordReader,(int)numberTestExamples,3000, Constants.getNumClasses());
 		DataSet testData = iterator.next();
 		
 		//        TODO:

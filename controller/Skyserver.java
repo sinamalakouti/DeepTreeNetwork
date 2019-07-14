@@ -4,26 +4,20 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
-import neuralnetwork.HoeffdingTree.HoeffdingTreeActivationFunction;
 import org.datavec.api.records.reader.RecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -33,7 +27,6 @@ import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.nd4j.linalg.learning.config.IUpdater;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
@@ -42,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import utils._utils;
-import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
@@ -88,7 +80,7 @@ public class Skyserver {
 		Constants.isDropoutEnable = false;
 //		Constants.dropoutRate = 0.3;
 		Constants.numBatches = (int) ( (numberTrainExamples) / Constants.batchSize); 
-		Constants.numClasses = 3;
+		Constants.setNumClasses(3);
 		// org.deeplearning4j.nn.layers.feedforward.dense.DenseLayer
 
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(6)
@@ -175,23 +167,23 @@ public class Skyserver {
 
 		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-		for (int c = 0; c < Constants.numClasses - 1; c++) {
+		for (int c = 0; c < Constants.getNumClasses() - 1; c++) {
 			// for 4 classes -> it is set only for mnist dataset ( to be changed
 			// )
-			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.getNumClasses()); i++) {
 				tmp1.add(c);
 			}
 		}
 
 		while (tmp1.size() < Constants.numberOfNeurons)
-			tmp1.add(Constants.numClasses - 1);
+			tmp1.add(Constants.getNumClasses() - 1);
 
 		for (int l = 0; l < Constants.numberOfLayers; l++) {
 
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.classChosedArray.put(l, tmp2);
+			Constants.getClassChosedArray().put(l, tmp2);
 		}
 //IUpdater
 		// set-up the project :
@@ -204,7 +196,7 @@ public class Skyserver {
 
 		recordReader.initialize(new FileSplit(new File("/Users/sina/Desktop/skyserverTest.csv")));
 		
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,9,Constants.numClasses);
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader,(int)numberOfExamples,9, Constants.getNumClasses());
 		DataSet allData = iterator.next();
 		allData.shuffle();
 		SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.7);  //Use 70% of data for training

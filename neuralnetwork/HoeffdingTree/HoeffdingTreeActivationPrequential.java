@@ -11,7 +11,6 @@ import org.nd4j.linalg.primitives.Pair;
 import utils.Constants;
 import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
-import weka.classifiers.trees.ht.NBNodeAdaptive;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
@@ -64,12 +63,12 @@ public class HoeffdingTreeActivationPrequential extends BaseActivationFunction {
 				// for mapping : result [i] = predictionDerivative[0]; should
 				// changed true -> false in the line above
 
-				if (predictionDerivative.length != Constants.numClasses && Constants.classChosedArray.get(layernumber)
+				if (predictionDerivative.length != Constants.getNumClasses() && Constants.getClassChosedArray().get(layernumber)
 						.get(neuronNumber) >= predictionDerivative.length) {
 					System.err.println("inja ham bayad doros shavad dar moshtagh e gerami");
 					result[i] = 0;
 				} else
-					result[i] = predictionDerivative[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+					result[i] = predictionDerivative[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 
 				// if (isOutputLayerActivation == false) {
 				// labelIndexes[i] = prediciton[1];
@@ -205,12 +204,12 @@ public class HoeffdingTreeActivationPrequential extends BaseActivationFunction {
 
 				if (isOutputLayerActivation == false) {
 
-					if (prediction.length != Constants.numClasses
-							&& Constants.classChosedArray.get(layernumber).get(neuronNumber) >= prediction.length) {
+					if (prediction.length != Constants.getNumClasses()
+							&& Constants.getClassChosedArray().get(layernumber).get(neuronNumber) >= prediction.length) {
 						System.err.println("in doostemoon bayad bezoodi hal beshe :))");
 						res = 0;
 					} else
-						res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+						res = prediction[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 					result[i] = res;
 
 					if (res < 0 || res - 1 > 0.01) {

@@ -32,7 +32,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.learning.config.Sgd;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.nd4j.linalg.util.NDArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +57,14 @@ public class HGGSNetwork {
 		RecordReader recordReader = new CSVRecordReader(numLinesToSkip, delimiter);
 		recordReader.initialize(new FileSplit( new File("/Users/sina/Documents/JGU_Research/ComplexNeuronsProject/datasets/HIGGS.csv")));
 		
-		Constants.numClasses = 2;
+		Constants.setNumClasses(2);
 		int datasetSize = 11000;
 		Constants.batchSize = 100;
 		Constants.numBatches = datasetSize / Constants.batchSize;
 		final int numInputs = 28;
 		
 		
-		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, datasetSize,0,Constants.numClasses);
+		DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, datasetSize,0, Constants.getNumClasses());
 		
 
 			DataSet allData = iterator.next();		
@@ -102,7 +101,7 @@ public class HGGSNetwork {
 								.activation(Activation.SIGMOID).build())
 				.layer(2,
 						new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-								.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(Constants.numClasses).build())
+								.activation(Activation.SOFTMAX).nIn(Constants.numberOfNeurons).nOut(Constants.getNumClasses()).build())
 .build();
 
 		// run the model
@@ -148,23 +147,23 @@ public class HGGSNetwork {
 
 		ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
-		for (int c = 0; c < Constants.numClasses - 1; c++) {
+		for (int c = 0; c < Constants.getNumClasses() - 1; c++) {
 			// for 4 classes -> it is set only for mnist dataset ( to be changed
 			// )
-			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
+			for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.getNumClasses()); i++) {
 				tmp1.add(c);
 			}
 		}
 
 		while (tmp1.size() < Constants.numberOfNeurons)
-			tmp1.add(Constants.numClasses - 1);
+			tmp1.add(Constants.getNumClasses() - 1);
 
 		for (int l = 0; l < Constants.numberOfLayers; l++) {
 
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.classChosedArray.put(l, tmp2);
+			Constants.getClassChosedArray().put(l, tmp2);
 		}
 
 		Instances trainSet2 = null;
@@ -222,7 +221,7 @@ public class HGGSNetwork {
 				Constants.isEvaluating = true;
 				log.info("Evaluate model....");
 
-				Evaluation eval = new Evaluation(Constants.numClasses); // create an
+				Evaluation eval = new Evaluation(Constants.getNumClasses()); // create an
 
 					System.out.println(Constants.isEvaluating);
 					_utils.setLabels(testData.getLabels(), Constants.isEvaluating, false);
@@ -247,7 +246,7 @@ public class HGGSNetwork {
 		}
 
 		Constants.isEvaluating = true;
-		Evaluation eval = new Evaluation(Constants.numClasses); // create an evaluation
+		Evaluation eval = new Evaluation(Constants.getNumClasses()); // create an evaluation
 			_utils.setLabels(testData.getLabels(), Constants.isEvaluating, false);
 			INDArray output = Constants.model.output(testData.getFeatures());
 			eval.eval(testData.getLabels(), output); // check the prediction
@@ -322,7 +321,7 @@ public class HGGSNetwork {
 			}
 
 			double correct = 0d;
-			int[][] classPredicted = new int[testSet.numExamples()][Constants.numClasses];
+			int[][] classPredicted = new int[testSet.numExamples()][Constants.getNumClasses()];
 			for (int j = 0; j < trees.size(); j++) {
 				INDArray temp = _utils.getSubDataset(Constants.attributesIndexes.get(j), testSet);
 				Instances test = _utils.ndArrayToInstances(temp);
@@ -354,7 +353,7 @@ public class HGGSNetwork {
 			for (int i = 0; i < classPredicted.length; i++) {
 				int max = Integer.MIN_VALUE;
 				int max_indx = -1;
-				for (int j = 0; j < Constants.numClasses; j++) {
+				for (int j = 0; j < Constants.getNumClasses(); j++) {
 					if (classPredicted[i][j] > max) {
 						max = classPredicted[i][j];
 						max_indx = j;
