@@ -556,7 +556,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		}
 
 		avgDepth = avgDepth / Constants.numberOfNeurons;
-		Constants.avgHFDepth[this.LayerNumber] = avgDepth;
+		Constants.avgHFDepth[this.LayerNumber - Constants.base_hf_layerNumber] = avgDepth;
 		if (maskArray != null) {
 			applyMask(z);
 		}
