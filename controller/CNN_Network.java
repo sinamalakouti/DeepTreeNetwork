@@ -578,6 +578,10 @@ public class CNN_Network {
             mnistTrain = null;
 
 
+            Constants.model = regular_net(6, 1);
+        Constants.model.init();
+        Constants.model.setListeners(new ScoreIterationListener(10));
+
 
             for (int i = 0; i < 1; i++) {
 
@@ -830,7 +834,7 @@ public class CNN_Network {
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
 //b/batch" + batchNumber + ".ser");
             FileOutputStream batch_file =
-                    new FileOutputStream("/batch" + batchNumber + ".ser");
+                    new FileOutputStream("/data/batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
