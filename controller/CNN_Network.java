@@ -46,6 +46,11 @@ public class CNN_Network {
     public static void main(String[] args) throws Exception {
 
 
+
+        boolean deSerializing = false;
+        boolean serializing = true;
+
+
         int channels = 1; // single channel for grayscale images
 
 
@@ -63,59 +68,42 @@ public class CNN_Network {
         Constants.maximumDepth = 20;
 
         int outputnum = 10;
+        double learning_rate = 0.1;
+        int feature_ratio = 2;
+        DataSetIterator mnistTrain = null;
+        DataSet mnistTest = new DataSet();
+        //
+        Instances trainSet2 = null;
+
+
+
+
+
+
+        mnistTrain = null;
 
         int numInputs = 2880;
-        ArrayList<Integer> featuresVector = new ArrayList<>();
-        for (int i = 0; i < numInputs; i++)
-            featuresVector.add(i);
 
-        int max = numInputs / 40;
-        HashMap<Integer, Boolean> attInexes = new HashMap<>();
-        for (int j = 0; j < Constants.numberOfNeurons; j++) {
-            Collections.shuffle(featuresVector);
-            int[] temp = new int[max];
-            for (int i = 0; i < max; i++) {
-                temp[i] = featuresVector.get(i);
-                attInexes.put(featuresVector.get(i), true);
-            }
+        CNN_Network net2 = new CNN_Network();
 
-            Constants.attributesIndexes.put(j, temp);
-
-        }
+        if (deSerializing == false) {
+            net2.init_problem_configuration(numInputs, feature_ratio);
+            trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
+            DataSet tempTrainSet;
+            tempTrainSet = _utils.instancesToDataSet(trainSet2);
+            saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
+        } else
+            trainSet2 = net2.load_problem_configuration(numInputs, feature_ratio);
 
 
-        ArrayList<Integer> tmp1 = new ArrayList<>();
+        FileInputStream mnistTest_file =
+                new FileInputStream(Constants.output_file_prefix + "/problem/mnistTest_file.ser");
+        ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
+        mnistTest.load(mnistTest_file);
 
 
-        for (int c = 0; c < Constants.numClasses - 1; c++) {
-            // for 4 classes -> it is set only for mnist dataset ( to be changed )
-            for (int i = 0; i < (int) (Constants.numberOfNeurons / Constants.numClasses); i++) {
-                tmp1.add(c);
-            }
-        }
-
-        while (tmp1.size() < Constants.numberOfNeurons)
-            tmp1.add(Constants.numClasses - 1);
-
-        for (int l = 0; l < Constants.numberOfLayers; l++) {
-
-            @SuppressWarnings("unchecked")
-            ArrayList<Integer> tmp2;
-            tmp2 = (ArrayList<Integer>) tmp1.clone();
-            Collections.shuffle(tmp2);
-            Constants.classChosedArray.put(l, tmp2);
-        }
-
-
-        DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
-
-
-        // pixel values from 0-255 to 0-1 (min-max scaling)
-        DataNormalization scaler = new NormalizerStandardize();
-        scaler.fit(mnistTrain);
-        mnistTrain.setPreProcessor(scaler);
-        mnistTest.setPreProcessor(scaler); // same normalization for better results
+        mnistTest_file.close();
+        mnistTest_file_in.close();
 
         log.info("Network configuration and training...");
 
@@ -126,22 +114,8 @@ public class CNN_Network {
 
         // evaluation while training (the score should go down)
 
-        Instances trainSet2 = null, trainTemp = null;
-        int c = 0;
 
-        while (mnistTrain.hasNext()) {
-            DataSet set = mnistTrain.next();
-            if (c == 0) {
-                trainSet2 = _utils.dataset2Instances(set);
-            } else {
-                trainTemp = _utils.dataset2Instances(set);
-                for (Object aTrainTemp : trainTemp) trainSet2.add((Instance) aTrainTemp);
-            }
 
-            c++;
-        }
-
-        mnistTrain.reset();
         NumericToNominal convert = new NumericToNominal();
         String[] options = new String[2];
         convert = new NumericToNominal();
@@ -172,17 +146,18 @@ public class CNN_Network {
 
                 Evaluation eval = new Evaluation(outputnum); // create an
 
-                while (mnistTest.hasNext()) {
+                //
+//                while (mnistTest.hasNext()) {
 
-                    DataSet next = mnistTest.next();
-                    System.out.println(Constants.isEvaluating);
-                    _utils.setLabels(next.getLabels(), Constants.isEvaluating,
-                            false);
-                    INDArray output = Constants.model.output(next.getFeatures());
+//                    DataSet next = mnistTest.next();
+                System.out.println(Constants.isEvaluating);
+                _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating,
+                        false);
+                INDArray output = Constants.model.output(mnistTest.getFeatures());
 
-                    eval.eval(next.getLabels(), output);
-                }
-                mnistTest.reset();
+                eval.eval(mnistTest.getLabels(), output);
+//                }
+//                mnistTest.reset();
 
 
 
@@ -209,7 +184,7 @@ public class CNN_Network {
 
         //lets run the other one
 
-        regular_experiment(trained_weights);
+        regular_experiment(trained_weights, deSerializing , serializing, net2, feature_ratio, mnistTest,  trainSet2);
     }
 
 
@@ -513,14 +488,13 @@ public class CNN_Network {
         return trainSet2;
     }
 
-    private static void regular_experiment(HashMap<Integer, INDArray> init_weights) throws Exception {
+    private static void regular_experiment(HashMap<Integer, INDArray> init_weights, boolean deSerializing,boolean serializing, CNN_Network net2, int feature_ratio, DataSet mnistTest, Instances trainSet2 ) throws Exception {
         {
+
+
 
             // TODO Nd4j.setDataType(Type.DOUBLE);
 
-
-            boolean deSerializing = false;
-            boolean serializing = true;
 
             Constants.weightLayerMin = new double[2];
             Constants.weightLayerMin[0] = Double.POSITIVE_INFINITY;
@@ -544,38 +518,7 @@ public class CNN_Network {
             Constants.maximumDepth--;
             Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/CNN";
 
-            double learning_rate = 0.1;
-            int feature_ratio = 2;
-            DataSetIterator mnistTrain = null;
-            DataSet mnistTest = new DataSet();
-            //
-            Instances trainSet2 = null;
 
-
-            CNN_Network net2 = new CNN_Network();
-
-
-            if (deSerializing == false) {
-                net2.init_problem_configuration(numInputs, feature_ratio);
-                trainSet2 = net2.save_problem_configuration(numInputs, feature_ratio, trainSet2);
-                DataSet tempTrainSet;
-                tempTrainSet = _utils.instancesToDataSet(trainSet2);
-                saveBatches(Constants.numBatches, Constants.batchSize, tempTrainSet, trainSet2);
-            } else
-                trainSet2 = net2.load_problem_configuration(numInputs, feature_ratio);
-
-
-            FileInputStream mnistTest_file =
-                    new FileInputStream(Constants.output_file_prefix + "/problem/mnistTest_file.ser");
-            ObjectInputStream mnistTest_file_in = new ObjectInputStream(mnistTest_file);
-            mnistTest.load(mnistTest_file);
-
-
-            mnistTest_file.close();
-            mnistTest_file_in.close();
-
-
-            mnistTrain = null;
 
 
 
