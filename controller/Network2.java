@@ -83,7 +83,7 @@ public class Network2 {
         Constants.output_file_prefix = "/home/research/result/phase5/9";
 
         double learning_rate = 0.1;
-        int feature_ratio = 40;
+        int feature_ratio = 20;
         DataSet mnistTrain;
         DataSet mnistTest;
         //
