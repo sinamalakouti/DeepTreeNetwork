@@ -328,34 +328,33 @@ public class CNN_Network {
                 .updater(new Sgd(0.1))
                 .weightInit(WeightInit.XAVIER)
                 .list()
-                .layer(0, new ConvolutionLayer.Builder(5, 5)
-                        .nIn(channels)
-                        .stride(1, 1)
-                        .nOut(20)
-                        .activation(Activation.IDENTITY)
-                        .build())
-                .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
-                        .kernelSize(2, 2)
-                        .stride(2, 2)
-                        .build())
-                .layer(2, new ConvolutionLayer.Builder(5, 5)
-                        .stride(1, 1) // nIn need not specified in later layers
-                        .nOut(50)
-                        .activation(Activation.IDENTITY)
-                        .build())
-                .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
-                        .kernelSize(2, 2)
-                        .stride(2, 2)
-                        .build())
-
-                .layer(4,
+//                .layer(0, new ConvolutionLayer.Builder(5, 5)
+//                        .nIn(channels)
+//                        .stride(1, 1)
+//                        .nOut(20)
+//                        .activation(Activation.IDENTITY)
+//                        .build())
+//                .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+//                        .kernelSize(2, 2)
+//                        .stride(2, 2)
+//                        .build())
+//                .layer(2, new ConvolutionLayer.Builder(5, 5)
+//                        .stride(1, 1) // nIn need not specified in later layers
+//                        .nOut(50)
+//                        .activation(Activation.IDENTITY)
+//                        .build())
+//                .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+//                        .kernelSize(2, 2)
+//                        .stride(2, 2)
+//                        .build())
+                .layer(0,
                         new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
                                 .nIn(numInputs)
                                 .activation(Activation.SIGMOID).build())
 //                .layer(5,
 //                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
 //                                .activation(Activation.SIGMOID).build())
-                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(10)
                         .activation(Activation.SOFTMAX)
                         .build())
@@ -530,7 +529,7 @@ public class CNN_Network {
             Constants.weightLayerMax[0] = Double.NEGATIVE_INFINITY;
             Constants.weightLayerMax[1] = Double.NEGATIVE_INFINITY;
 
-            final int numInputs = 800;
+            final int numInputs = 784;
             int outputNum = 10;
             log.info("Build model....");
             Constants.numberOfLayers = 1;
@@ -654,13 +653,13 @@ public class CNN_Network {
             Constants.model.setListeners(new ScoreIterationListener(5));
             System.out.println("start");
 
-            Constants.model.getLayer(0).setParam("W", init_weights.get(0));
+//            Constants.model.getLayer(0).setParam("W", init_weights.get(0));
 //            Constants.model.getLayer(1).setParam("W", init_weights.get(1));
-            Constants.model.getLayer(2).setParam("W", init_weights.get(2));
+//            Constants.model.getLayer(2).setParam("W", init_weights.get(2));
 //            Constants.model.getLayer(3).setParam("W", init_weights.get(3));
-            Constants.model.getLayer(4).setParam("W", init_weights.get(4));
+            Constants.model.getLayer(0).setParam("W", init_weights.get(4));
 //            nothing for 5
-            Constants.model.getLayer(5).setParam("W", init_weights.get(5));
+            Constants.model.getLayer(1).setParam("W", init_weights.get(5));
 
 
 //			tmp1.clear();
