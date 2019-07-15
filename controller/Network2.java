@@ -78,7 +78,7 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/13";
+        Constants.output_file_prefix = "/home/research/result/phase5/9";
 
         double learning_rate = 0.1;
         int feature_ratio = 40;
@@ -161,88 +161,88 @@ public class Network2 {
                 trainSet2 = _utils.dataset2Instances(mnistTrain);
 
 
-            for (int i = 0 + net2.iteration_based; i < 156; i++) {
-                // in the first iteration do the bagging test and the each batch
-                // test :D
-                for (int b = 0; b < Constants.numBatches; b++) {
+                for (int i = 0 + net2.iteration_based; i < 156; i++) {
+                    // in the first iteration do the bagging test and the each batch
+                    // test :D
+                    for (int b = 0; b < Constants.numBatches; b++) {
 
-                    System.out.println("at fold iteration " + net2.fold_iteration + "   iteration  " + i + "  batch   " + b);
+                        System.out.println("at fold iteration " + net2.fold_iteration + "   iteration  " + i + "  batch   " + b);
 
-                    DataSet set = getBatchTrainSet(b, Constants.batchSize, trainSet2);
+                        DataSet set = getBatchTrainSet(b, Constants.batchSize, trainSet2);
 
-                    if (i % 10 == 0 && serializing && b == Constants.numBatches - 1) {
-                        Constants.isSerialzing = true;
-                        _utils.serializing();
-                        File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
-                        FileWriter fr = new FileWriter(file);
-                        BufferedWriter out = new BufferedWriter(fr);
-                        String str = new String();
-                        str += "iteration_based " + i + "\n";
-                        str += "fold " + net2.fold_iteration + "\n";
-                        out.write(str);
+                        if (i % 10 == 0 && serializing && b == Constants.numBatches - 1) {
+                            Constants.isSerialzing = true;
+                            _utils.serializing();
+                            File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
+                            FileWriter fr = new FileWriter(file);
+                            BufferedWriter out = new BufferedWriter(fr);
+                            String str = new String();
+                            str += "iteration_based " + i + "\n";
+                            str += "fold " + net2.fold_iteration + "\n";
+                            out.write(str);
+                            out.close();
+                            fr.close();
+                        }
+                        if (deSerializing == true) {
+                            Constants.isDeSerializing = true;
+                            _utils.deserializing();
+                        }
+
+
+                        Constants.model.fit(set);
+
+                        if (Constants.isSerialzing == true)
+                            Constants.isSerialzing = false;
+                        if (Constants.isDeSerializing == true) {
+                            Constants.isDeSerializing = false;
+                            deSerializing = false;
+                        }
+
+
+                    }
+
+                    if (i % 2 == 0) {
+                        System.out.println("EVALUATING AT ITERATION  " + i);
+                        Constants.isEvaluating = true;
+                        log.info("Evaluate model....");
+                        //
+                        Evaluation eval = new Evaluation(outputNum); // create an
+                        //
+    //                while (mnistTest.hasNext()) {
+
+    //                    DataSet next = mnistTest.next();
+                        System.out.println(Constants.isEvaluating);
+                        _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating,
+                                false);
+                        INDArray output = Constants.model.output(mnistTest.getFeatures());
+
+                        eval.eval(mnistTest.getLabels(), output);
+    //                }
+    //                mnistTest.reset();
+                        //
+                        String path = Constants.output_file_prefix + "/" + (net2.fold_iteration + 1) + "/resultIteration_" + i;
+                        File file = new File(path);
+                        BufferedWriter out = new BufferedWriter(new
+                                FileWriter(file));
+                        String avglayersTreesDepth = "";
+                        for (int l = 0; l < Constants.numberOfLayers; l++)
+                            avglayersTreesDepth = avglayersTreesDepth + " " +
+                                    Constants.avgHFDepth[l];
+                        out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
+    //
+                        System.out.println(eval.stats() + "\n" + "errors:  " +
+                                Constants.model.score() + "\n" + avglayersTreesDepth);
+
+                        //
                         out.close();
-                        fr.close();
+                        Constants.isEvaluating = false;
+                        //
                     }
-                    if (deSerializing == true) {
-                        Constants.isDeSerializing = true;
-                        _utils.deserializing();
-                    }
-
-
-                    Constants.model.fit(set);
-
-                    if (Constants.isSerialzing == true)
-                        Constants.isSerialzing = false;
-                    if (Constants.isDeSerializing == true) {
-                        Constants.isDeSerializing = false;
-                        deSerializing = false;
-                    }
-
+                    // if ( i == 10 ){
+                    // _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
+                    // }
 
                 }
-
-                if (i % 2 == 0) {
-                    System.out.println("EVALUATING AT ITERATION  " + i);
-                    Constants.isEvaluating = true;
-                    log.info("Evaluate model....");
-                    //
-                    Evaluation eval = new Evaluation(outputNum); // create an
-                    //
-//                while (mnistTest.hasNext()) {
-
-//                    DataSet next = mnistTest.next();
-                    System.out.println(Constants.isEvaluating);
-                    _utils.setLabels(mnistTest.getLabels(), Constants.isEvaluating,
-                            false);
-                    INDArray output = Constants.model.output(mnistTest.getFeatures());
-
-                    eval.eval(mnistTest.getLabels(), output);
-//                }
-//                mnistTest.reset();
-                    //
-                    String path = Constants.output_file_prefix + "/" + (net2.fold_iteration + 1) + "/resultIteration_" + i;
-                    File file = new File(path);
-                    BufferedWriter out = new BufferedWriter(new
-                            FileWriter(file));
-                    String avglayersTreesDepth = "";
-                    for (int l = 0; l < Constants.numberOfLayers; l++)
-                        avglayersTreesDepth = avglayersTreesDepth + " " +
-                                Constants.avgHFDepth[l];
-                    out.write(eval.stats() + "\nerrors\t" + Constants.model.score() + "\n" + avglayersTreesDepth);
-//
-                    System.out.println(eval.stats() + "\n" + "errors:  " +
-                            Constants.model.score() + "\n" + avglayersTreesDepth);
-
-                    //
-                    out.close();
-                    Constants.isEvaluating = false;
-                    //
-                }
-                // if ( i == 10 ){
-                // _utils.draw_accuracy_fscore("hello world plot", "", 0, 10);
-                // }
-
-            }
 
             // run the model
             Constants.model = new MultiLayerNetwork(conf);
@@ -556,12 +556,12 @@ public class Network2 {
 
         System.out.println("SAVING THE PROBLEM");
         File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
-//        FileWriter fr = new FileWriter(file);
-//        BufferedWriter out = new BufferedWriter(fr);
+        FileWriter fr = new FileWriter(file);
+        BufferedWriter out = new BufferedWriter(fr);
         String str = new String();
         str += "iteration_based " + iteration_based + "\n";
         str += "fold " + fold_iteration + "\n";
-//        out.write(str);
+        out.write(str);
 
         FileOutputStream attributesIndexes_file =
                 new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
@@ -587,10 +587,10 @@ public class Network2 {
 
             DataSet allData = _utils.instancesToDataSet(AllInstances);
             this.fivefoldIterator = new KFoldIterator(5, allData);
-//            FileOutputStream mnist_kfold =
-//                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
-//            ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
-//            mnist_kfold_out.writeObject(this.fivefoldIterator);
+            FileOutputStream mnist_kfold =
+                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnist_kfold.ser");
+            ObjectOutputStream mnist_kfold_out = new ObjectOutputStream(mnist_kfold);
+            mnist_kfold_out.writeObject(this.fivefoldIterator);
         }
 
 
@@ -628,8 +628,8 @@ public class Network2 {
 
         FileOutputStream mnistTrain_file =
                 new FileOutputStream(Constants.output_file_prefix + "/problem/mnistTrain_file.ser");
-//        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
-//        mnistTrain_file_out.writeObject(mnistTrain);
+        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
+        mnistTrain_file_out.writeObject(mnistTrain);
 
 
         FileOutputStream mnistTest_file =

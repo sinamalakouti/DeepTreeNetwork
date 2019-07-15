@@ -463,7 +463,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == 0 )
+				if (LayerNumber == Constants.base_hf_layerNumber )
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
@@ -476,22 +476,22 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, ret);
 				// todo : if random class config
 				result = ret.transpose().dup();
-				 zprim = ret.toDoubleMatrix();
-				for (int i = 0; i < zprim.length; i++)
-					for (int j = 0; j < zprim[i].length; j++) {
-						if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-							System.out.println("stop stage number 2");
-
-							for (int i1 = 0; i1 < zprim.length; i1++)
-								for (int j1 = 0; j1 < zprim[i].length; j1++) {
-									System.out.println(zprim[i1][j1]);
-
-								}
-
-							System.exit(0);
-						}
-
-					}
+//				 zprim = ret.toDoubleMatrix();
+//				for (int i = 0; i < zprim.length; i++)
+//					for (int j = 0; j < zprim[i].length; j++) {
+//						if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+//							System.out.println("stop stage number 2");
+//
+//							for (int i1 = 0; i1 < zprim.length; i1++)
+//								for (int j1 = 0; j1 < zprim[i].length; j1++) {
+//									System.out.println(zprim[i1][j1]);
+//
+//								}
+//
+//							System.exit(0);
+//						}
+//
+//					}
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 				// todo : if we want to pass all the predictions
 				// result = ret.dup();
@@ -501,7 +501,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == 0)
+				if (LayerNumber == Constants.base_hf_layerNumber )
 					// todo: if other layers are dense change follwoing line to
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
 				// ztemp =
@@ -517,11 +517,11 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				// if we want pass all the predicitons
 				// result = Nd4j.concat(1, result, ret);
 
-				 zprim = ret.toDoubleMatrix();
+				zprim = result.toDoubleMatrix();
 				for (int i = 0; i < zprim.length; i++)
 					for (int j = 0; j < zprim[i].length; j++) {
 						if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-							System.out.println("stop stage number 3");
+							System.out.println("stop stage number 2	");
 
 							for (int i1 = 0; i1 < zprim.length; i1++)
 								for (int j1 = 0; j1 < zprim[i].length; j1++) {
@@ -533,7 +533,9 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 						}
 
 					}
-				
+
+
+
 
 			}
 
@@ -624,6 +626,23 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		}
 
 		INDArray z = workspaceMgr.createUninitialized(ArrayType.ACTIVATIONS, input.size(0), W.size(0));
+
+		double[][] zprim = z.toDoubleMatrix();
+		for (int i = 0; i < zprim.length; i++)
+			for (int j = 0; j < zprim[i].length; j++) {
+				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number 3");
+
+					for (int i1 = 0; i1 < zprim.length; i1++)
+						for (int j1 = 0; j1 < zprim[i].length; j1++) {
+							System.out.println(zprim[i1][j1]);
+
+						}
+
+					System.exit(0);
+				}
+
+			}
 		INDArray result = null;
 		for (int neuron = 0; neuron < W.columns(); neuron++) {
 
@@ -658,7 +677,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == 0)
+				if (LayerNumber == Constants.base_hf_layerNumber)
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
@@ -672,7 +691,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			} else {
 				INDArray ztemp;
 				// todo : if other layers are dense uncomment the followings
-				if (LayerNumber == 0)
+				if (LayerNumber == Constants.base_hf_layerNumber)
 					// todo: if other layers are dense change follwoing line to
 					// :
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
@@ -691,9 +710,24 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 		if (maskArray != null) {
 			applyMask(z);
 		}
-		
-		
-		z.cleanup();
+
+
+		 zprim = result.toDoubleMatrix();
+		for (int i = 0; i < zprim.length; i++)
+			for (int j = 0; j < zprim[i].length; j++) {
+				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number 4");
+
+					for (int i1 = 0; i1 < zprim.length; i1++)
+						for (int j1 = 0; j1 < zprim[i].length; j1++) {
+							System.out.println(zprim[i1][j1]);
+
+						}
+
+					System.exit(0);
+				}
+
+			}
 
 		return result;
 	}

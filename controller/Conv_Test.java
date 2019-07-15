@@ -41,6 +41,7 @@ import utils._utils;
 import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.pmml.Constant;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 /**
@@ -96,8 +97,8 @@ public class Conv_Test {
 //    testIter.setPreProcessor(scaler); // same normalization for better results
 
     
-    Constants.numberOfLayers = 2 ;
-	Constants.numberOfNeurons = 20;
+    Constants.numberOfLayers = 1 ;
+	Constants.numberOfNeurons = 40;
 	Constants.batchSize = 100;
 	Constants.avgHFDepth = new double[Constants.numberOfLayers];
 	double numberTrainExamples = 60000d;
@@ -111,8 +112,8 @@ public class Conv_Test {
 	ArrayList<Integer> featuresVector = new ArrayList<>();
 	for (int i = 0; i < numInputs; i++)
 		featuresVector.add(i);
-	
-	int max = numInputs / 40;
+
+	int max = numInputs / 30;
 	HashMap<Integer, Boolean> attInexes = new HashMap<>();
 	for (int j = 0; j < Constants.numberOfNeurons; j++) {
 		Collections.shuffle(featuresVector);
@@ -126,7 +127,7 @@ public class Conv_Test {
 
 	}
 	
-	
+//
 	ArrayList<Integer> tmp1 = new ArrayList<Integer>();
 
 
@@ -146,7 +147,7 @@ public class Conv_Test {
 			@SuppressWarnings("unchecked")
 			ArrayList<Integer> tmp2 = (ArrayList<Integer>) tmp1.clone();
 			Collections.shuffle(tmp2);
-			Constants.getClassChosedArray().put(l, tmp2);
+			Constants.getClassChosedArray().put(l + Constants.base_hf_layerNumber, tmp2);
 		}
 
 	
@@ -169,7 +170,7 @@ public class Conv_Test {
         .seed(seed)
 		.trainingWorkspaceMode(WorkspaceMode.NONE).inferenceWorkspaceMode(WorkspaceMode.NONE)
         .l2(0.0001)
-        .updater(new Sgd(0.01))
+        .updater(new Sgd(0.1))
         .weightInit(WeightInit.XAVIER)
         .list()
         .layer(0, new ConvolutionLayer.Builder(5, 5)
@@ -183,13 +184,16 @@ public class Conv_Test {
                 .stride(2, 2)
                 .build())
             .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+					.nIn(numInputs)
                     .nOut(Constants.numberOfNeurons).build())
-            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
-                    .nOut(Constants.numberOfNeurons).build())
+
+
+//            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
+//                    .nOut(Constants.numberOfNeurons).build())
 //            .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
 //                    .nOut(Constants.numberOfNeurons).build())
             
-                .layer(4	, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(3	, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                 		.nOut(outputnum)
                         .activation(Activation.SOFTMAX)
                         .build())

@@ -14,6 +14,8 @@ import weka.classifiers.trees.HoeffdingTree;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
+import weka.core.pmml.Constant;
+import weka.core.pmml.jaxbbindings.ContStats;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 @SuppressWarnings("serial")
@@ -233,10 +235,12 @@ public class HoeffdingTreeActivationFunction extends BaseActivationFunction impl
 							System.out.println("prediction \t"  +prediction.length);
 							System.out.println("num classes \t " + Constants.getNumClasses());
 							res = 0;
-						} else
+						} else {
 							// having random class config:
-							res = prediction[Constants.getClassChosedArray().get(layernumber).get(neuronNumber)];
 
+							res = prediction[Constants.classChosedArray.get(layernumber).get(neuronNumber)];
+
+						}
 						// passing whole predicitions:
 						// res = prediction.clone();
 						result[i] = res;
