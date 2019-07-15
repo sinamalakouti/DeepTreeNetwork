@@ -352,10 +352,10 @@ public class CNN_Network {
                         new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
                                 .nIn(numInputs)
                                 .activation(Activation.SIGMOID).build())
-//                .layer(5,
-//                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-//                                .activation(Activation.SIGMOID).build())
-                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+                .layer(5,
+                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+                                .activation(Activation.SIGMOID).build())
+                .layer(6, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(10)
                         .activation(Activation.SOFTMAX)
                         .build())
@@ -534,7 +534,7 @@ public class CNN_Network {
             int outputNum = 10;
             log.info("Build model....");
             Constants.numberOfLayers = 1;
-            Constants.numberOfNeurons = 50;
+            Constants.numberOfNeurons = 30;
             Constants.batchSize = 100;
             Constants.avgHFDepth = new double[Constants.numberOfLayers];
             double numberTrainExamples = 60000d;
@@ -660,7 +660,7 @@ public class CNN_Network {
 //            Constants.model.getLayer(3).setParam("W", init_weights.get(3));
             Constants.model.getLayer(4).setParam("W", init_weights.get(4));
 //            nothing for 5
-            Constants.model.getLayer(5).setParam("W", init_weights.get(5));
+            Constants.model.getLayer(6).setParam("W", init_weights.get(5));
 
 
 //			tmp1.clear();
