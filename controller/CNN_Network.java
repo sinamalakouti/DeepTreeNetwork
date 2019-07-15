@@ -350,6 +350,7 @@ public class CNN_Network {
 
                 .layer(4,
                         new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
+                                .nIn(100)
                                 .activation(Activation.SIGMOID).build())
 //                .layer(5,
 //                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
@@ -533,7 +534,7 @@ public class CNN_Network {
             int outputNum = 10;
             log.info("Build model....");
             Constants.numberOfLayers = 1;
-            Constants.numberOfNeurons = 20;
+            Constants.numberOfNeurons = 30;
             Constants.batchSize = 100;
             Constants.avgHFDepth = new double[Constants.numberOfLayers];
             double numberTrainExamples = 60000d;
@@ -545,7 +546,7 @@ public class CNN_Network {
             Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/CNN";
             Constants.base_hf_layerNumber = 4;
             double learning_rate = 0.1;
-            int feature_ratio = 2;
+            int feature_ratio = 10;
             DataSetIterator mnistTrain = null;
             DataSet mnistTest = new DataSet();
             //
@@ -644,12 +645,7 @@ public class CNN_Network {
 
 
 
-            // run the model
-            Constants.model = complexDT_cnn(6,1,numInputs);
 
-            Constants.model.init();
-            Constants.model.setListeners(new ScoreIterationListener(5));
-            System.out.println("start");
 
 
             // run the model
