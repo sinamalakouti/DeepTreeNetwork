@@ -238,7 +238,6 @@ public class CNN_Network {
                 .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2, 2)
                         .stride(2, 2)
-
                         .build())
 
                 .layer(4, new DenseLayer.Builder()
@@ -347,12 +346,11 @@ public class CNN_Network {
                 .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2, 2)
                         .stride(2, 2)
-
                         .build())
 
                 .layer(4,
                         new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
-                                .nIn(800)
+                                .nIn(numInputs)
                                 .activation(Activation.SIGMOID).build())
 //                .layer(5,
 //                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
@@ -431,42 +429,42 @@ public class CNN_Network {
 
         System.out.println("SAVING THE PROBLEM");
         File file = new File(Constants.output_file_prefix + "/problem/problem_configuration");
-            FileWriter fr = new FileWriter(file);
-            BufferedWriter out = new BufferedWriter(fr);
-            String str = new String();
-            str += "iteration_based " + iteration_based + "\n";
-            out.write(str);
+        FileWriter fr = new FileWriter(file);
+        BufferedWriter out = new BufferedWriter(fr);
+        String str = new String();
+        str += "iteration_based " + iteration_based + "\n";
+        out.write(str);
 
-            FileOutputStream attributesIndexes_file =
-                    new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
-            ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
-            attIndex_out.writeObject(Constants.attributesIndexes);
+        FileOutputStream attributesIndexes_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/attributesIndexes.ser");
+        ObjectOutputStream attIndex_out = new ObjectOutputStream(attributesIndexes_file);
+        attIndex_out.writeObject(Constants.attributesIndexes);
 
 
-            FileOutputStream class_file =
-                    new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
-            ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
-            class_file_out.writeObject(Constants.classChosedArray);
-    //
-            DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
-            DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
-            DataNormalization scaler = new NormalizerStandardize();
-            scaler.fit(mnistTrain);
-            mnistTrain.setPreProcessor(scaler);
-            mnistTest.setPreProcessor(scaler); // same normalization for better results
-            mnistTrain.reset();
+        FileOutputStream class_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/class_file.ser");
+        ObjectOutputStream class_file_out = new ObjectOutputStream(class_file);
+        class_file_out.writeObject(Constants.classChosedArray);
 
-    //
-            FileOutputStream mnistTrain_file =
-                    new FileOutputStream(Constants.output_file_prefix + "/problem/mnistTrain_file.ser");
-        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
-        mnistTrain_file_out.writeObject(mnistTrain);
+        DataSetIterator mnistTrain = new MnistDataSetIterator(Constants.batchSize, true, 6);
+        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+        DataNormalization scaler = new NormalizerStandardize();
+        scaler.fit(mnistTrain);
+        mnistTrain.setPreProcessor(scaler);
+        mnistTest.setPreProcessor(scaler); // same normalization for better results
+        mnistTrain.reset();
+
+
+        FileOutputStream mnistTrain_file =
+                new FileOutputStream(Constants.output_file_prefix + "/problem/mnistTrain_file.ser");
+//        ObjectOutputStream mnistTrain_file_out = new ObjectOutputStream(mnistTrain_file);
+//        mnistTrain_file_out.writeObject(mnistTrain);
 
 
         FileOutputStream mnistTest_file =
                 new FileOutputStream(Constants.output_file_prefix + "/problem/mnistTest_file.ser");
         ObjectOutputStream mnistTest_file_out = new ObjectOutputStream(mnistTest_file);
-        mnistTest_file_out.writeObject(mnistTest);
+//        mnistTest_file_out.writeObject(mnistTest);
         mnistTest.next().save(mnistTest_file);
 
         int counter = 0;
@@ -803,10 +801,8 @@ public class CNN_Network {
     private static DataSet readBatch_dataset(int batchNumber) throws IOException, ClassNotFoundException {
 
 //
-//        FileInputStream batch_file =
-//                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
         FileInputStream batch_file =
-                new FileInputStream( "batch" + batchNumber + ".ser");
+                new FileInputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
 
 //        FileInputStream batch_file =
 //                new FileInputStream("batch" + batchNumber + ".ser");
@@ -832,12 +828,9 @@ public class CNN_Network {
             INDArray batchTrain_labels = labels.get(NDArrayIndex.interval(start, end), NDArrayIndex.all());
 
             DataSet set = new DataSet(batchTrain_features, batchTrain_labels);
-
-//            FileOutputStream batch_file =
-//                    new FileOutputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
-
+//b/batch" + batchNumber + ".ser");
             FileOutputStream batch_file =
-                    new FileOutputStream( "batch" + batchNumber + ".ser");
+                    new FileOutputStream(Constants.output_file_prefix + "/data/batch" + batchNumber + ".ser");
             ObjectOutputStream batch_file_out = new ObjectOutputStream(batch_file);
             batch_file_out.writeObject(set);
 
