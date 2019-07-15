@@ -532,7 +532,7 @@ public class CNN_Network {
             final int numInputs = 784;
             int outputNum = 10;
             log.info("Build model....");
-            Constants.numberOfLayers = 2;
+            Constants.numberOfLayers = 1;
             Constants.numberOfNeurons = 20;
             Constants.batchSize = 100;
             Constants.avgHFDepth = new double[Constants.numberOfLayers];
