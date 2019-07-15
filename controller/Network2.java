@@ -27,6 +27,7 @@ import utils.Constants;
 import utils._utils;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.pmml.Constant;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
@@ -71,6 +72,7 @@ public class Network2 {
         int outputNum = 10;
         log.info("Build model....");
         Constants.numberOfLayers = 2;
+        Constants.base_hf_layerNumber = 0;
         Constants.numberOfNeurons = 10;
         Constants.batchSize = 100;
         Constants.avgHFDepth = new double[Constants.numberOfLayers];

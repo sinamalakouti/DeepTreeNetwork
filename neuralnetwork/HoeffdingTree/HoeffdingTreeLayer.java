@@ -468,8 +468,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 					// todo: if other layers are dense change follwoing line to
 					// :
 				{
-					System.out.println("We are here !!!!!");
-					System.exit(0);
+
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
 				}
 				// ztemp =
