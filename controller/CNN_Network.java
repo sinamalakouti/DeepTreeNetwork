@@ -238,6 +238,7 @@ public class CNN_Network {
                 .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2, 2)
                         .stride(2, 2)
+
                         .build())
 
                 .layer(4, new DenseLayer.Builder()
@@ -346,11 +347,12 @@ public class CNN_Network {
                 .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
                         .kernelSize(2, 2)
                         .stride(2, 2)
+
                         .build())
 
                 .layer(4,
                         new CustomLayer.Builder().nOut(Constants.numberOfNeurons)
-                                .nIn(100)
+                                .nIn(30)
                                 .activation(Activation.SIGMOID).build())
 //                .layer(5,
 //                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)

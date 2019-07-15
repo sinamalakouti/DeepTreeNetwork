@@ -47,7 +47,7 @@ public class Network2 {
 
     public static void main(String[] args) throws Exception {
 //        DataSetIterator mnistTrain = new MnistDataSetIterator(60000, true, 6);
-s//        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
+//        DataSetIterator mnistTest = new MnistDataSetIterator(10000, false, 6);
 
         kfold_experiment(5);
 

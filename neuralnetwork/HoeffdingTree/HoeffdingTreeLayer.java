@@ -53,6 +53,7 @@ import org.nd4j.linalg.primitives.Pair;
 import neuralnetwork.CustomLayer;
 import utils.Constants;
 import weka.core.Instances;
+import weka.core.SystemInfo;
 
 /**
  * A layer with parameters
@@ -466,7 +467,11 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				if (LayerNumber == Constants.base_hf_layerNumber )
 					// todo: if other layers are dense change follwoing line to
 					// :
+				{
+					System.out.println("We are here !!!!!");
+					System.exit(0);
 					ztemp = z.getColumns(Constants.attributesIndexes.get(neuron)).dup();
+				}
 				// ztemp =
 				// z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
 				else
