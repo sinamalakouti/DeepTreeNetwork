@@ -356,22 +356,22 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 //				 W = W.subi(mu);
 //				 W = W.divi(std);
 
-//		  zprim = W.toDoubleMatrix();
-//		for (int i = 0; i < zprim.length; i++)
-//			for (int j = 0; j < zprim[i].length; j++) {
-//				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
-//					System.out.println("stop stage number four");
-//					
-//					for (int i1 = 0; i1 < zprim.length; i1++)
-//						for (int j1 = 0; j1 < zprim[i].length; j1++) {
-//							System.out.println(zprim[i1][j1]);
-//
-//						}
-//					
-//					System.exit(0);
-//				}
-//				
-//			}
+		double[][] zprim = W.toDoubleMatrix();
+		for (int i = 0; i < zprim.length; i++)
+			for (int j = 0; j < zprim[i].length; j++) {
+				if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+					System.out.println("stop stage number 1");
+
+					for (int i1 = 0; i1 < zprim.length; i1++)
+						for (int j1 = 0; j1 < zprim[i].length; j1++) {
+							System.out.println(zprim[i1][j1]);
+
+						}
+
+					System.exit(0);
+				}
+
+			}
 
 		// Input validation:
 		if (input.rank() != 2 || input.columns() != W.rows()) {
@@ -471,12 +471,27 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				// z.getColumns(Constants.attributesIndexes2.get(LayerNumber).get(neuron)).dup();
 				else
 					ztemp = z.dup();
-				//System.out.println(activationModels);
-				//System.out.println(activationModels.get(neuron));
+
 				INDArray ret = activationModels.get(neuron).getActivation(ztemp, training);
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, ret);
 				// todo : if random class config
 				result = ret.transpose().dup();
+				 zprim = ret.toDoubleMatrix();
+				for (int i = 0; i < zprim.length; i++)
+					for (int j = 0; j < zprim[i].length; j++) {
+						if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+							System.out.println("stop stage number 2");
+
+							for (int i1 = 0; i1 < zprim.length; i1++)
+								for (int j1 = 0; j1 < zprim[i].length; j1++) {
+									System.out.println(zprim[i1][j1]);
+
+								}
+
+							System.exit(0);
+						}
+
+					}
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 				// todo : if we want to pass all the predictions
 				// result = ret.dup();
@@ -501,9 +516,25 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 				workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 				// if we want pass all the predicitons
 				// result = Nd4j.concat(1, result, ret);
+
+				 zprim = ret.toDoubleMatrix();
+				for (int i = 0; i < zprim.length; i++)
+					for (int j = 0; j < zprim[i].length; j++) {
+						if (Double.isNaN(zprim[i][j]) || Double.isInfinite(zprim[i][j])) {
+							System.out.println("stop stage number 3");
+
+							for (int i1 = 0; i1 < zprim.length; i1++)
+								for (int j1 = 0; j1 < zprim[i].length; j1++) {
+									System.out.println(zprim[i1][j1]);
+
+								}
+
+							System.exit(0);
+						}
+
+					}
 				
-//				ztemp.cleanup();
-//				ret.cleanup();
+
 			}
 
 			if (Constants.isSerialzing == true) {
@@ -561,8 +592,7 @@ public class HoeffdingTreeLayer<LayerConfT extends org.deeplearning4j.nn.conf.la
 			applyMask(z);
 		}
 
-		z.cleanup();
-		
+
 		workspaceMgr.leverageTo(ArrayType.ACTIVATIONS, result);
 		
 		return result;

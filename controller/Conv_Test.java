@@ -104,6 +104,7 @@ public class Conv_Test {
 	Constants.numBatches = (int) ((numberTrainExamples) / Constants.batchSize);
 	Constants.setNumClasses(10);
 	Constants.maximumDepth = 20;
+	  Constants.base_hf_layerNumber =2;
 	int outputnum =10;
 	
 	int numInputs =2880;
@@ -182,7 +183,6 @@ public class Conv_Test {
                 .stride(2, 2)
                 .build())
             .layer(2, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
-            		.nIn(100)
                     .nOut(Constants.numberOfNeurons).build())
             .layer(3, new CustomLayer.Builder().activation(new HoeffdingTreeActivationFunction(-1, false, -1))
                     .nOut(Constants.numberOfNeurons).build())
