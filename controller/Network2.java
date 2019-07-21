@@ -82,10 +82,10 @@ public class Network2 {
         Constants.numClasses = 10;
         Constants.maximumDepth = 20;
         Constants.maximumDepth--;
-        Constants.output_file_prefix = "/home/research/result/phase5/9";
+        Constants.output_file_prefix = "/home/research/result/phase5/5";
 
         double learning_rate = 0.1;
-        int feature_ratio = 20;
+        int feature_ratio = 10;
         DataSet mnistTrain;
         DataSet mnistTest;
         //

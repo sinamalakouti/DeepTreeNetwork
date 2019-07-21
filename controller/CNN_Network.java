@@ -358,10 +358,10 @@ public class CNN_Network {
                 .layer(6,
                         new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
                                 .activation(Activation.SIGMOID).build())
-                .layer(7,
-                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
-                                .activation(Activation.SIGMOID).build())
-                .layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+//                .layer(7,
+//                        new CustomLayer.Builder().nIn(Constants.numberOfNeurons).nOut(Constants.numberOfNeurons)
+//                                .activation(Activation.SIGMOID).build())
+                .layer(7, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(10)
                         .activation(Activation.SOFTMAX)
                         .build())
@@ -540,7 +540,7 @@ public class CNN_Network {
             final int numInputs = 800;
             int outputNum = 10;
             log.info("Build model....");
-            Constants.numberOfLayers = 4;
+            Constants.numberOfLayers = 3;
             Constants.numberOfNeurons = 40;
             Constants.batchSize = 100;
             Constants.avgHFDepth = new double[Constants.numberOfLayers];
@@ -550,7 +550,7 @@ public class CNN_Network {
             Constants.numClasses = 10;
             Constants.maximumDepth = 20;
             Constants.maximumDepth--;
-            Constants.output_file_prefix = "/root/research/result/phase5/Barchart_Experiments/CNN/2";
+            Constants.output_file_prefix = "/Users/sina/Documents/JGU_Research/ComplexNeuronsProject/Experiments/phase5/CNN/1";
             Constants.base_hf_layerNumber = 4;
             double learning_rate = 0.1;
             int feature_ratio = 10;
@@ -667,7 +667,7 @@ public class CNN_Network {
 //            Constants.model.getLayer(3).setParam("W", init_weights.get(3));
             Constants.model.getLayer(4).setParam("W", init_weights.get(4));
 //            nothing for 5 and 6 and 7
-            Constants.model.getLayer(8).setParam("W", init_weights.get(5));
+            Constants.model.getLayer(7).setParam("W", init_weights.get(5));
 
 
 //			tmp1.clear();
